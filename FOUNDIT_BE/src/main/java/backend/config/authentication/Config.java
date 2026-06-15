@@ -51,10 +51,13 @@ public class Config {
 	
 	@Value("${frontend.url}")
 	private String frontendUrl;
+
+	@Value("${GOOGLE_CLIENT_ID:}")
+	private String googleClientId;
 	
 	@Bean 
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{	
-		return http
+		HttpSecurity security = http
 				.cors(cors -> cors.configurationSource(corsConfig()))
 				.csrf(csrf -> csrf.disable())
 				.exceptionHandling(exception -> exception.authenticationEntryPoint((request, response, authException) -> {
@@ -120,11 +123,15 @@ public class Config {
 				.addFilterBefore(jwtVerify(), UsernamePasswordAuthenticationFilter.class)
 				.addFilterAfter(maintenanceModeFilter, JwtVerify.class)
 				.addFilterAfter(suspendedAccountFilter, MaintenanceModeFilter.class)
-				.addFilterAt(jwtLoginFilter(), UsernamePasswordAuthenticationFilter.class)
-				.oauth2Login(auth -> 
-					auth.successHandler(
-							new OAuthGoogleHandler(authGoogleHandler, frontendUrl)))
-				.build();
+				.addFilterAt(jwtLoginFilter(), UsernamePasswordAuthenticationFilter.class);
+
+		if (googleClientId != null && !googleClientId.isBlank()) {
+			security.oauth2Login(auth ->
+				auth.successHandler(
+						new OAuthGoogleHandler(authGoogleHandler, frontendUrl)));
+		}
+
+		return security.build();
 	}
 	
 	@Bean
