@@ -1,0 +1,539 @@
+<div class="min-h-screen bg-[#f8fafc] px-4 py-6 md:px-6">
+  <div class="mx-auto max-w-5xl">
+    <!-- Back -->
+    <a
+      routerLink="/freelancer/dashboard"
+      class="mb-4 inline-flex items-center gap-2 text-sm font-medium text-[#4b5563] transition hover:text-[#111827]"
+    >
+      <lucide-angular [img]="icons.ChevronLeft" class="h-4 w-4"></lucide-angular>
+      Back to Dashboard
+    </a>
+
+    <!-- Header -->
+    <div class="mb-6">
+      <h1 class="text-[38px] font-bold leading-tight tracking-[-0.02em] text-[#111827]">
+        {{ isEditMode ? 'Edit Service' : 'Create a New Service' }}
+      </h1>
+      <p class="mt-2 text-sm text-[#6b7280]">
+        {{
+          isEditMode
+            ? 'Update your gig details, pricing, and images.'
+            : 'List your service and start earning from clients worldwide.'
+        }}
+      </p>
+    </div>
+
+    <!-- Error Message Display -->
+    <div
+      *ngIf="errorMessage"
+      class="mb-6 rounded-xl border border-[#fecaca] bg-[#fee2e2] p-4 text-sm text-[#dc2626]"
+    >
+      {{ errorMessage }}
+    </div>
+    <!-- Stepper -->
+    <div class="mb-8 flex items-center">
+      <!-- Step 1 -->
+      <div class="flex items-center">
+        <div
+          class="flex h-7 w-7 items-center justify-center rounded-full border text-xs font-semibold"
+          [ngClass]="
+            currentStep > 1
+              ? 'border-[#16a34a] bg-[#16a34a] text-white'
+              : currentStep === 1
+                ? 'border-[#16a34a] bg-white text-[#16a34a]'
+                : 'border-[#d1d5db] bg-white text-[#9ca3af]'
+          "
+        >
+          <ng-container *ngIf="currentStep > 1; else stepOneNumber">
+            <lucide-angular [img]="icons.Check" class="h-3.5 w-3.5"></lucide-angular>
+          </ng-container>
+          <ng-template #stepOneNumber>1</ng-template>
+        </div>
+        <span
+          class="ml-2 text-sm font-medium"
+          [ngClass]="currentStep >= 1 ? 'text-[#16a34a]' : 'text-[#9ca3af]'"
+        >
+          Overview
+        </span>
+      </div>
+
+      <div
+        class="mx-3 h-0.5 flex-1 rounded-full"
+        [ngClass]="currentStep > 1 ? 'bg-[#22c55e]' : 'bg-[#e5e7eb]'"
+      ></div>
+
+      <!-- Step 2 -->
+      <div class="flex items-center">
+        <div
+          class="flex h-7 w-7 items-center justify-center rounded-full border text-xs font-semibold"
+          [ngClass]="
+            currentStep > 2
+              ? 'border-[#16a34a] bg-[#16a34a] text-white'
+              : currentStep === 2
+                ? 'border-[#16a34a] bg-white text-[#16a34a]'
+                : 'border-[#d1d5db] bg-white text-[#9ca3af]'
+          "
+        >
+          <ng-container *ngIf="currentStep > 2; else stepTwoNumber">
+            <lucide-angular [img]="icons.Check" class="h-3.5 w-3.5"></lucide-angular>
+          </ng-container>
+          <ng-template #stepTwoNumber>2</ng-template>
+        </div>
+        <span
+          class="ml-2 text-sm font-medium"
+          [ngClass]="currentStep >= 2 ? 'text-[#16a34a]' : 'text-[#9ca3af]'"
+        >
+          Pricing
+        </span>
+      </div>
+
+      <div
+        class="mx-3 h-0.5 flex-1 rounded-full"
+        [ngClass]="currentStep > 2 ? 'bg-[#22c55e]' : 'bg-[#e5e7eb]'"
+      ></div>
+
+      <!-- Step 3 -->
+      <div class="flex items-center">
+        <div
+          class="flex h-7 w-7 items-center justify-center rounded-full border text-xs font-semibold"
+          [ngClass]="
+            currentStep === 3
+              ? 'border-[#16a34a] bg-white text-[#16a34a]'
+              : 'border-[#d1d5db] bg-white text-[#9ca3af]'
+          "
+        >
+          3
+        </div>
+        <span
+          class="ml-2 text-sm font-medium"
+          [ngClass]="currentStep >= 3 ? 'text-[#16a34a]' : 'text-[#9ca3af]'"
+        >
+          Publish
+        </span>
+      </div>
+    </div>
+
+    <!-- Card -->
+    <div
+      class="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-[0_2px_8px_rgba(15,23,42,0.04)] md:p-6"
+    >
+      <!-- STEP 1 -->
+      <ng-container *ngIf="currentStep === 1">
+        <h2 class="text-[24px] font-semibold text-[#111827]">Service Overview</h2>
+
+        <div class="mt-6 space-y-5">
+          <div>
+            <label class="mb-2 block text-sm font-medium text-[#374151]">
+              Service Title <span class="text-[#ef4444]">*</span>
+            </label>
+            <input
+              type="text"
+              [(ngModel)]="overview.title"
+              maxlength="80"
+              placeholder="e.g. I will design a modern UI/UX for your app"
+              class="h-12 w-full rounded-xl border border-[#d1d5db] bg-white px-4 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#16a34a]"
+            />
+            <p class="mt-2 text-xs text-[#9ca3af]">{{ overview.title.length }}/80 characters</p>
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-medium text-[#374151]">
+              Category <span class="text-[#ef4444]">*</span>
+            </label>
+            <input
+              type="text"
+              [(ngModel)]="overview.category"
+              class="h-12 w-full rounded-xl border border-[#d1d5db] bg-white px-4 text-sm text-[#111827] outline-none focus:border-[#16a34a]"
+            />
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-medium text-[#374151]">
+              Service Description <span class="text-[#ef4444]">*</span>
+            </label>
+            <textarea
+              rows="6"
+              [(ngModel)]="overview.description"
+              placeholder="Describe your service in detail. What do you offer? What makes you stand out?"
+              class="w-full rounded-xl border border-[#d1d5db] bg-white px-4 py-3 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#16a34a]"
+            ></textarea>
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-medium text-[#374151]">Tags/Keywords</label>
+            <input
+              type="text"
+              [(ngModel)]="overview.tags"
+              placeholder="Add tags separated by commas e.g react, typescript, ui"
+              class="h-12 w-full rounded-xl border border-[#d1d5db] bg-white px-4 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#16a34a]"
+            />
+          </div>
+        </div>
+
+        <div class="mt-8 flex items-center justify-between">
+          <button
+            type="button"
+            class="rounded-xl px-6 py-3 text-sm font-medium text-[#4b5563] transition hover:bg-[#f3f4f6]"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            (click)="nextStep()"
+            [disabled]="isLoading"
+            class="rounded-xl bg-[#16a34a] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#15803d] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {{ isLoading ? 'Please wait...' : 'Continue' }}
+          </button>
+        </div>
+      </ng-container>
+
+      <!-- STEP 2 -->
+      <ng-container *ngIf="currentStep === 2">
+        <h2 class="text-[24px] font-semibold text-[#111827]">Pricing &amp; Packages</h2>
+
+        <div class="mt-6 space-y-4">
+          <!-- Basic -->
+          <div
+            role="button"
+            tabindex="0"
+            (click)="selectPackage('basic')"
+            (keydown.enter)="selectPackage('basic')"
+            (keydown.space)="selectPackage('basic')"
+            [ngClass]="
+              selectedPackage === 'basic'
+                ? 'border-[#16a34a] bg-[#f0fdf4] shadow-[inset_0_0_0_1px_rgba(22,163,74,0.2)]'
+                : 'border-[#e5e7eb]'
+            "
+            class="cursor-pointer rounded-2xl border p-5"
+          >
+            <div class="flex items-center justify-between gap-3">
+              <h3 class="text-xl font-semibold text-[#111827]">Basic</h3>
+            </div>
+
+            <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label class="mb-2 block text-sm font-medium text-[#374151]">Price ($)</label>
+                <input
+                  type="number"
+                  [(ngModel)]="packages.basic.price"
+                  class="h-11 w-full rounded-xl border border-[#d1d5db] px-4 text-sm outline-none focus:border-[#16a34a]"
+                />
+              </div>
+
+              <div>
+                <label class="mb-2 block text-sm font-medium text-[#374151]">Delivery (days)</label>
+                <input
+                  type="number"
+                  [(ngModel)]="packages.basic.delivery"
+                  class="h-11 w-full rounded-xl border border-[#d1d5db] px-4 text-sm outline-none focus:border-[#16a34a]"
+                />
+              </div>
+
+              <div>
+                <label class="mb-2 block text-sm font-medium text-[#374151]">Revisions</label>
+                <input
+                  type="number"
+                  [(ngModel)]="packages.basic.revisions"
+                  class="h-11 w-full rounded-xl border border-[#d1d5db] px-4 text-sm outline-none focus:border-[#16a34a]"
+                />
+              </div>
+
+              <div>
+                <label class="mb-2 block text-sm font-medium text-[#374151]"
+                  >Package Description</label
+                >
+                <input
+                  type="text"
+                  [(ngModel)]="packages.basic.description"
+                  placeholder="Describe Basic package"
+                  class="h-11 w-full rounded-xl border border-[#d1d5db] px-4 text-sm outline-none placeholder:text-[#9ca3af] focus:border-[#16a34a]"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Standard -->
+          <div
+            role="button"
+            tabindex="0"
+            (click)="selectPackage('standard')"
+            (keydown.enter)="selectPackage('standard')"
+            (keydown.space)="selectPackage('standard')"
+            [ngClass]="
+              selectedPackage === 'standard'
+                ? 'border-[#16a34a] bg-[#f0fdf4] shadow-[inset_0_0_0_1px_rgba(22,163,74,0.2)]'
+                : 'border-[#e5e7eb]'
+            "
+            class="relative cursor-pointer rounded-2xl border p-5"
+          >
+            <span
+              class="absolute right-4 top-4 rounded-full bg-[#16a34a] px-3 py-1 text-[11px] font-semibold text-white"
+            >
+              Popular
+            </span>
+
+            <div class="flex items-center justify-between gap-3">
+              <h3 class="text-xl font-semibold text-[#111827]">Standard</h3>
+            </div>
+
+            <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label class="mb-2 block text-sm font-medium text-[#374151]">Price ($)</label>
+                <input
+                  type="number"
+                  [(ngModel)]="packages.standard.price"
+                  class="h-11 w-full rounded-xl border border-[#d1d5db] px-4 text-sm outline-none focus:border-[#16a34a]"
+                />
+              </div>
+
+              <div>
+                <label class="mb-2 block text-sm font-medium text-[#374151]">Delivery (days)</label>
+                <input
+                  type="number"
+                  [(ngModel)]="packages.standard.delivery"
+                  class="h-11 w-full rounded-xl border border-[#d1d5db] px-4 text-sm outline-none focus:border-[#16a34a]"
+                />
+              </div>
+
+              <div>
+                <label class="mb-2 block text-sm font-medium text-[#374151]">Revisions</label>
+                <input
+                  type="number"
+                  [(ngModel)]="packages.standard.revisions"
+                  class="h-11 w-full rounded-xl border border-[#d1d5db] px-4 text-sm outline-none focus:border-[#16a34a]"
+                />
+              </div>
+
+              <div>
+                <label class="mb-2 block text-sm font-medium text-[#374151]"
+                  >Package Description</label
+                >
+                <input
+                  type="text"
+                  [(ngModel)]="packages.standard.description"
+                  placeholder="Describe Standard package"
+                  class="h-11 w-full rounded-xl border border-[#d1d5db] px-4 text-sm outline-none placeholder:text-[#9ca3af] focus:border-[#16a34a]"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Premium -->
+          <div
+            role="button"
+            tabindex="0"
+            (click)="selectPackage('premium')"
+            (keydown.enter)="selectPackage('premium')"
+            (keydown.space)="selectPackage('premium')"
+            [ngClass]="
+              selectedPackage === 'premium'
+                ? 'border-[#16a34a] bg-[#f0fdf4] shadow-[inset_0_0_0_1px_rgba(22,163,74,0.2)]'
+                : 'border-[#e5e7eb]'
+            "
+            class="cursor-pointer rounded-2xl border p-5"
+          >
+            <div class="flex items-center justify-between gap-3">
+              <h3 class="text-xl font-semibold text-[#111827]">Premium</h3>
+            </div>
+
+            <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label class="mb-2 block text-sm font-medium text-[#374151]">Price ($)</label>
+                <input
+                  type="number"
+                  [(ngModel)]="packages.premium.price"
+                  class="h-11 w-full rounded-xl border border-[#d1d5db] px-4 text-sm outline-none focus:border-[#16a34a]"
+                />
+              </div>
+
+              <div>
+                <label class="mb-2 block text-sm font-medium text-[#374151]">Delivery (days)</label>
+                <input
+                  type="number"
+                  [(ngModel)]="packages.premium.delivery"
+                  class="h-11 w-full rounded-xl border border-[#d1d5db] px-4 text-sm outline-none focus:border-[#16a34a]"
+                />
+              </div>
+
+              <div>
+                <label class="mb-2 block text-sm font-medium text-[#374151]">Revisions</label>
+                <input
+                  type="number"
+                  [(ngModel)]="packages.premium.revisions"
+                  class="h-11 w-full rounded-xl border border-[#d1d5db] px-4 text-sm outline-none focus:border-[#16a34a]"
+                />
+              </div>
+
+              <div>
+                <label class="mb-2 block text-sm font-medium text-[#374151]"
+                  >Package Description</label
+                >
+                <input
+                  type="text"
+                  [(ngModel)]="packages.premium.description"
+                  placeholder="Describe Premium package"
+                  class="h-11 w-full rounded-xl border border-[#d1d5db] px-4 text-sm outline-none placeholder:text-[#9ca3af] focus:border-[#16a34a]"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-8 flex items-center justify-between">
+          <button
+            type="button"
+            (click)="prevStep()"
+            class="rounded-xl border border-[#d1d5db] bg-white px-6 py-3 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+          >
+            Back
+          </button>
+
+          <button
+            type="button"
+            (click)="nextStep()"
+            class="rounded-xl bg-[#16a34a] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#15803d]"
+          >
+            Continue
+          </button>
+        </div>
+      </ng-container>
+
+      <!-- STEP 3 -->
+      <ng-container *ngIf="currentStep === 3">
+        <h2 class="text-[24px] font-semibold text-[#111827]">Upload &amp; Publish</h2>
+
+        <div class="mt-6 space-y-6">
+          <!-- Cover -->
+          <div>
+            <label class="mb-2 block text-sm font-medium text-[#374151]">
+              Cover Image <span class="text-[#ef4444]">*</span>
+            </label>
+
+            <div
+              class="flex min-h-60 flex-col items-center justify-center rounded-2xl border border-dashed border-[#d1d5db] bg-[#fcfcfd] px-6 py-8 text-center"
+            >
+              <div class="flex h-16 w-16 items-center justify-center rounded-full bg-[#dcfce7]">
+                <lucide-angular
+                  [img]="icons.FileImage"
+                  class="h-8 w-8 text-[#16a34a]"
+                ></lucide-angular>
+              </div>
+
+              <p class="mt-4 text-lg font-semibold text-[#111827]">Upload Cover Image</p>
+              <p class="mt-2 text-sm text-[#6b7280]">
+                PNG, JPG up to 10MB • Recommended 1280x769px
+              </p>
+
+              <button
+                type="button"
+                (click)="mainImageInput.click()"
+                class="mt-5 rounded-xl bg-[#16a34a] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#15803d]"
+              >
+                Browse Files
+              </button>
+
+              <input
+                #mainImageInput
+                type="file"
+                accept="image/*"
+                (change)="onMainImageSelected($event)"
+                class="hidden"
+              />
+
+              <p *ngIf="mainImage" class="mt-3 text-xs text-[#16a34a]">
+                Selected: {{ mainImage.name }}
+              </p>
+              <img
+                *ngIf="!mainImage && mainImagePreview"
+                [src]="mainImagePreview"
+                alt="Current cover"
+                class="mt-4 h-28 w-44 rounded-xl object-cover"
+              />
+            </div>
+          </div>
+
+          <!-- Gallery -->
+          <div>
+            <label class="mb-3 block text-sm font-medium text-[#374151]">Gallery (Optional)</label>
+
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div
+                *ngFor="let slot of coverImageSlots; let index = index"
+                class="relative flex h-28 items-center justify-center overflow-hidden rounded-xl border border-dashed border-[#d1d5db] bg-[#fcfcfd] text-sm text-[#9ca3af]"
+                [ngClass]="coverImagePreviews[index] ? 'border-solid border-[#bbf7d0]' : ''"
+              >
+                <ng-container *ngIf="coverImagePreviews[index]; else emptyCoverSlot">
+                  <img
+                    [src]="coverImagePreviews[index]"
+                    [alt]="'Cover image ' + (index + 1)"
+                    class="h-full w-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    (click)="removeCoverImage(index)"
+                    class="absolute right-2 top-2 rounded-full bg-white/90 px-2 py-1 text-xs font-semibold text-[#dc2626] shadow-sm transition hover:bg-white"
+                  >
+                    Remove
+                  </button>
+                </ng-container>
+
+                <ng-template #emptyCoverSlot>
+                  <button
+                    type="button"
+                    (click)="coverInput.click()"
+                    [disabled]="coverImages.length >= coverImageSlots.length"
+                    class="flex h-full w-full items-center justify-center text-sm text-[#9ca3af] transition hover:text-[#16a34a] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    + Add Image
+                  </button>
+                </ng-template>
+              </div>
+            </div>
+
+            <input
+              #coverInput
+              type="file"
+              accept="image/*"
+              multiple
+              (change)="onCoverImagesSelected($event)"
+              class="hidden"
+            />
+
+            <p class="mt-2 text-xs text-[#16a34a]">
+              {{ coverImages.length }}/{{ coverImageSlots.length }} cover image(s) selected
+            </p>
+          </div>
+
+          <!-- Notice -->
+          <div class="rounded-2xl border border-[#86efac] bg-[#ecfdf3] px-5 py-4">
+            <p class="text-base font-semibold text-[#111827]">Ready to Publish?</p>
+            <p class="mt-1 text-sm text-[#6b7280]">
+              Your service listing will be reviewed and go live within a few hours.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-8 flex items-center justify-between">
+          <button
+            type="button"
+            (click)="prevStep()"
+            class="rounded-xl border border-[#d1d5db] bg-white px-6 py-3 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+          >
+            Back
+          </button>
+
+          <button
+            type="button"
+            (click)="nextStep()"
+            [disabled]="isLoading"
+            class="rounded-xl bg-[#16a34a] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#15803d]"
+          >
+            {{ isLoading ? 'Saving...' : isEditMode ? 'Save Changes' : 'Publish Service' }}
+          </button>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>

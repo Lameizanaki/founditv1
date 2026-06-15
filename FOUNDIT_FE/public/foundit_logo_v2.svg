@@ -1,0 +1,29 @@
+<svg width="100%" viewBox="0 0 680 280" role="img" xmlns="http://www.w3.org/2000/svg" style="">
+  <title style="fill:rgb(0, 0, 0);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">FoundIT Logo</title>
+  <desc style="fill:rgb(0, 0, 0);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">FoundIT logo with IT inside Angular shield</desc>
+
+  <defs>
+    <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#DD0031"/>
+      <stop offset="100%" stop-color="#A80025"/>
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(340,140)" style="fill:rgb(0, 0, 0);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
+
+    <!-- Shield -->
+    <g transform="translate(-130,-52)" style="fill:rgb(0, 0, 0);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
+      <polygon points="52,0 104,18 104,52 52,104 0,52 0,18" fill="url(#sg)" style="stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+      <!-- IT text inside shield -->
+      <text x="52" y="66" text-anchor="middle" font-family="'Helvetica Neue',Arial,sans-serif" font-size="38" font-weight="700" fill="white" letter-spacing="-1" style="fill:rgb(255, 255, 255);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Helvetica Neue&quot;, Arial, sans-serif;font-size:38px;font-weight:700;text-anchor:middle;dominant-baseline:auto">IT</text>
+    </g>
+
+    <!-- FoundIT wordmark -->
+    <text x="2" y="64" text-anchor="middle" font-family="'Helvetica Neue',Arial,sans-serif" font-size="36" font-weight="700" letter-spacing="0.5" fill="#1a1a2e" style="fill:rgb(26, 26, 46);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Helvetica Neue&quot;, Arial, sans-serif;font-size:36px;font-weight:700;text-anchor:middle;dominant-baseline:auto">Found</text>
+    <text x="92" y="64" text-anchor="start" font-family="'Helvetica Neue',Arial,sans-serif" font-size="36" font-weight="300" fill="#DD0031" style="fill:rgb(221, 0, 49);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Helvetica Neue&quot;, Arial, sans-serif;font-size:36px;font-weight:300;text-anchor:start;dominant-baseline:auto">IT</text>
+
+    <!-- Tagline -->
+    <text x="18" y="88" text-anchor="middle" font-family="'Helvetica Neue',Arial,sans-serif" font-size="10.5" font-weight="400" letter-spacing="4" fill="#999" style="fill:rgb(153, 153, 153);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Helvetica Neue&quot;, Arial, sans-serif;font-size:10.5px;font-weight:400;text-anchor:middle;dominant-baseline:auto">PROFESSIONAL GROUP</text>
+
+  </g>
+</svg>

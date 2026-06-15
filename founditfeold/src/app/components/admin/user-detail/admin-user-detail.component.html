@@ -1,0 +1,249 @@
+<div class="min-h-screen bg-[#f8fafc] p-4 md:p-6">
+  <div class="mx-auto max-w-7xl">
+    <a
+      routerLink="/admin/users"
+      class="mb-5 inline-flex items-center gap-2 text-sm font-medium text-[#374151] transition hover:text-black"
+    >
+      <span>&lt;</span>
+      Back to Users
+    </a>
+
+    <div *ngIf="loading" class="rounded-lg border border-[#e5e7eb] bg-white p-5 text-sm text-[#6b7280]">
+      Loading user detail...
+    </div>
+
+    <div *ngIf="!loading && errorMessage" class="rounded-lg border border-red-200 bg-red-50 p-5 text-sm text-red-700">
+      {{ errorMessage }}
+    </div>
+
+    <ng-container *ngIf="!errorMessage && user">
+      <div class="rounded-lg border border-[#e5e7eb] bg-white p-5">
+        <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div class="flex gap-4">
+            <div class="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-[#e5e7eb] text-lg font-semibold text-[#374151]">
+              <img
+                *ngIf="avatarSrc(user) as avatar"
+                [src]="avatar"
+                [alt]="user.username"
+                class="h-full w-full object-cover"
+              />
+              <span *ngIf="!avatarSrc(user)">
+                {{ user.username.charAt(0).toUpperCase() }}
+              </span>
+            </div>
+
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <h1 class="text-[22px] font-semibold leading-tight text-[#111827]">
+                  {{ user.username }}
+                </h1>
+                <span class="rounded-full bg-[#eef2ff] px-2.5 py-1 text-xs font-medium text-[#4338ca]">
+                  {{ user.role }}
+                </span>
+                <span
+                  class="rounded-full px-2.5 py-1 text-xs font-medium"
+                  [ngClass]="
+                    user.status === 'ACTIVE'
+                      ? 'bg-[#dcfce7] text-[#16a34a]'
+                      : user.status === 'PENDING'
+                        ? 'bg-[#fef3c7] text-[#b45309]'
+                        : 'bg-[#fee2e2] text-[#dc2626]'
+                  "
+                >
+                  {{ user.status }}
+                </span>
+              </div>
+
+              <p class="mt-2 text-sm text-[#6b7280]">{{ user.email }}</p>
+              <p class="mt-2 text-sm text-[#6b7280]">{{ user.country || 'Location not set' }}</p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <button type="button" (click)="setStatus('ACTIVE')" class="rounded-lg border border-[#bbf7d0] px-4 py-2 text-sm font-medium text-[#16a34a] hover:bg-[#f0fdf4]">Activate</button>
+            <button type="button" (click)="setStatus('PENDING')" class="rounded-lg border border-[#fde68a] px-4 py-2 text-sm font-medium text-[#b45309] hover:bg-[#fffbeb]">Pending</button>
+            <button type="button" (click)="setStatus('SUSPENDED')" class="rounded-lg border border-[#fecaca] px-4 py-2 text-sm font-medium text-[#dc2626] hover:bg-[#fef2f2]">Suspend</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div class="rounded-lg border border-[#e5e7eb] bg-white p-5">
+          <p class="text-sm text-[#6b7280]">Total Earned</p>
+          <h3 class="mt-4 text-[24px] font-semibold text-[#111827]">{{ money(user.totalEarned) }}</h3>
+        </div>
+        <div class="rounded-lg border border-[#e5e7eb] bg-white p-5">
+          <p class="text-sm text-[#6b7280]">Total Spent</p>
+          <h3 class="mt-4 text-[24px] font-semibold text-[#111827]">{{ money(user.totalSpent) }}</h3>
+        </div>
+        <div class="rounded-lg border border-[#e5e7eb] bg-white p-5">
+          <p class="text-sm text-[#6b7280]">Projects</p>
+          <h3 class="mt-4 text-[24px] font-semibold text-[#111827]">{{ user.projectCount }}</h3>
+        </div>
+        <div class="rounded-lg border border-[#e5e7eb] bg-white p-5">
+          <p class="text-sm text-[#6b7280]">E-KYC Status</p>
+          <h3 class="mt-4 text-[18px] font-semibold text-[#111827]">{{ user.ekycStatus || 'Not submitted' }}</h3>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <div class="inline-flex rounded-lg bg-[#f3f4f6] p-1">
+          <button
+            *ngFor="let tab of tabs"
+            type="button"
+            (click)="selectedTab = tab"
+            [ngClass]="selectedTab === tab ? 'bg-white text-[#111827] shadow-sm' : 'text-[#374151]'"
+            class="rounded-md px-4 py-2 text-sm font-medium transition"
+          >
+            {{ tab }}
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="selectedTab === 'Overview'" class="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <section class="rounded-lg border border-[#e5e7eb] bg-white p-5">
+          <h2 class="text-lg font-semibold text-[#111827]">Account Information</h2>
+          <div class="mt-5 space-y-4 text-sm">
+            <div class="flex justify-between gap-4"><span class="text-[#6b7280]">User ID</span><span class="font-medium text-[#111827]">{{ user.id }}</span></div>
+            <div class="flex justify-between gap-4"><span class="text-[#6b7280]">Email</span><span class="font-medium text-[#111827]">{{ user.email }}</span></div>
+            <div class="flex justify-between gap-4"><span class="text-[#6b7280]">Role</span><span class="font-medium text-[#111827]">{{ user.role }}</span></div>
+            <div class="flex justify-between gap-4"><span class="text-[#6b7280]">Status</span><span class="font-medium text-[#111827]">{{ user.status }}</span></div>
+          </div>
+        </section>
+
+        <section class="rounded-lg border border-[#e5e7eb] bg-white p-5">
+          <h2 class="text-lg font-semibold text-[#111827]">Profile</h2>
+          <p class="mt-5 text-sm leading-7 text-[#6b7280]">{{ profileText(user) }}</p>
+        </section>
+      </div>
+
+      <div *ngIf="selectedTab === 'Freelancer'" class="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <section class="rounded-lg border border-[#e5e7eb] bg-white p-5">
+          <h2 class="text-lg font-semibold text-[#111827]">Freelancer Details</h2>
+          <div class="mt-5 space-y-4 text-sm">
+            <div class="flex justify-between gap-4"><span class="text-[#6b7280]">Job Title</span><span class="font-medium text-[#111827]">{{ user.jobTitle || 'Not set' }}</span></div>
+            <div class="flex justify-between gap-4"><span class="text-[#6b7280]">Experience</span><span class="font-medium text-[#111827]">{{ user.yearExperience || 0 }} years</span></div>
+            <div class="flex justify-between gap-4"><span class="text-[#6b7280]">Rating</span><span class="font-medium text-[#111827]">{{ user.rating || 0 }}</span></div>
+            <div class="flex justify-between gap-4"><span class="text-[#6b7280]">Gigs</span><span class="font-medium text-[#111827]">{{ user.gigCount }}</span></div>
+            <div class="flex justify-between gap-4"><span class="text-[#6b7280]">Hire Requests</span><span class="font-medium text-[#111827]">{{ user.hireRequestCount }}</span></div>
+            <div class="flex justify-between gap-4"><span class="text-[#6b7280]">Total Earned</span><span class="font-medium text-[#16a34a]">{{ money(user.totalEarned) }}</span></div>
+          </div>
+        </section>
+
+        <section class="rounded-lg border border-[#e5e7eb] bg-white p-5">
+          <h2 class="text-lg font-semibold text-[#111827]">Skills</h2>
+          <div class="mt-5 flex flex-wrap gap-2">
+            <span *ngFor="let skill of user.skills" class="rounded-lg border border-[#e5e7eb] bg-[#f9fafb] px-3 py-1.5 text-xs text-[#374151]">{{ skill }}</span>
+            <span *ngIf="!user.skills.length" class="text-sm text-[#6b7280]">No skills added.</span>
+          </div>
+        </section>
+
+        <section class="rounded-lg border border-[#e5e7eb] bg-white p-5 xl:col-span-2">
+          <h2 class="text-lg font-semibold text-[#111827]">Recent Gigs</h2>
+          <div class="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2">
+            <div *ngFor="let item of user.recentGigs" class="rounded-lg border border-[#e5e7eb] bg-[#f9fafb] p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <p class="text-sm font-medium text-[#111827]">{{ item.title }}</p>
+                  <p class="mt-1 text-xs text-[#6b7280]">Gig ID {{ item.id }}</p>
+                </div>
+                <span class="shrink-0 rounded-full bg-[#eef2ff] px-2 py-1 text-xs font-medium text-[#4338ca]">{{ item.status || 'UNKNOWN' }}</span>
+              </div>
+              <p class="mt-3 text-sm font-semibold text-[#16a34a]">{{ activityAmount(item) }}</p>
+            </div>
+            <p *ngIf="!user.recentGigs.length" class="text-sm text-[#6b7280]">No gig records found.</p>
+          </div>
+        </section>
+      </div>
+
+      <div *ngIf="selectedTab === 'Client'" class="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <section class="rounded-lg border border-[#e5e7eb] bg-white p-5">
+          <h2 class="text-lg font-semibold text-[#111827]">Client Activity</h2>
+          <div class="mt-5 space-y-4 text-sm">
+            <div class="flex justify-between gap-4"><span class="text-[#6b7280]">Projects</span><span class="font-medium text-[#111827]">{{ user.projectCount }}</span></div>
+            <div class="flex justify-between gap-4"><span class="text-[#6b7280]">Hire Requests</span><span class="font-medium text-[#111827]">{{ user.hireRequestCount }}</span></div>
+            <div class="flex justify-between gap-4"><span class="text-[#6b7280]">Total Spent</span><span class="font-medium text-[#2563eb]">{{ money(user.totalSpent) }}</span></div>
+          </div>
+        </section>
+
+        <section class="rounded-lg border border-[#e5e7eb] bg-white p-5">
+          <h2 class="text-lg font-semibold text-[#111827]">Client Profile</h2>
+          <p class="mt-5 text-sm leading-7 text-[#6b7280]">{{ profileText(user) }}</p>
+        </section>
+      </div>
+
+      <section *ngIf="selectedTab === 'Activity Log'" class="mt-4 rounded-lg border border-[#e5e7eb] bg-white p-5">
+        <h2 class="text-lg font-semibold text-[#111827]">Activity</h2>
+        <div class="mt-5 grid grid-cols-1 gap-4 xl:grid-cols-2">
+          <div class="rounded-lg bg-[#f9fafb] p-4">
+            <h3 class="text-sm font-semibold text-[#111827]">Recent Projects</h3>
+            <div class="mt-3 space-y-3">
+              <div *ngFor="let item of user.recentProjects" class="rounded-lg border border-[#e5e7eb] bg-white p-3">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <p class="text-sm font-medium text-[#111827]">{{ item.title }}</p>
+                    <p class="mt-1 text-xs text-[#6b7280]">{{ item.relatedUser || 'No related user' }} - {{ activityDate(item) }}</p>
+                  </div>
+                  <span class="shrink-0 rounded-full bg-[#eef2ff] px-2 py-1 text-xs font-medium text-[#4338ca]">{{ item.status || 'UNKNOWN' }}</span>
+                </div>
+                <p class="mt-2 text-sm font-semibold text-[#16a34a]">{{ activityAmount(item) }}</p>
+              </div>
+              <p *ngIf="!user.recentProjects.length" class="text-sm text-[#6b7280]">No project records found.</p>
+            </div>
+          </div>
+
+          <div class="rounded-lg bg-[#f9fafb] p-4">
+            <h3 class="text-sm font-semibold text-[#111827]">Recent Hire Requests</h3>
+            <div class="mt-3 space-y-3">
+              <div *ngFor="let item of user.recentHireRequests" class="rounded-lg border border-[#e5e7eb] bg-white p-3">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <p class="text-sm font-medium text-[#111827]">{{ item.title }}</p>
+                    <p class="mt-1 text-xs text-[#6b7280]">{{ item.relatedUser || 'No related user' }} - {{ activityDate(item) }}</p>
+                  </div>
+                  <span class="shrink-0 rounded-full bg-[#fef3c7] px-2 py-1 text-xs font-medium text-[#b45309]">{{ item.status || 'UNKNOWN' }}</span>
+                </div>
+                <p class="mt-2 text-sm font-semibold text-[#16a34a]">{{ activityAmount(item) }}</p>
+              </div>
+              <p *ngIf="!user.recentHireRequests.length" class="text-sm text-[#6b7280]">No hire request records found.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section *ngIf="selectedTab === 'Financial'" class="mt-4 rounded-lg border border-[#e5e7eb] bg-white p-5">
+        <h2 class="text-lg font-semibold text-[#111827]">Financial Summary</h2>
+        <div class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div class="rounded-lg bg-[#f9fafb] p-4">
+            <p class="text-sm text-[#6b7280]">Paid Freelancer Earnings</p>
+            <p class="mt-2 text-xl font-semibold text-[#16a34a]">{{ money(user.totalEarned) }}</p>
+          </div>
+          <div class="rounded-lg bg-[#f9fafb] p-4">
+            <p class="text-sm text-[#6b7280]">Paid Client Spending</p>
+            <p class="mt-2 text-xl font-semibold text-[#2563eb]">{{ money(user.totalSpent) }}</p>
+          </div>
+        </div>
+        <div class="mt-5 space-y-3">
+          <div *ngFor="let item of user.recentPayments" class="rounded-lg border border-[#e5e7eb] bg-[#f9fafb] p-4">
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p class="text-sm font-medium text-[#111827]">{{ item.title }}</p>
+                <p class="mt-1 text-xs text-[#6b7280]">{{ item.relatedUser || 'No transaction reference' }} - {{ activityDate(item) }}</p>
+              </div>
+              <div class="sm:text-right">
+                <p class="text-sm font-semibold text-[#16a34a]">{{ activityAmount(item) }}</p>
+                <p class="mt-1 text-xs font-medium text-[#6b7280]">{{ item.status || 'UNKNOWN' }}</p>
+              </div>
+            </div>
+          </div>
+          <p *ngIf="!user.recentPayments.length" class="text-sm text-[#6b7280]">No payment records found.</p>
+        </div>
+      </section>
+
+      <section *ngIf="user.ekycFailureReason" class="mt-4 rounded-lg border border-[#fed7aa] bg-[#fff7ed] p-5">
+        <h2 class="text-lg font-semibold text-[#9a3412]">E-KYC Failure Reason</h2>
+        <p class="mt-3 text-sm leading-6 text-[#9a3412]">{{ user.ekycFailureReason }}</p>
+      </section>
+    </ng-container>
+  </div>
+</div>

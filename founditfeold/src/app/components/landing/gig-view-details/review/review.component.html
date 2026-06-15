@@ -1,0 +1,71 @@
+<div class="w-full max-w-7xl mt-12 mx-auto">
+  <div
+    class="rounded-[22px] border border-[#d9dce3] bg-white px-8 py-8 shadow-[0_2px_6px_rgba(15,23,42,0.06)]"
+  >
+    <h2 class="mb-7 text-[22px] font-semibold text-[#1f2937]">
+      {{ title }}
+    </h2>
+
+    <div>
+      <div
+        *ngFor="let review of visibleReviews; let last = last; trackBy: trackByIndex"
+        class="py-6"
+        [ngClass]="{ 'border-b border-[#eef1f4]': !last }"
+      >
+        <div class="flex items-start gap-4">
+          <div
+            class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#dde2e8] bg-white"
+          >
+            <img
+              *ngIf="review.avatarUrl"
+              [src]="review.avatarUrl"
+              [alt]="review.name"
+              class="h-full w-full object-cover"
+            />
+          </div>
+
+          <div class="min-w-0 flex-1">
+            <div class="mb-2 flex flex-wrap items-center gap-2 text-[15px]">
+              <span class="font-semibold text-[#1f2937]">{{ review.name }}</span>
+              <span class="text-[#9aa3b2]">•</span>
+              <span class="text-[#7b8698]">{{ review.timeAgo }}</span>
+            </div>
+
+            <div class="mb-3 flex flex-wrap items-center gap-2 text-[15px]">
+              <div class="flex items-center gap-0.5">
+                <lucide-angular
+                  *ngFor="let _ of [].constructor(review.rating)"
+                  [img]="icons.Star"
+                  class="h-4 w-4 fill-[#f4b400] text-[#f4b400]"
+                ></lucide-angular>
+              </div>
+
+              <span class="text-[#5f6b7a]"> for {{ review.service }} </span>
+            </div>
+
+            <p class="max-w-none text-[15px] leading-8 text-[#5f6b7a]">
+              {{ review.comment }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="reviews.length > initialVisibleCount" class="pt-8 text-center">
+      <button
+        type="button"
+        (click)="toggleShowMore()"
+        class="inline-flex items-center gap-2 text-[16px] font-semibold text-[#9333ea] transition hover:text-[#7e22ce]"
+      >
+        <span>
+          {{ showAll ? 'Show Less' : 'Show More (' + remainingCount + ' more)' }}
+        </span>
+
+        <lucide-angular
+          [img]="showAll ? icons.ChevronUp : icons.ChevronDown"
+          class="h-4 w-4"
+        ></lucide-angular>
+      </button>
+    </div>
+  </div>
+</div>

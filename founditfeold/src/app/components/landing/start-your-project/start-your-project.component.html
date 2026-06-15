@@ -1,0 +1,37 @@
+<section class="bg-[#0f8f3a] py-20">
+    <div class="mx-auto full px-6 text-center text-white">
+
+        <!-- Heading -->
+        <h2 class="text-[36px] font-extrabold leading-tight md:text-[44px]">
+        Ready to start your next project?
+        </h2>
+
+        <!-- Description -->
+        <p class="mx-auto mt-6 xl:w-full lg:w-full md:w-full w-sm text-[18px] leading-8 text-[#d7f5df]">
+        Join thousands of users who have successfully collaborated on our freelance marketplace.
+        Browse top freelancers or create your professional profile today.
+        </p>
+
+        <!-- Buttons -->
+        <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+
+        <!-- Hire Freelancers -->
+        <button
+            (click)="selectOption('hire')"
+            [class]="selectedOption === 'hire' ? 'rounded-xl bg-white px-7 py-3 text-[16px] font-semibold text-[#0f8f3a] shadow-md transition hover:shadow-lg cursor-pointer' : 'rounded-xl border border-white px-7 py-3 text-[16px] font-semibold text-white transition hover:bg-white hover:text-[#0f8f3a] cursor-pointer'"
+        >
+            Hire Freelancers
+        </button>
+
+        <!-- Become a Freelancer -->
+        <button
+            (click)="selectOption('freelancer')"
+            [class]="selectedOption === 'freelancer' ? 'rounded-xl bg-white px-7 py-3 text-[16px] font-semibold text-[#0f8f3a] shadow-md transition hover:shadow-lg cursor-pointer' : 'rounded-xl border border-white px-7 py-3 text-[16px] font-semibold text-white transition hover:bg-white hover:text-[#0f8f3a] cursor-pointer'"
+        >
+            Become a Freelancer
+        </button>
+
+        </div>
+
+    </div>
+</section>

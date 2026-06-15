@@ -1,0 +1,130 @@
+<div class="h-screen bg-[#f8f8f8] px-6 py-6">
+  <div class="mx-auto flex w-full flex-col items-center overflow-y-auto">
+    <div class="mb-16 mt-2 p-12">
+      <img
+        src="/assets/images/logo.png"
+        alt="FOUND IT"
+        class="h-8 w-full object-contain"
+      />
+    </div>
+
+    <div
+      class="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[#e9f8ef]"
+    >
+      <lucide-angular
+        [img]="icons.Sparkles"
+        class="h-6 w-6 text-[#0db14b]"
+      ></lucide-angular>
+    </div>
+
+    <p class="mb-2 text-[24px] font-medium text-[#111827]">
+      Nice! Your feed is tuned.
+    </p>
+
+    <h1 class="mb-10 text-center text-[18px] font-normal text-[#64748b]">
+      Now let's set you up so you can start right away
+    </h1>
+
+    <div class="mb-14 grid w-full max-w-2xl grid-cols-1 gap-5 sm:grid-cols-2">
+      <button
+        type="button"
+        (click)="selectRole(RoleEnum.CLIENT)"
+        class="relative w-full rounded-2xl border bg-white p-5 text-left transition cursor-pointer"
+        [ngClass]="
+          selectedRole === RoleEnum.CLIENT
+            ? 'border-[#16a34a] shadow-sm'
+            : 'border-[#d9dde3] hover:border-[#bfc6cf]'
+        "
+      >
+        <div
+          *ngIf="selectedRole === RoleEnum.CLIENT"
+          class="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-[#16a34a]"
+        >
+          <lucide-angular
+            [img]="icons.Check"
+            class="h-4 w-4 text-white"
+          ></lucide-angular>
+        </div>
+
+        <div
+          class="mb-5 flex h-10 w-10 items-center justify-center rounded-xl bg-[#edf3ff]"
+        >
+          <lucide-angular
+            [img]="icons.BriefcaseBusiness"
+            class="h-5 w-5 text-[#2563eb]"
+          ></lucide-angular>
+        </div>
+
+        <h2 class="mb-2 text-[16px] font-medium text-[#111827]">
+          I want to hire
+        </h2>
+
+        <p class="mb-4 text-[14px] leading-6 text-[#475569]">
+          Find and collaborate<br />
+          with top talent
+        </p>
+
+        <span class="text-[13px] text-[#94a3b8]">5 quick steps</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="selectRole(RoleEnum.FREELANCER)"
+        class="relative w-full rounded-2xl border bg-white p-5 text-left transition cursor-pointer"
+        [ngClass]="
+          selectedRole === RoleEnum.FREELANCER
+            ? 'border-[#16a34a] shadow-sm'
+            : 'border-[#d9dde3] hover:border-[#bfc6cf]'
+        "
+      >
+        <div
+          *ngIf="selectedRole === RoleEnum.FREELANCER"
+          class="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-[#16a34a]"
+        >
+          <lucide-angular
+            [img]="icons.Check"
+            class="h-4 w-4 text-white"
+          ></lucide-angular>
+        </div>
+
+        <div
+          class="mb-5 flex h-10 w-10 items-center justify-center rounded-xl bg-[#eaf8ee]"
+        >
+          <lucide-angular
+            [img]="icons.CodeXml"
+            class="h-5 w-5 text-[#16a34a]"
+          ></lucide-angular>
+        </div>
+
+        <h2 class="mb-2 text-[16px] font-medium text-[#111827]">
+          I want to freelance
+        </h2>
+
+        <p class="mb-4 text-[14px] leading-6 text-[#475569]">
+          Offer services and<br />
+          build your profile
+        </p>
+
+        <span class="text-[13px] text-[#94a3b8]">6 quick steps</span>
+      </button>
+    </div>
+
+    <button
+      type="button"
+      (click)="continueSetup()"
+      [disabled]="!selectedRole"
+      class="mb-4 h-11 w-full max-w-xs rounded-lg px-6 text-[14px] font-medium text-white transition"
+      [ngClass]="
+        selectedRole
+          ? 'bg-[#00A63E] hover:bg-[#77ce8d] cursor-pointer'
+          : 'cursor-not-allowed bg-[#b7e6c2]'
+      "
+    >
+      Continue to setup
+    </button>
+
+    <p class="text-center text-[14px] text-[#7c8898]">
+      Takes about 2 minutes · You can finish later
+    </p>
+  </div>
+</div>

@@ -1,0 +1,103 @@
+<div class="w-full max-w-7xl mt-6 mx-auto">
+  <div class="rounded-2xl border border-[#d9dce3] bg-white p-5 shadow-sm">
+    <!-- Header -->
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <h2 class="text-[28px] font-semibold leading-none text-[#1f2937]">Active Gigs</h2>
+        <p class="mt-2 text-sm text-[#9ca3af]">Services offered by this freelancer</p>
+      </div>
+
+      <button
+        type="button"
+        (click)="createGig()"
+        class="inline-flex items-center gap-2 rounded-xl bg-[#16a34a] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#15803d]"
+      >
+        <lucide-angular [img]="icons.CirclePlus" class="h-4 w-4"></lucide-angular>
+        Sign In to Hire
+      </button>
+    </div>
+
+    <!-- Gig Grid -->
+    <div
+      *ngIf="normalizedGigs.length === 0"
+      class="mt-6 rounded-xl border border-dashed border-[#d1d5db] p-8 text-center text-[#6b7280]"
+    >
+      No active gigs available.
+    </div>
+
+    <div class="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-2">
+      <div
+        *ngFor="let gig of normalizedGigs"
+        class="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white"
+      >
+        <!-- Image -->
+        <div class="relative h-47.5 w-full overflow-hidden">
+          <img
+            *ngIf="gig.image"
+            [src]="gig.image"
+            [alt]="gig.title"
+            class="h-full w-full object-cover"
+          />
+
+          <div
+            *ngIf="!gig.image"
+            class="grid h-full w-full place-items-center bg-[#f3f4f6] text-sm font-medium text-[#9ca3af]"
+          >
+            No image
+          </div>
+
+          <span
+            class="absolute left-3 top-3 rounded-md px-2.5 py-1 text-xs font-semibold"
+            [ngClass]="getStatusClasses(gig.status)"
+          >
+            {{ gig.status }}
+          </span>
+        </div>
+
+        <!-- Content -->
+        <div class="p-4">
+          <h3 class="line-clamp-2 min-h-14 text-[22px] font-semibold leading-7 text-[#374151]">
+            {{ gig.title }}
+          </h3>
+
+          <div class="mt-3 flex items-center gap-2 text-sm text-[#9ca3af]">
+            <span class="inline-flex items-center gap-1 font-semibold text-[#f59e0b]">
+              <lucide-angular [img]="icons.Star" class="h-4 w-4 fill-current"></lucide-angular>
+              {{ gig.rating }}
+            </span>
+
+            <span>({{ gig.reviews }})</span>
+
+            <span class="text-[#d1d5db]">•</span>
+
+            <span>{{ gig.orders }} orders</span>
+          </div>
+
+          <div class="mt-6 flex items-end justify-between">
+            <div class="inline-flex items-center gap-1 text-sm text-[#9ca3af]">
+              <lucide-angular [img]="icons.Clock3" class="h-4 w-4"></lucide-angular>
+              {{ gig.days }} days
+            </div>
+
+            <div class="text-right">
+              <p class="text-sm text-[#9ca3af]">Starting at</p>
+              <p class="text-[32px] font-bold leading-none text-[#374151]">${{ gig.price }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-8 border-t border-[#e5e7eb] pt-6 text-center">
+      <button
+        type="button"
+        (click)="viewAllGigs()"
+        class="inline-flex items-center gap-2 text-[17px] font-semibold text-[#22c55e] transition hover:text-[#16a34a]"
+      >
+        View All Gigs
+        <lucide-angular [img]="icons.ChevronRight" class="h-4 w-4"></lucide-angular>
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,19 @@
+<div class="w-full max-w-7xl mt-6 mx-auto">
+  <div
+    class="rounded-[22px] border border-[#d9dce3] bg-white px-8 py-9 shadow-[0_2px_6px_rgba(15,23,42,0.06)]"
+  >
+    <h2 class="mb-5 text-[18px] font-semibold text-[#1f2937]">
+      {{ title }}
+    </h2>
+
+    <p *ngIf="displayDescription; else emptyAbout" class="max-w-none text-[17px] leading-[1.8] text-[#5f6b7a]">
+      {{ displayDescription }}
+    </p>
+
+    <ng-template #emptyAbout>
+      <p class="rounded-2xl border border-dashed border-[#d1d5db] bg-[#f9fafb] px-5 py-4 text-[15px] text-[#6b7280]">
+        This freelancer has not added an about section yet.
+      </p>
+    </ng-template>
+  </div>
+</div>

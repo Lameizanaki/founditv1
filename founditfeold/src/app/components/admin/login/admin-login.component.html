@@ -1,0 +1,74 @@
+<div class="min-h-screen bg-[#f8fafc] px-6 py-8">
+  <div class="mx-auto flex min-h-[calc(100vh-4rem)] max-w-md items-center">
+    <section class="w-full rounded-lg border border-[#e5e7eb] bg-white p-6 shadow-sm">
+      <div class="mb-6 text-center">
+        <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#ecfdf5]">
+          <lucide-angular [img]="icons.ShieldCheck" class="h-6 w-6 text-[#16a34a]"></lucide-angular>
+        </div>
+        <h1 class="text-2xl font-semibold text-[#111827]">Admin Login</h1>
+        <p class="mt-2 text-sm text-[#6b7280]">Sign in with an administrator account.</p>
+      </div>
+
+      <div
+        *ngIf="errorMessage"
+        class="mb-5 rounded-lg border border-[#fecaca] bg-[#fef2f2] px-4 py-3 text-sm font-medium text-[#dc2626]"
+      >
+        {{ errorMessage }}
+      </div>
+
+      <form (ngSubmit)="onSubmit()" class="space-y-5">
+        <div>
+          <label for="adminEmail" class="mb-2 block text-sm font-medium text-[#374151]">Email</label>
+          <input
+            id="adminEmail"
+            name="email"
+            type="email"
+            [(ngModel)]="email"
+            required
+            autocomplete="email"
+            class="h-11 w-full rounded-lg border border-[#e5e7eb] bg-[#f9fafb] px-4 text-sm text-[#111827] outline-none focus:border-[#16a34a] focus:bg-white"
+            placeholder="admin@example.com"
+          />
+        </div>
+
+        <div>
+          <label for="adminPassword" class="mb-2 block text-sm font-medium text-[#374151]">Password</label>
+          <div class="relative">
+            <input
+              id="adminPassword"
+              name="password"
+              [type]="showPassword ? 'text' : 'password'"
+              [(ngModel)]="password"
+              required
+              autocomplete="current-password"
+              class="h-11 w-full rounded-lg border border-[#e5e7eb] bg-[#f9fafb] px-4 pr-11 text-sm text-[#111827] outline-none focus:border-[#16a34a] focus:bg-white"
+              placeholder="Enter password"
+            />
+
+            <button
+              type="button"
+              (click)="togglePasswordVisibility()"
+              class="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-[#6b7280] hover:bg-[#f3f4f6]"
+              title="Show password"
+            >
+              <lucide-angular [img]="icons.Eye" class="h-4 w-4"></lucide-angular>
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="isLoading"
+          class="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#16a34a] px-4 text-sm font-semibold text-white transition hover:bg-[#15803d] disabled:cursor-not-allowed disabled:opacity-70"
+        >
+          <lucide-angular [img]="icons.LockKeyhole" class="h-4 w-4"></lucide-angular>
+          {{ isLoading ? 'Signing in...' : 'Sign in as Admin' }}
+        </button>
+      </form>
+
+      <a routerLink="/" class="mt-5 block text-center text-sm font-medium text-[#6b7280] hover:text-[#111827]">
+        Back to site
+      </a>
+    </section>
+  </div>
+</div>

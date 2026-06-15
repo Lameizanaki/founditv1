@@ -1,0 +1,414 @@
+<div class="min-h-screen bg-[#f8fafc] pl-16 pr-16 mt-12">
+  <div class="mx-auto max-w-full px-8">
+    <!-- Header -->
+    <div class="mt-3 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div>
+        <h1 class="text-[32px] font-semibold text-[#111827]">My Orders</h1>
+        <p class="mt-1 text-sm text-[#6b7280]">
+          Track all your hired projects and freelancer engagements
+        </p>
+      </div>
+
+      <button
+        type="button"
+        [routerLink]="['/client/browse-freelancers']"
+        class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-4 py-3 text-sm font-medium text-white transition hover:bg-[#1d4ed8]"
+      >
+        <lucide-angular [img]="icons.UserRoundSearch" class="h-4 w-4"></lucide-angular>
+        Find Freelancers
+      </button>
+    </div>
+
+    <!-- Stats -->
+    <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div class="rounded-2xl border border-[#e5e7eb] bg-white p-5">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f3f4f6]">
+          <lucide-angular
+            [img]="icons.BriefcaseBusiness"
+            class="h-5 w-5 text-[#6b7280]"
+          ></lucide-angular>
+        </div>
+        <p class="mt-5 text-3xl font-semibold text-[#111827]">{{ totalOrders }}</p>
+        <p class="mt-1 text-sm font-medium text-[#111827]">Total Orders</p>
+        <p class="mt-1 text-xs text-[#9ca3af]">All time</p>
+      </div>
+
+      <div class="rounded-2xl border border-[#e5e7eb] bg-white p-5">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#eef2ff]">
+          <lucide-angular [img]="icons.Clock3" class="h-5 w-5 text-[#2563eb]"></lucide-angular>
+        </div>
+        <p class="mt-5 text-3xl font-semibold text-[#111827]">{{ activeOrders }}</p>
+        <p class="mt-1 text-sm font-medium text-[#111827]">Active</p>
+        <p class="mt-1 text-xs text-[#9ca3af]">Currently running</p>
+      </div>
+
+      <div class="rounded-2xl border border-[#e5e7eb] bg-white p-5">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ecfdf3]">
+          <lucide-angular
+            [img]="icons.CircleCheckBig"
+            class="h-5 w-5 text-[#22c55e]"
+          ></lucide-angular>
+        </div>
+        <p class="mt-5 text-3xl font-semibold text-[#111827]">{{ completedOrders }}</p>
+        <p class="mt-1 text-sm font-medium text-[#111827]">Completed</p>
+        <p class="mt-1 text-xs text-[#9ca3af]">Successfully delivered</p>
+      </div>
+
+      <div class="rounded-2xl border border-[#e5e7eb] bg-white p-5">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ecfdf3]">
+          <lucide-angular
+            [img]="icons.BadgeDollarSign"
+            class="h-5 w-5 text-[#22c55e]"
+          ></lucide-angular>
+        </div>
+        <p class="mt-5 text-3xl font-semibold text-[#111827]">${{ totalSpent }}</p>
+        <p class="mt-1 text-sm font-medium text-[#111827]">Total Spent</p>
+        <p class="mt-1 text-xs text-[#9ca3af]">Excluding cancellations</p>
+      </div>
+    </div>
+
+    <!-- Search + Filter -->
+    <div class="mt-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <div class="relative w-full lg:max-w-xl">
+        <lucide-angular
+          [img]="icons.Search"
+          class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-[#9ca3af]"
+        ></lucide-angular>
+
+        <input
+          [(ngModel)]="searchTerm"
+          type="text"
+          placeholder="Search by title, freelancer, or category..."
+          class="h-11 w-full rounded-xl border border-[#e5e7eb] bg-white py-2 pr-4 pl-10 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#2563eb]"
+        />
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        <button
+          type="button"
+          (click)="selectFilter('all')"
+          [ngClass]="
+            selectedFilter === 'all'
+              ? 'bg-[#2563eb] text-white'
+              : 'border border-[#e5e7eb] bg-white text-[#4b5563] hover:bg-[#f9fafb]'
+          "
+          class="rounded-xl px-4 py-2.5 text-sm font-medium transition"
+        >
+          All {{ getFilterCount('all') }}
+        </button>
+
+        <button
+          type="button"
+          (click)="selectFilter('pending')"
+          [ngClass]="
+            selectedFilter === 'pending'
+              ? 'bg-[#2563eb] text-white'
+              : 'border border-[#e5e7eb] bg-white text-[#4b5563] hover:bg-[#f9fafb]'
+          "
+          class="rounded-xl px-4 py-2.5 text-sm font-medium transition"
+        >
+          Pending {{ getFilterCount('pending') }}
+        </button>
+
+        <button
+          type="button"
+          (click)="selectFilter('accepted')"
+          [ngClass]="
+            selectedFilter === 'accepted'
+              ? 'bg-[#2563eb] text-white'
+              : 'border border-[#e5e7eb] bg-white text-[#4b5563] hover:bg-[#f9fafb]'
+          "
+          class="rounded-xl px-4 py-2.5 text-sm font-medium transition"
+        >
+          Accepted {{ getFilterCount('accepted') }}
+        </button>
+
+        <button
+          type="button"
+          (click)="selectFilter('rejected')"
+          [ngClass]="
+            selectedFilter === 'rejected'
+              ? 'bg-[#2563eb] text-white'
+              : 'border border-[#e5e7eb] bg-white text-[#4b5563] hover:bg-[#f9fafb]'
+          "
+          class="rounded-xl px-4 py-2.5 text-sm font-medium transition"
+        >
+          Rejected {{ getFilterCount('rejected') }}
+        </button>
+
+        <button
+          type="button"
+          (click)="selectFilter('completed')"
+          [ngClass]="
+            selectedFilter === 'completed'
+              ? 'bg-[#2563eb] text-white'
+              : 'border border-[#e5e7eb] bg-white text-[#4b5563] hover:bg-[#f9fafb]'
+          "
+          class="rounded-xl px-4 py-2.5 text-sm font-medium transition"
+        >
+          Completed
+        </button>
+
+        <button
+          type="button"
+          (click)="selectFilter('cancelled')"
+          [ngClass]="
+            selectedFilter === 'cancelled'
+              ? 'bg-[#2563eb] text-white'
+              : 'border border-[#e5e7eb] bg-white text-[#4b5563] hover:bg-[#f9fafb]'
+          "
+          class="rounded-xl px-4 py-2.5 text-sm font-medium transition"
+        >
+          Cancelled {{ getFilterCount('cancelled') }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Orders List -->
+    <div class="mt-5 space-y-4">
+      <div
+        *ngIf="isLoading"
+        class="rounded-2xl border border-[#e5e7eb] bg-white p-6 text-sm text-[#6b7280]"
+      >
+        Loading your orders...
+      </div>
+
+      <div
+        *ngIf="loadError"
+        class="rounded-2xl border border-red-200 bg-red-50 p-6 text-sm text-red-700"
+      >
+        {{ loadError }}
+      </div>
+
+      <ng-container *ngIf="!isLoading && !loadError">
+      <ng-container *ngIf="filteredOrders.length; else emptyState">
+        <div
+          *ngFor="let order of filteredOrders; trackBy: trackByOrderId"
+          class="rounded-2xl border border-[#e5e7eb] bg-white p-5 transition hover:shadow-sm"
+        >
+          <div class="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
+            <div class="flex gap-4">
+              <!-- Avatar -->
+              <a
+                *ngIf="getFreelancerProfileLink(order) as profileLink; else plainAvatar"
+                [routerLink]="profileLink"
+                class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#e5e7eb] bg-[#f3f4f6] text-sm font-semibold text-[#374151] transition hover:border-[#2563eb]"
+              >
+                <img
+                  *ngIf="order.freelancerAvatar; else linkedInitials"
+                  [src]="order.freelancerAvatar"
+                  [alt]="order.freelancerName"
+                  class="h-full w-full object-cover"
+                />
+                <ng-template #linkedInitials>
+                  {{ getInitials(order.freelancerName) }}
+                </ng-template>
+              </a>
+              <ng-template #plainAvatar>
+                <div
+                  class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#e5e7eb] bg-[#f3f4f6] text-sm font-semibold text-[#374151]"
+                >
+                  <img
+                    *ngIf="order.freelancerAvatar; else plainInitials"
+                    [src]="order.freelancerAvatar"
+                    [alt]="order.freelancerName"
+                    class="h-full w-full object-cover"
+                  />
+                  <ng-template #plainInitials>
+                    {{ getInitials(order.freelancerName) }}
+                  </ng-template>
+                </div>
+              </ng-template>
+
+              <div class="flex-1">
+                <div class="flex flex-wrap items-center gap-2">
+                  <h3 class="text-lg font-semibold text-[#111827]">{{ order.title }}</h3>
+                  <span
+                    class="rounded-full px-3 py-1 text-xs font-medium"
+                    [ngClass]="getStatusClasses(order.status)"
+                  >
+                    {{ getStatusLabel(order.status) }}
+                  </span>
+                  <span
+                    *ngIf="order.isPaid"
+                    class="inline-flex items-center gap-1 rounded-full bg-[#dcfce7] px-3 py-1 text-xs font-semibold text-[#15803d]"
+                  >
+                    <lucide-angular [img]="icons.CheckCircle2" class="h-3.5 w-3.5"></lucide-angular>
+                    Paid
+                  </span>
+                </div>
+
+                <div class="mt-2 flex flex-wrap items-center gap-3 text-xs text-[#6b7280]">
+                  <span class="inline-flex items-center gap-1">
+                    <lucide-angular [img]="icons.User" class="h-3.5 w-3.5"></lucide-angular>
+                    <a
+                      *ngIf="getFreelancerProfileLink(order) as profileLink; else plainFreelancerName"
+                      [routerLink]="profileLink"
+                      class="font-medium text-[#2563eb] transition hover:text-[#1d4ed8]"
+                    >
+                      {{ order.freelancerName }}
+                    </a>
+                    <ng-template #plainFreelancerName>
+                      <span class="text-[#2563eb]">{{ order.freelancerName }}</span>
+                    </ng-template>
+                  </span>
+
+                  <span class="inline-flex items-center gap-1 text-[#f59e0b]">
+                    <lucide-angular
+                      [img]="icons.Star"
+                      class="h-3.5 w-3.5 fill-current"
+                    ></lucide-angular>
+                    {{ order.rating }}
+                  </span>
+
+                  <span class="inline-flex items-center gap-1">
+                    <lucide-angular [img]="icons.CalendarDays" class="h-3.5 w-3.5"></lucide-angular>
+                    Due {{ formatDueDate(order.dueDate) }}
+                  </span>
+
+                  <span class="inline-flex items-center gap-1">
+                    <lucide-angular
+                      [img]="icons.BadgeDollarSign"
+                      class="h-3.5 w-3.5"
+                    ></lucide-angular>
+                    ${{ order.price }}
+                  </span>
+
+                  <span
+                    class="rounded-md bg-[#f3f4f6] px-2 py-1 text-[10px] font-medium text-[#6b7280]"
+                  >
+                    {{ order.category }}
+                  </span>
+                </div>
+
+                <!-- Progress -->
+                <div
+                  *ngIf="
+                    order.status !== 'completed' &&
+                    order.status !== 'cancelled' &&
+                    order.status !== 'rejected'
+                  "
+                  class="mt-4"
+                >
+                  <div class="mb-2 flex items-center justify-between">
+                    <span class="text-xs font-medium text-[#6b7280]">Progress</span>
+                    <span class="text-xs font-semibold text-[#2563eb]"
+                      >{{ order.progress || 0 }}%</span
+                    >
+                  </div>
+
+                  <div class="h-2 w-full overflow-hidden rounded-full bg-[#e5e7eb]">
+                    <div
+                      class="h-full rounded-full bg-[#2563eb] transition-all duration-300"
+                      [style.width.%]="order.progress || 0"
+                    ></div>
+                  </div>
+                </div>
+
+                <!-- Review for completed -->
+                <div
+                  *ngIf="order.status === 'completed'"
+                  class="mt-3 flex items-center gap-1 text-[#facc15]"
+                >
+                  <ng-container *ngIf="!order.reviewLeft; else reviewedState">
+                    <lucide-angular
+                      [img]="icons.Star"
+                      class="h-4 w-4 fill-current"
+                    ></lucide-angular>
+                    <lucide-angular
+                      [img]="icons.Star"
+                      class="h-4 w-4 fill-current"
+                    ></lucide-angular>
+                    <lucide-angular
+                      [img]="icons.Star"
+                      class="h-4 w-4 fill-current"
+                    ></lucide-angular>
+                    <lucide-angular
+                      [img]="icons.Star"
+                      class="h-4 w-4 fill-current"
+                    ></lucide-angular>
+                    <lucide-angular
+                      [img]="icons.Star"
+                      class="h-4 w-4 fill-current"
+                    ></lucide-angular>
+
+                    <button
+                      type="button"
+                      (click)="leaveReview(order)"
+                      class="ml-2 text-xs text-[#9ca3af] transition hover:text-[#111827]"
+                    >
+                      Leave a review
+                    </button>
+                  </ng-container>
+
+                  <ng-template #reviewedState>
+                    <span class="text-xs font-medium text-[#16a34a]">Review submitted</span>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex shrink-0 flex-col gap-3 xl:w-[190px]">
+              <a
+                *ngIf="getViewLink(order) as viewLink; else unavailableView"
+                [routerLink]="viewLink"
+                class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#1d4ed8]"
+              >
+                <lucide-angular [img]="icons.Eye" class="h-4 w-4"></lucide-angular>
+                View
+              </a>
+              <ng-template #unavailableView>
+                <button
+                  type="button"
+                  disabled
+                  class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-4 py-2.5 text-sm font-medium text-white opacity-50"
+                >
+                  <lucide-angular [img]="icons.Eye" class="h-4 w-4"></lucide-angular>
+                  View
+                </button>
+              </ng-template>
+
+              <a
+                *ngIf="getChatLink(order) as chatLink; else unavailableMessage"
+                [routerLink]="chatLink"
+                class="inline-flex items-center justify-center gap-2 rounded-xl border border-[#e5e7eb] bg-white px-4 py-2.5 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+              >
+                <lucide-angular [img]="icons.MessageCircle" class="h-4 w-4"></lucide-angular>
+                Message
+              </a>
+              <ng-template #unavailableMessage>
+                <button
+                  type="button"
+                  disabled
+                  class="inline-flex items-center justify-center gap-2 rounded-xl border border-[#e5e7eb] bg-white px-4 py-2.5 text-sm font-medium text-[#374151] opacity-50"
+                >
+                  <lucide-angular [img]="icons.MessageCircle" class="h-4 w-4"></lucide-angular>
+                  Message
+                </button>
+              </ng-template>
+
+              <button
+                *ngIf="order.status === 'revision-requested'"
+                type="button"
+                class="rounded-xl border border-[#e5e7eb] bg-[#fff7ed] px-4 py-2.5 text-sm font-medium text-[#c2410c]"
+              >
+                Waiting for Update
+              </button>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #emptyState>
+        <div class="rounded-2xl border border-dashed border-[#d1d5db] bg-white p-10 text-center">
+          <h3 class="text-lg font-semibold text-[#111827]">No orders found</h3>
+          <p class="mt-2 text-sm text-[#6b7280]">
+            Try changing the filter or searching with another keyword.
+          </p>
+        </div>
+      </ng-template>
+      </ng-container>
+    </div>
+  </div>
+</div>

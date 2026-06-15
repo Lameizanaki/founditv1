@@ -1,0 +1,46 @@
+<section class="bg-[#f7f7f7] py-24 pl-16 pr-16">
+    <div class="mx-auto w-full px-6">
+        <!-- Heading -->
+        <div class="text-center max-w-xl mx-auto">
+            <h2 class="text-[36px] font-extrabold text-[#0f172a]" data-aos="zoom-in-up">
+                How FoundIt Works
+            </h2>
+
+            <p class="mt-4 text-[18px] text-[#6b7280] leading-8" data-aos="fade-up-right">
+                Getting your project done is simpler than ever. Hire top freelancers in three easy steps.
+            </p>
+        </div>
+
+        <!-- Steps -->
+        <div class="mt-20 grid md:grid-cols-3 gap-12 text-center">
+            <div *ngFor="let step of steps" data-aos="zoom-out-up" class="relative" >
+                <!-- Icon -->
+                <div
+                class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#16a34a] text-white shadow-lg">
+
+                <lucide-icon
+                    [img]="step.icon"
+                    class="h-8 w-8">
+                </lucide-icon>
+
+                </div>
+
+                <!-- Step Label -->
+                <p class="mt-6 text-[13px] font-semibold tracking-[2px] text-[#16a34a]">
+                    {{ step.step }}
+                </p>
+
+                <!-- Title -->
+                <h3 class="mt-2 text-[20px] font-bold text-[#111827]">
+                    {{ step.title }}
+                </h3>
+
+                <!-- Description -->
+                <p class="mt-3 text-[16px] text-[#6b7280] leading-7">
+                    {{ step.description }}
+                </p>
+
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,24 @@
+<div class="w-full max-w-7xl mt-12 mx-auto">
+  <div
+    class="rounded-[22px] border border-[#d9dce3] bg-white px-8 py-9 shadow-[0_2px_6px_rgba(15,23,42,0.06)]"
+  >
+    <h2 class="mb-5 text-[18px] font-semibold text-[#1f2937]">
+      {{ title }}
+    </h2>
+
+    <div *ngIf="displaySkills.length > 0; else emptySkills" class="flex flex-wrap gap-3">
+      <span
+        *ngFor="let skill of displaySkills"
+        class="rounded-xl border border-[#e5e7eb] bg-[#f3f4f6] px-4 py-2.5 text-[14px] font-medium leading-none text-[#374151]"
+      >
+        {{ skill }}
+      </span>
+    </div>
+
+    <ng-template #emptySkills>
+      <p class="rounded-2xl border border-dashed border-[#d1d5db] bg-[#f9fafb] px-5 py-4 text-[15px] text-[#6b7280]">
+        This freelancer has not added skills yet.
+      </p>
+    </ng-template>
+  </div>
+</div>

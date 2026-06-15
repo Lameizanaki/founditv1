@@ -1,0 +1,975 @@
+<div class="min-h-screen bg-[#f8f8f8] p-3 md:p-5">
+  <div class="mx-auto" [ngClass]="isDirectRoomRoute ? 'max-w-[900px]' : 'max-w-7xl'">
+    <a
+      *ngIf="!isDirectRoomRoute"
+      routerLink="/freelancer/dashboard"
+      class="mb-3 inline-flex items-center gap-2 text-sm text-[#6b7280] transition hover:text-[#111827]"
+    >
+      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M15 18L9 12L15 6"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+      Back
+    </a>
+
+    <div
+      *ngIf="!isDirectRoomRoute"
+      class="mb-4 flex flex-col gap-2 md:flex-row md:items-end md:justify-between"
+    >
+      <div>
+        <h1 class="text-[20px] font-semibold text-[#111827]">Messages</h1>
+        <p class="mt-1 text-sm text-[#6b7280]">
+          Chat directly with your clients and keep the thread updated.
+        </p>
+      </div>
+
+      <p *ngIf="selectedChat" class="text-sm text-[#6b7280]">Room {{ selectedChat.roomId }}</p>
+    </div>
+
+    <div
+      *ngIf="errorMessage"
+      class="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700"
+    >
+      {{ errorMessage }}
+    </div>
+
+    <div
+      class="grid grid-cols-1"
+      [ngClass]="isDirectRoomRoute ? 'gap-0' : 'gap-5 lg:grid-cols-[360px_minmax(0,1fr)]'"
+    >
+      <div *ngIf="!isDirectRoomRoute" class="rounded-2xl border border-[#e5e7eb] bg-white p-3">
+        <div class="mb-4 flex items-center gap-2 rounded-xl bg-[#f3f4f6] px-3 py-3">
+          <svg class="h-4 w-4 text-[#9ca3af]" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M21 21L16.65 16.65M11 18C14.866 18 18 14.866 18 11C18 7.13401 14.866 4 11 4C7.13401 4 4 7.13401 4 11C4 14.866 7.13401 18 11 18Z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            placeholder="Search messages..."
+            class="w-full bg-transparent text-sm text-[#111827] placeholder:text-[#9ca3af] outline-none"
+          />
+        </div>
+
+        <div
+          *ngIf="loadingConversations"
+          class="rounded-xl bg-[#f9fafb] px-4 py-8 text-center text-sm text-[#6b7280]"
+        >
+          Loading conversations...
+        </div>
+
+        <div
+          *ngIf="!loadingConversations && filteredConversations.length === 0"
+          class="rounded-xl border border-dashed border-[#e5e7eb] px-4 py-8 text-center text-sm text-[#6b7280]"
+        >
+          No conversations found.
+        </div>
+
+        <div *ngIf="!loadingConversations && filteredConversations.length > 0" class="space-y-2">
+          <button
+            *ngFor="let chat of filteredConversations; trackBy: trackByConversationId"
+            type="button"
+            (click)="selectChat(chat)"
+            class="flex w-full items-start gap-3 rounded-2xl px-3 py-3 text-left transition"
+            [ngClass]="
+              selectedChatId === chat.id
+                ? 'border border-[#cfe9de] bg-[#ecf8f2]'
+                : 'border border-transparent hover:bg-[#f9fafb]'
+            "
+          >
+            <div class="relative shrink-0">
+              <ng-container *ngIf="chat.avatar; else initialAvatar">
+                <img
+                  [src]="chat.avatar"
+                  [alt]="chat.name"
+                  class="h-12 w-12 rounded-full object-cover"
+                />
+              </ng-container>
+
+              <ng-template #initialAvatar>
+                <div
+                  class="flex h-12 w-12 items-center justify-center rounded-full bg-[#e5e7eb] text-sm font-semibold text-[#4b5563]"
+                >
+                  {{ chat.initial }}
+                </div>
+              </ng-template>
+
+              <span
+                *ngIf="chat.online"
+                class="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-[#22c55e]"
+              ></span>
+            </div>
+
+            <div class="min-w-0 flex-1">
+              <div class="flex items-start justify-between gap-2">
+                <p class="truncate text-[15px] font-medium text-[#111827]">{{ chat.name }}</p>
+                <span class="shrink-0 text-xs text-[#6b7280]">{{ chat.time }}</span>
+              </div>
+
+              <p class="mt-1 line-clamp-2 text-sm text-[#6b7280]">{{ chat.preview }}</p>
+
+              <p *ngIf="chat.unreadCount > 0" class="mt-2 text-xs font-medium text-[#16a34a]">
+                {{ chat.unreadCount }} unread
+              </p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <ng-container *ngIf="selectedChat as currentChat; else noConversation">
+        <div class="relative min-w-0 rounded-2xl border border-[#e5e7eb] bg-white">
+          <div class="flex items-center justify-between border-b border-[#e5e7eb] px-4 py-3">
+            <div class="flex items-center gap-3">
+              <div class="relative">
+                <ng-container *ngIf="currentChat.avatar; else currentInitialAvatar">
+                  <img
+                    [src]="currentChat.avatar"
+                    [alt]="currentChat.name"
+                    class="h-12 w-12 rounded-full object-cover"
+                  />
+                </ng-container>
+
+                <ng-template #currentInitialAvatar>
+                  <div
+                    class="flex h-12 w-12 items-center justify-center rounded-full bg-[#e5e7eb] text-sm font-semibold text-[#4b5563]"
+                  >
+                    {{ currentChat.initial }}
+                  </div>
+                </ng-template>
+
+                <span
+                  *ngIf="currentChat.online"
+                  class="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-[#22c55e]"
+                ></span>
+              </div>
+
+              <div class="min-w-0">
+                <h2 class="text-[18px] font-medium text-[#111827]">{{ currentChat.name }}</h2>
+                <p class="truncate text-sm text-[#6b7280]">
+                  Chat for this project: {{ currentChat.project }}
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <button
+                (click)="openClientProfile()"
+                class="rounded-full p-2 text-[#6b7280] transition hover:bg-[#f9fafb] hover:text-[#111827]"
+                type="button"
+                title="View profile"
+              >
+                <lucide-angular [img]="icons.UserRound" class="h-5 w-5"></lucide-angular>
+              </button>
+
+              <button
+                class="rounded-full p-2 text-[#6b7280] transition hover:bg-[#f9fafb] hover:text-[#111827]"
+                type="button"
+              >
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M23 7L16 12L23 17V7Z"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <rect
+                    x="1"
+                    y="5"
+                    width="15"
+                    height="14"
+                    rx="2"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <form
+            *ngIf="showDeliveryForm"
+            class="border-b border-[#f3f4f6] bg-[#fbfdff] px-4 py-4"
+            (ngSubmit)="submitDelivery()"
+          >
+            <label class="block">
+              <span class="text-xs font-medium text-[#6b7280]">Delivery message</span>
+              <textarea
+                [(ngModel)]="deliveryForm.deliveryMessage"
+                name="deliveryMessage"
+                rows="3"
+                class="mt-1 w-full resize-none rounded-lg border border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#111827] outline-none focus:border-[#7fdcc0]"
+              ></textarea>
+            </label>
+
+            <div class="mt-3 flex flex-wrap items-center gap-2">
+              <input
+                #deliveryFileInput
+                type="file"
+                accept=".zip,application/zip,application/x-zip-compressed"
+                class="hidden"
+                (change)="onDeliveryFileSelected($event)"
+              />
+              <button
+                type="button"
+                (click)="deliveryFileInput.click()"
+                class="inline-flex h-9 items-center gap-2 rounded-lg border border-[#d1d5db] bg-white px-3 text-xs font-medium text-[#374151]"
+              >
+                <lucide-angular [img]="icons.FileUp" class="h-4 w-4"></lucide-angular>
+                Source ZIP
+              </button>
+              <span
+                *ngIf="deliveryForm.deliveryFile"
+                class="max-w-[16rem] truncate text-xs text-[#4b5563]"
+              >
+                {{ deliveryForm.deliveryFile.name }}
+              </span>
+              <button
+                *ngIf="deliveryForm.deliveryFile"
+                type="button"
+                (click)="clearDeliveryFile()"
+                class="text-xs font-medium text-[#dc2626]"
+              >
+                Remove
+              </button>
+              <span class="flex-1"></span>
+              <button
+                type="button"
+                (click)="toggleDeliveryForm()"
+                class="h-9 rounded-lg px-3 text-xs font-medium text-[#6b7280] hover:bg-[#f3f4f6]"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                [disabled]="savingDelivery"
+                class="h-9 rounded-lg bg-[#111827] px-4 text-xs font-medium text-white disabled:opacity-50"
+              >
+                {{ savingDelivery ? 'Submitting...' : 'Submit delivery' }}
+              </button>
+            </div>
+          </form>
+
+          <div
+            #messagesScroll
+            class="space-y-6 overflow-x-hidden overflow-y-auto px-4 py-5"
+            [ngClass]="isDirectRoomRoute ? 'h-80' : 'h-96'"
+          >
+            <div
+              *ngIf="loadingMessages"
+              class="rounded-xl bg-[#f9fafb] px-4 py-10 text-center text-sm text-[#6b7280]"
+            >
+              Loading messages...
+            </div>
+
+            <div
+              *ngIf="!loadingMessages && messages.length === 0"
+              class="rounded-xl border border-dashed border-[#e5e7eb] px-4 py-10 text-center text-sm text-[#6b7280]"
+            >
+              No messages in this conversation yet.
+            </div>
+
+            <ng-container *ngIf="!loadingMessages && messages.length > 0">
+              <div
+                *ngFor="let message of messages; trackBy: trackByMessageId"
+                class="flex gap-3"
+                [ngClass]="message.isMine ? 'justify-end' : 'items-start'"
+              >
+                <ng-container *ngIf="!message.isMine">
+                  <ng-container *ngIf="message.avatar; else incomingInitial">
+                    <img
+                      [src]="message.avatar"
+                      [alt]="message.senderName"
+                      class="h-10 w-10 rounded-full object-cover"
+                    />
+                  </ng-container>
+
+                  <ng-template #incomingInitial>
+                    <div
+                      class="flex h-10 w-10 items-center justify-center rounded-full bg-[#e5e7eb] text-sm font-semibold text-[#4b5563]"
+                    >
+                      {{ message.initial }}
+                    </div>
+                  </ng-template>
+                </ng-container>
+
+                <div
+                  class="min-w-0 max-w-[85%] sm:max-w-[70%]"
+                  [ngClass]="message.isMine ? 'text-right' : ''"
+                >
+                  <p
+                    class="mb-1 text-[15px] font-medium"
+                    [ngClass]="message.isMine ? 'text-[#6b7280]' : 'text-[#111827]'"
+                  >
+                    {{ message.isMine ? 'You' : message.senderName }}
+                  </p>
+
+                  <div
+                    class="rounded-2xl px-4 py-3 text-sm"
+                    [ngClass]="
+                      message.isFormalNotice ||
+                      message.isHireRequest ||
+                      message.isPriceProposal ||
+                      message.isProjectRequirementProposal ||
+                      message.isProjectDelivery ||
+                      message.isProjectRevisionRequest
+                        ? 'bg-transparent p-0 text-[#111827]'
+                        : message.isMine
+                          ? 'inline-block rounded-tr-md bg-[#11c585] text-white'
+                          : 'rounded-tl-md bg-[#2563eb] text-white'
+                    "
+                  >
+                    <ng-container
+                      *ngIf="message.isProjectDelivery; else revisionOrRegularMessage"
+                    >
+                      <div
+                        class="w-full max-w-[30rem] rounded-xl border border-sky-200 bg-sky-50/70 px-4 py-3 text-left shadow-sm"
+                      >
+                        <div class="flex items-start justify-between gap-3">
+                          <div>
+                            <div
+                              class="text-[11px] font-semibold uppercase tracking-wide text-[#6b7280]"
+                            >
+                              Delivery
+                            </div>
+                            <div class="mt-1 text-sm font-semibold text-[#111827]">
+                              Submitted for client review
+                            </div>
+                          </div>
+                          <span
+                            class="rounded-full bg-sky-100 px-2.5 py-1 text-[11px] font-semibold capitalize text-sky-700"
+                          >
+                            {{ getProjectDeliveryStatusLabel(message) }}
+                          </span>
+                        </div>
+
+                        <p class="mt-3 text-sm leading-5 text-[#4b5563]">
+                          {{ getMessageDisplayText(message) }}
+                        </p>
+
+                        <button
+                          *ngIf="message.hireRequestDetails?.['deliveryFileName']"
+                          type="button"
+                          (click)="downloadProjectDelivery(message)"
+                          class="mt-3 inline-flex max-w-full items-center gap-2 rounded-lg border border-sky-200 bg-white px-3 py-2 text-xs font-medium text-sky-700 transition hover:bg-sky-50"
+                        >
+                          <lucide-angular [img]="icons.FileUp" class="h-4 w-4 shrink-0"></lucide-angular>
+                          <span class="truncate">
+                            {{ getDeliveryDownloadLabel(message) }}
+                          </span>
+                        </button>
+
+                        <div *ngIf="canAcceptDeliveryRevision(message)" class="mt-3 flex flex-wrap gap-2">
+                          <button
+                            type="button"
+                            (click)="acceptProjectRevision(message)"
+                            class="inline-flex items-center justify-center rounded-xl bg-[#16a34a] px-3 py-2 text-xs font-medium text-white transition hover:bg-[#15803d]"
+                          >
+                            Accept Revision
+                          </button>
+                        </div>
+                      </div>
+                    </ng-container>
+
+                    <ng-template #revisionOrRegularMessage>
+                      <ng-container
+                        *ngIf="message.isProjectRevisionRequest; else requirementOrRegularMessage"
+                      >
+                        <div
+                          class="w-full max-w-[30rem] rounded-xl border border-amber-200 bg-amber-50/70 px-4 py-3 text-left shadow-sm"
+                        >
+                          <div class="flex items-start justify-between gap-3">
+                            <div>
+                              <div
+                                class="text-[11px] font-semibold uppercase tracking-wide text-[#6b7280]"
+                              >
+                                Revision request
+                              </div>
+                              <div class="mt-1 text-sm font-semibold text-[#111827]">
+                                Client needs adjustment
+                              </div>
+                            </div>
+                            <span
+                              class="rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-semibold capitalize text-amber-700"
+                            >
+                              {{ getProjectRevisionStatusLabel(message) }}
+                            </span>
+                          </div>
+
+                          <div
+                            class="mt-3 grid gap-2 rounded-xl bg-white/80 p-3 text-xs text-[#374151]"
+                          >
+                            <div class="flex items-center justify-between gap-3">
+                              <span class="text-[#6b7280]">Project</span>
+                              <span
+                                class="min-w-0 break-words text-right font-medium text-[#111827]"
+                              >
+                                {{ getProjectRevisionValue(message, 'projectTitle') }}
+                              </span>
+                            </div>
+                            <div class="grid gap-1">
+                              <span class="text-[#6b7280]">Adjustment note</span>
+                              <span class="break-words font-medium text-[#111827]">
+                                {{ getProjectRevisionValue(message, 'revisionMessage') }}
+                              </span>
+                            </div>
+                          </div>
+
+                          <p class="mt-3 text-sm leading-5 text-[#4b5563]">
+                            {{ getMessageDisplayText(message) }}
+                          </p>
+
+                          <div *ngIf="canAcceptProjectRevision(message)" class="mt-3 flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              (click)="acceptProjectRevision(message)"
+                              class="inline-flex items-center justify-center rounded-xl bg-[#16a34a] px-3 py-2 text-xs font-medium text-white transition hover:bg-[#15803d]"
+                            >
+                              Accept Revision
+                            </button>
+                          </div>
+                        </div>
+                      </ng-container>
+                    </ng-template>
+
+                    <ng-template #requirementOrRegularMessage>
+                      <ng-container
+                        *ngIf="message.isProjectRequirementProposal; else priceOrRegularMessage"
+                      >
+                        <div
+                          class="w-full max-w-[30rem] rounded-xl border border-emerald-200 bg-emerald-50/70 px-4 py-3 text-left shadow-sm"
+                        >
+                          <div class="flex items-start justify-between gap-3">
+                            <div>
+                              <div
+                                class="text-[11px] font-semibold uppercase tracking-wide text-[#6b7280]"
+                              >
+                                Actual requirement
+                              </div>
+                              <div class="mt-1 text-sm font-semibold text-[#111827]">
+                                Freelancer approval required
+                              </div>
+                            </div>
+                            <span
+                              class="rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold capitalize text-emerald-700"
+                            >
+                              {{ getProjectRequirementStatus(message) | lowercase }}
+                            </span>
+                          </div>
+
+                          <div
+                            class="mt-3 grid gap-2 rounded-xl bg-white/80 p-3 text-xs text-[#374151]"
+                          >
+                            <div class="flex items-center justify-between gap-3">
+                              <span class="text-[#6b7280]">Project</span>
+                              <span
+                                class="min-w-0 break-words text-right font-medium text-[#111827]"
+                              >
+                                {{ getProjectRequirementValue(message, 'projectTitle') }}
+                              </span>
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                              <span class="text-[#6b7280]">Price</span>
+                              <span class="font-medium text-[#111827]">
+                                {{ getProjectRequirementValue(message, 'agreedPrice') }}
+                              </span>
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                              <span class="text-[#6b7280]">Deadline</span>
+                              <span class="font-medium text-[#111827]">
+                                {{ getProjectRequirementValue(message, 'deadline') }}
+                              </span>
+                            </div>
+                            <div class="grid gap-1">
+                              <span class="text-[#6b7280]">Requirements</span>
+                              <span class="break-words font-medium text-[#111827]">
+                                {{ getProjectRequirementValue(message, 'requirements') }}
+                              </span>
+                            </div>
+                            <div
+                              *ngIf="
+                                message.attachmentUrl ||
+                                message.hireRequestDetails?.['requirementFileName']
+                              "
+                              class="flex items-center justify-between gap-3"
+                            >
+                              <span class="text-[#6b7280]">File</span>
+
+                              <button
+                                *ngIf="
+                                  message.hireRequestDetails?.['requirementFileName'];
+                                  else requirementFileNameOnly
+                                "
+                                type="button"
+                                (click)="downloadProjectRequirementFile(message)"
+                                class="inline-flex min-w-0 max-w-full items-center gap-2 rounded-lg border border-emerald-200 bg-white px-3 py-1.5 text-right font-medium text-[#111827] transition hover:bg-emerald-50"
+                              >
+                                <lucide-angular
+                                  [img]="icons.FileUp"
+                                  class="h-3.5 w-3.5 shrink-0"
+                                ></lucide-angular>
+                                <span class="truncate">
+                                  {{ message.hireRequestDetails?.['requirementFileName'] }}
+                                </span>
+                              </button>
+
+                              <ng-template #requirementFileNameOnly>
+                                <span
+                                  class="min-w-0 truncate text-right font-medium text-[#111827]"
+                                >
+                                  {{ message.hireRequestDetails?.['requirementFileName'] }}
+                                </span>
+                              </ng-template>
+                            </div>
+                          </div>
+
+                          <button
+                            *ngIf="canAcceptProjectRequirement(message)"
+                            type="button"
+                            (click)="acceptProjectRequirement(message)"
+                            class="mt-3 rounded-xl bg-[#16a34a] px-3 py-2 text-xs font-medium text-white transition hover:bg-[#15803d]"
+                          >
+                            Accept Actual Requirement
+                          </button>
+                        </div>
+                      </ng-container>
+                    </ng-template>
+
+                    <ng-template #priceOrRegularMessage>
+                      <ng-container *ngIf="message.isPriceProposal; else noticeOrRegularMessage">
+                        <div
+                          class="w-full max-w-[28rem] overflow-hidden rounded-xl border px-4 py-3 text-left shadow-sm"
+                          [ngClass]="
+                            message.priceProposalStatus === 'accepted'
+                              ? 'border-green-200 bg-green-50/70'
+                              : message.priceProposalStatus === 'rejected'
+                                ? 'border-red-200 bg-red-50/70'
+                                : 'border-blue-200 bg-blue-50/70'
+                          "
+                        >
+                          <div class="flex items-start justify-between gap-3">
+                            <div>
+                              <div
+                                class="text-[11px] font-semibold uppercase tracking-wide text-[#6b7280]"
+                              >
+                                Price proposal
+                              </div>
+                              <div class="mt-1 text-sm font-semibold text-[#111827]">
+                                {{
+                                  message.priceProposalStatus === 'accepted'
+                                    ? 'Price accepted'
+                                    : message.priceProposalStatus === 'rejected'
+                                      ? 'Price rejected'
+                                      : 'Waiting for client'
+                                }}
+                              </div>
+                            </div>
+                            <span
+                              class="rounded-full px-2.5 py-1 text-[11px] font-semibold capitalize"
+                              [ngClass]="
+                                message.priceProposalStatus === 'accepted'
+                                  ? 'bg-green-100 text-green-700'
+                                  : message.priceProposalStatus === 'rejected'
+                                    ? 'bg-red-100 text-red-700'
+                                    : 'bg-blue-100 text-blue-700'
+                              "
+                            >
+                              {{ message.priceProposalStatus || 'pending' }}
+                            </span>
+                          </div>
+
+                          <div
+                            class="mt-3 grid gap-2 rounded-xl bg-white/80 p-3 text-xs text-[#374151]"
+                          >
+                            <div class="flex items-center justify-between gap-3">
+                              <span class="text-[#6b7280]">Gig</span>
+                              <span
+                                class="min-w-0 break-words text-right font-medium text-[#111827]"
+                              >
+                                {{ getPriceProposalTitle(message) }}
+                              </span>
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                              <span class="text-[#6b7280]">Price</span>
+                              <span class="shrink-0 font-semibold text-[#111827]">
+                                {{ getPriceProposalAmount(message) }}
+                              </span>
+                            </div>
+                          </div>
+
+                          <p class="mt-3 text-sm leading-5 text-[#4b5563]">
+                            {{ getMessageDisplayText(message) }}
+                          </p>
+
+                          <div
+                            *ngIf="canRespondToPriceProposal(message)"
+                            class="mt-3 flex flex-wrap gap-2"
+                          >
+                            <button
+                              type="button"
+                              (click)="acceptPriceProposal(message)"
+                              class="inline-flex items-center justify-center rounded-xl bg-[#16a34a] px-3 py-2 text-xs font-medium text-white transition hover:bg-[#15803d]"
+                            >
+                              Accept Price & Start Project
+                            </button>
+                            <button
+                              type="button"
+                              (click)="rejectPriceProposal(message)"
+                              class="inline-flex items-center justify-center rounded-xl border border-red-200 bg-white px-3 py-2 text-xs font-medium text-red-700 transition hover:bg-red-50"
+                            >
+                              Reject Price
+                            </button>
+                          </div>
+                        </div>
+                      </ng-container>
+                    </ng-template>
+
+                    <ng-template #noticeOrRegularMessage>
+                      <ng-container *ngIf="message.isFormalNotice; else regularMessage">
+                        <div
+                          class="w-full max-w-[28rem] rounded-xl border px-4 py-3 text-left shadow-sm"
+                          [ngClass]="
+                            message.formalNoticeStatus === 'rejected'
+                              ? 'border-red-200 bg-red-50/70'
+                              : 'border-green-200 bg-green-50/70'
+                          "
+                        >
+                          <div class="flex items-start justify-between gap-3">
+                            <div>
+                              <div
+                                class="text-[11px] font-semibold uppercase tracking-wide text-[#6b7280]"
+                              >
+                                Formal notice
+                              </div>
+                              <div class="mt-1 text-sm font-semibold text-[#111827]">
+                                {{
+                                  message.formalNoticeStatus === 'rejected'
+                                    ? 'Request rejected'
+                                    : 'Request accepted'
+                                }}
+                              </div>
+                            </div>
+
+                            <span
+                              class="rounded-full px-2.5 py-1 text-[11px] font-semibold capitalize"
+                              [ngClass]="
+                                message.formalNoticeStatus === 'rejected'
+                                  ? 'bg-red-50 text-red-700'
+                                  : 'bg-green-50 text-green-700'
+                              "
+                            >
+                              {{ message.formalNoticeStatus || message.hireRequestStatus }}
+                            </span>
+                          </div>
+
+                          <div
+                            class="mt-3 grid gap-2 rounded-xl bg-[#f8fafc] p-3 text-xs text-[#374151]"
+                          >
+                            <div class="flex items-center justify-between gap-3">
+                              <span class="text-[#6b7280]">Gig</span>
+                              <span
+                                class="min-w-0 break-words text-right font-medium text-[#111827]"
+                              >
+                                {{ getRequestTitle(message) }}
+                              </span>
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                              <span class="text-[#6b7280]">Project</span>
+                              <span class="font-medium text-[#111827]">
+                                {{
+                                  message.formalNoticeProjectId ||
+                                    message.hireRequestDetails?.['projectId'] ||
+                                    'Not created'
+                                }}
+                              </span>
+                            </div>
+                          </div>
+
+                          <p class="mt-3 text-sm leading-5 text-[#4b5563]">
+                            {{ message.text }}
+                          </p>
+                        </div>
+                      </ng-container>
+                    </ng-template>
+                    <ng-template #regularMessage>
+                      <ng-container *ngIf="message.isHireRequest; else normalText">
+                        <div
+                          class="w-full max-w-[30rem] rounded-xl border px-4 py-3 text-left shadow-sm"
+                          [ngClass]="
+                            message.hireRequestStatus === 'accepted'
+                              ? 'border-green-200 bg-green-50/70'
+                              : message.hireRequestStatus === 'rejected'
+                                ? 'border-red-200 bg-red-50/70'
+                                : message.hireRequestStatus === 'cancelled'
+                                  ? 'border-slate-200 bg-slate-50'
+                                  : 'border-amber-200 bg-amber-50/70'
+                          "
+                        >
+                          <div class="flex items-start justify-between gap-3">
+                            <div>
+                              <div
+                                class="text-[11px] font-semibold uppercase tracking-wide text-[#6b7280]"
+                              >
+                                Hire request
+                              </div>
+                              <div class="mt-1 text-sm font-semibold text-[#111827]">
+                                Client request
+                              </div>
+                            </div>
+                            <span
+                              class="inline-flex shrink-0 items-center rounded-full px-2.5 py-1 text-[11px] font-semibold capitalize"
+                              [ngClass]="
+                                message.hireRequestStatus === 'accepted'
+                                  ? 'bg-green-100 text-green-700'
+                                  : message.hireRequestStatus === 'rejected'
+                                    ? 'bg-red-100 text-red-700'
+                                    : message.hireRequestStatus === 'cancelled'
+                                      ? 'bg-slate-100 text-slate-700'
+                                      : 'bg-amber-100 text-amber-700'
+                              "
+                            >
+                              {{ message.hireRequestStatus || 'pending' }}
+                            </span>
+                          </div>
+
+                          <div
+                            class="mt-3 grid gap-2 rounded-xl bg-[#f8fafc] p-3 text-xs text-[#374151]"
+                          >
+                            <div class="flex items-center justify-between gap-3">
+                              <span class="text-[#6b7280]">Gig</span>
+                              <span
+                                class="min-w-0 break-words text-right font-medium text-[#111827]"
+                              >
+                                {{ getRequestTitle(message) }}
+                              </span>
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                              <span class="text-[#6b7280]">Price</span>
+                              <span class="shrink-0 font-medium text-[#111827]">
+                                {{ getRequestPrice(message) }}
+                              </span>
+                            </div>
+                            <div class="flex items-center justify-between gap-3">
+                              <span class="text-[#6b7280]">Status</span>
+                              <span class="font-medium text-[#111827]">
+                                {{ message.hireRequestStatus || 'pending' }}
+                              </span>
+                            </div>
+                          </div>
+
+                          <p class="mt-3 text-sm leading-5 text-[#4b5563]">
+                            {{ getMessageDisplayText(message) }}
+                          </p>
+
+                          <div class="mt-3 flex items-center gap-3">
+                            <a
+                              routerLink="/freelancer/hire-requests"
+                              class="text-xs font-medium text-[#2563eb] hover:underline"
+                              >View in list</a
+                            >
+                            <div class="flex-1"></div>
+                            <div *ngIf="message.hireRequestStatus === 'pending'" class="flex gap-2">
+                              <button
+                                type="button"
+                                (click)="acceptHireRequest(message)"
+                                class="rounded-xl bg-[#16a34a] px-3 py-1.5 text-xs font-medium text-white"
+                              >
+                                Accept
+                              </button>
+                              <button
+                                type="button"
+                                (click)="rejectHireRequest(message)"
+                                class="rounded-xl border border-[#e5e7eb] bg-white px-3 py-1.5 text-xs font-medium text-[#374151]"
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </ng-container>
+                      <ng-template #normalText>
+                        <div class="space-y-3">
+                          <div>{{ message.text }}</div>
+                          <button
+                            *ngIf="message.attachmentName"
+                            type="button"
+                            (click)="downloadAttachment(message, message.attachmentUrl ?? null)"
+                            class="inline-flex items-center gap-2 rounded-xl border border-dashed border-current/20 px-3 py-2 text-xs font-medium text-inherit transition hover:opacity-90"
+                          >
+                            <lucide-angular [img]="icons.FileUp" class="h-4 w-4"></lucide-angular>
+                            <span class="max-w-[16rem] truncate">
+                              {{ message.attachmentName || 'Attached file' }}
+                            </span>
+                          </button>
+                        </div>
+                      </ng-template>
+                    </ng-template>
+                  </div>
+
+                  <p class="mt-1 text-sm text-[#6b7280]">{{ message.time }}</p>
+                </div>
+
+                <ng-container *ngIf="message.isMine">
+                  <ng-container *ngIf="message.avatar; else mineInitial">
+                    <img
+                      [src]="message.avatar"
+                      [alt]="message.senderName"
+                      class="h-10 w-10 rounded-full object-cover"
+                    />
+                  </ng-container>
+
+                  <ng-template #mineInitial>
+                    <div
+                      class="flex h-10 w-10 items-center justify-center rounded-full bg-[#e5e7eb] text-sm font-medium text-[#374151]"
+                    >
+                      {{ message.initial }}
+                    </div>
+                  </ng-template>
+                </ng-container>
+              </div>
+            </ng-container>
+          </div>
+
+          <div class="border-t border-[#e5e7eb] px-4 py-4">
+            <form class="flex items-center gap-3" (ngSubmit)="sendMessage()">
+              <div class="relative">
+                <input
+                  #attachmentInput
+                  type="file"
+                  class="hidden"
+                  (change)="onAttachmentSelected($event)"
+                />
+                <button
+                  class="flex h-11 w-11 items-center justify-center rounded-xl text-[#111827] transition hover:bg-[#f3f4f6] hover:text-[#10b981]"
+                  type="button"
+                  (click)="toggleAttachMenu()"
+                  title="Attach actions"
+                >
+                  <lucide-angular [img]="icons.Paperclip" class="h-5 w-5"></lucide-angular>
+                </button>
+
+                <div
+                  *ngIf="showAttachMenu"
+                  class="absolute bottom-14 left-0 z-20 w-72 rounded-xl border border-[#e5e7eb] bg-white p-3 text-left shadow-lg"
+                >
+                  <button
+                    type="button"
+                    (click)="openAttachmentPicker()"
+                    class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#374151] hover:bg-[#f9fafb]"
+                  >
+                    <lucide-angular [img]="icons.FileUp" class="h-4 w-4"></lucide-angular>
+                    Attach File
+                  </button>
+                  <button
+                    type="button"
+                    (click)="toggleDeliveryForm()"
+                    class="mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-[#374151] hover:bg-[#f9fafb]"
+                  >
+                    <lucide-angular [img]="icons.ClipboardList" class="h-4 w-4"></lucide-angular>
+                    Delivery
+                  </button>
+                  <div class="mt-2 rounded-lg bg-[#f8fafc] p-2">
+                    <label class="flex items-center gap-2 text-xs font-medium text-[#6b7280]">
+                      <lucide-angular [img]="icons.DollarSign" class="h-4 w-4"></lucide-angular>
+                      Set Agreed Price
+                    </label>
+                    <div class="mt-2 flex gap-2">
+                      <input
+                        [(ngModel)]="priceDraft"
+                        name="freelancerPriceDraft"
+                        type="number"
+                        min="1"
+                        placeholder="Amount"
+                        class="h-9 min-w-0 flex-1 rounded-lg border border-[#e5e7eb] px-3 text-sm outline-none"
+                      />
+                      <button
+                        type="button"
+                        (click)="submitPriceProposal()"
+                        class="rounded-lg bg-[#16a34a] px-3 text-xs font-medium text-white"
+                      >
+                        Set
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <input
+                type="text"
+                name="message"
+                [(ngModel)]="draftMessage"
+                placeholder="Type your message..."
+                class="h-12 flex-1 rounded-xl bg-[#f3f4f6] px-4 text-sm text-[#111827] placeholder:text-[#9ca3af] outline-none"
+              />
+
+              <button
+                type="submit"
+                [disabled]="!canSendMessage"
+                class="flex h-12 w-12 items-center justify-center rounded-xl bg-[#7fdcc0] text-white transition hover:opacity-90"
+                [ngClass]="{ 'opacity-50 pointer-events-none': !canSendMessage }"
+              >
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M22 2L11 13"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M22 2L15 22L11 13L2 9L22 2Z"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+            </form>
+
+            <div
+              *ngIf="selectedAttachment"
+              class="mt-3 flex items-center justify-between gap-3 rounded-xl border border-dashed border-[#cfe9de] bg-[#f0fdf4] px-3 py-2 text-xs text-[#166534]"
+            >
+              <div class="min-w-0">
+                <p class="truncate font-medium">{{ selectedAttachment.name }}</p>
+                <p class="text-[11px] text-[#4b5563]">Ready to send as an attachment</p>
+              </div>
+
+              <button
+                type="button"
+                (click)="clearAttachment()"
+                class="rounded-full px-3 py-1 text-[11px] font-medium text-[#166534] transition hover:bg-white"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #noConversation>
+        <div
+          class="flex min-h-144 items-center justify-center rounded-2xl border border-dashed border-[#e5e7eb] bg-white px-6 text-center text-sm text-[#6b7280]"
+        >
+          <div>
+            <p class="text-[16px] font-semibold text-[#111827]">No conversation selected</p>
+            <p class="mt-2">Your chat rooms will appear here after the server returns them.</p>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,43 @@
+<div class="w-full bg-[#f6f7f9]">
+  <div class="min-h-screen bg-[#f8f9fb] px-4 py-6 md:px-8 lg:px-10">
+    <!-- Loading state -->
+    <div *ngIf="isLoading" class="flex justify-center items-center h-64">
+      <div class="text-center">
+        <div
+          class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"
+        ></div>
+        <p class="mt-4 text-gray-600">Loading freelancer profile...</p>
+      </div>
+    </div>
+
+    <!-- Error state -->
+    <div
+      *ngIf="errorMessage && !isLoading"
+      class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4"
+    >
+      <p class="text-sm text-red-700">{{ errorMessage }}</p>
+    </div>
+
+    <!-- Profile content -->
+    <div *ngIf="freelancer && !isLoading">
+      <!-- profile-component -->
+      <app-client-freelancer-profile-component [freelancer]="freelancer" [freelancerId]="routeId" />
+      <!-- about-component -->
+      <app-client-freelancer-about-component [freelancer]="freelancer" />
+      <!-- skills-component -->
+      <app-client-freelancer-skills-component [freelancer]="freelancer" />
+      <!-- experience-component -->
+      <app-client-freelancer-experience-component
+        [freelancer]="freelancer"
+        [freelancerId]="freelancerId"
+      />
+      <!-- active-gigs-component -->
+      <app-client-freelancer-active-gigs-component [freelancer]="freelancer" />
+      <!-- reviews-component -->
+      <app-client-freelancer-review-component
+        [freelancer]="freelancer"
+        [freelancerId]="freelancerId"
+      />
+    </div>
+  </div>
+</div>

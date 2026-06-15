@@ -1,0 +1,163 @@
+<div class="min-h-screen bg-[#f8fafc] p-4 md:p-6">
+  <div class="mx-auto max-w-full">
+    <!-- Header -->
+    <div class="mb-4 flex items-center justify-between border-b border-[#e5e7eb] pb-3">
+      <div class="flex items-center gap-3">
+        <div class="flex h-8 w-8 items-center justify-center rounded-full">
+          <svg class="h-5 w-5 text-[#16a34a]" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M15 17H20L18.6 15.6C18.2 15.2 18 14.7 18 14.1V10.5C18 7.4 15.9 4.8 13 4.2V3.5C13 2.7 12.3 2 11.5 2S10 2.7 10 3.5V4.2C7.1 4.8 5 7.4 5 10.5V14.1C5 14.7 4.8 15.2 4.4 15.6L3 17H8"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M9 18C9.4 19.2 10.3 20 11.5 20C12.7 20 13.6 19.2 14 18"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+          </svg>
+        </div>
+
+        <h1 class="text-[34px] font-semibold tracking-[-0.02em] text-[#111827]">
+          Notifications
+        </h1>
+      </div>
+
+      <button
+        (click)="markAllAsRead()"
+        class="text-sm font-medium text-[#16a34a] transition hover:text-[#15803d]"
+      >
+        Mark all as read
+      </button>
+    </div>
+
+    <!-- Notification List -->
+    <div *ngIf="loading" class="rounded-2xl border border-[#e5e7eb] bg-white p-8 text-center text-sm text-[#6b7280]">
+      Loading notifications...
+    </div>
+
+    <div *ngIf="error && !loading" class="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+      {{ error }}
+    </div>
+
+    <div *ngIf="!loading && !error && notifications.length === 0" class="rounded-2xl border border-[#e5e7eb] bg-white p-8 text-center text-sm text-[#6b7280]">
+      No notifications yet.
+    </div>
+
+    <div *ngIf="!loading && !error && notifications.length > 0" class="space-y-3">
+      <div
+        *ngFor="let notification of notifications"
+        class="flex items-start justify-between rounded-2xl px-4 py-4"
+        [ngClass]="
+          notification.type === 'alert'
+            ? 'border border-[#ede9fe] bg-[#faf7ff]'
+            : 'border border-[#d8e8dd] bg-[#f3faf5]'
+        "
+      >
+        <div class="flex min-w-0 items-start gap-4">
+          <!-- Icon -->
+          <div
+            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#d1d5db] bg-white"
+          >
+            <!-- Message -->
+            <svg
+              *ngIf="notification.type === 'message'"
+              class="h-5 w-5 text-[#3b82f6]"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
+              <path
+                d="M7 8.5A1.5 1.5 0 0 1 8.5 7H16a1 1 0 0 1 1 1v7.5A1.5 1.5 0 0 1 15.5 17H8a1 1 0 0 1-1-1V8.5Z"
+                stroke="currentColor"
+                stroke-width="1.7"
+              />
+              <path
+                d="M7 9H5.5A1.5 1.5 0 0 0 4 10.5V17a1 1 0 0 0 1 1h7.5A1.5 1.5 0 0 0 14 16.5V15"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+
+            <!-- Order -->
+            <svg
+              *ngIf="notification.type === 'order'"
+              class="h-5 w-5 text-[#22c55e]"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
+              <path
+                d="M8 4V7"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+              <path
+                d="M16 4V7"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+              <rect
+                x="4"
+                y="6"
+                width="16"
+                height="14"
+                rx="3"
+                stroke="currentColor"
+                stroke-width="1.7"
+              />
+              <path
+                d="M4 10H20"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+            </svg>
+
+            <!-- Alert -->
+            <svg
+              *ngIf="notification.type === 'alert'"
+              class="h-5 w-5 text-[#a855f7]"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
+              <circle cx="12" cy="12" r="7" stroke="currentColor" stroke-width="1.7" />
+              <path
+                d="M9.5 12L11.3 13.8L14.8 10.3"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+
+          <!-- Content -->
+          <div class="min-w-0">
+            <h3 class="text-[18px] font-semibold text-[#111827]">
+              {{ notification.title }}
+            </h3>
+            <p class="mt-1 text-sm text-[#4b5563]">
+              {{ notification.description }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Time + unread dot -->
+        <div class="ml-4 flex shrink-0 items-center gap-3">
+          <span class="text-xs text-[#9ca3af]">{{ notification.time }}</span>
+
+          <span
+            *ngIf="!notification.isRead"
+            class="h-2.5 w-2.5 rounded-full bg-[#16a34a]"
+          ></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

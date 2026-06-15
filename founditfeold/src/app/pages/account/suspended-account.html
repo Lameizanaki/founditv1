@@ -1,0 +1,95 @@
+<main class="min-h-screen bg-[#f8fafc] px-4 py-8">
+  <div class="mx-auto max-w-3xl">
+    <div class="rounded-lg border border-[#fee2e2] bg-white p-6 shadow-sm">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div class="flex gap-3">
+          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[#fee2e2]">
+            <lucide-angular [img]="icons.AlertTriangle" class="h-6 w-6 text-[#dc2626]"></lucide-angular>
+          </div>
+          <div>
+            <h1 class="text-2xl font-semibold text-[#111827]">Account Suspended</h1>
+            <p class="mt-1 text-sm text-[#6b7280]">
+              Your account is still signed in, but platform access is paused while an admin reviews it.
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          (click)="logout()"
+          class="inline-flex items-center justify-center gap-2 rounded-lg border border-[#e5e7eb] bg-white px-3 py-2 text-sm font-medium text-[#374151] hover:bg-[#f9fafb]"
+        >
+          <lucide-angular [img]="icons.LogOut" class="h-4 w-4"></lucide-angular>
+          Sign Out
+        </button>
+      </div>
+
+      <div *ngIf="account" class="mt-5 rounded-lg bg-[#f9fafb] p-4 text-sm text-[#374151]">
+        <p class="font-medium text-[#111827]">{{ account.username || account.email }}</p>
+        <p class="mt-1">{{ account.email }} · {{ account.role }}</p>
+      </div>
+
+      <form class="mt-6 space-y-4" (ngSubmit)="submitReport()">
+        <div>
+          <label class="mb-2 block text-sm font-medium text-[#111827]">Subject</label>
+          <input
+            [(ngModel)]="subject"
+            name="subject"
+            type="text"
+            class="w-full rounded-lg border border-[#e5e7eb] bg-white px-3 py-2 text-sm outline-none focus:border-[#16a34a]"
+          />
+        </div>
+
+        <div>
+          <label class="mb-2 block text-sm font-medium text-[#111827]">Request Message</label>
+          <textarea
+            [(ngModel)]="message"
+            name="message"
+            rows="6"
+            placeholder="Explain why you think your account should be reviewed or restored..."
+            class="w-full resize-none rounded-lg border border-[#e5e7eb] bg-white px-3 py-2 text-sm outline-none placeholder:text-[#9ca3af] focus:border-[#16a34a]"
+          ></textarea>
+        </div>
+
+        <div *ngIf="successMessage" class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+          {{ successMessage }}
+        </div>
+        <div *ngIf="errorMessage" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {{ errorMessage }}
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="submitting || !message.trim()"
+          class="inline-flex items-center justify-center gap-2 rounded-lg bg-[#16a34a] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#15803d] disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <lucide-angular [img]="icons.Send" class="h-4 w-4"></lucide-angular>
+          {{ submitting ? 'Sending...' : 'Send Review Request' }}
+        </button>
+      </form>
+    </div>
+
+    <section class="mt-6 rounded-lg border border-[#e5e7eb] bg-white p-6">
+      <h2 class="text-lg font-semibold text-[#111827]">Your Requests</h2>
+      <div *ngIf="loading" class="mt-4 text-sm text-[#6b7280]">Loading...</div>
+      <div *ngIf="!loading && reports.length === 0" class="mt-4 text-sm text-[#6b7280]">
+        No review requests have been sent yet.
+      </div>
+      <div class="mt-4 space-y-3">
+        <article *ngFor="let report of reports" class="rounded-lg border border-[#e5e7eb] p-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <p class="font-medium text-[#111827]">{{ report.subject }}</p>
+            <span class="rounded-full px-2.5 py-1 text-xs font-medium" [ngClass]="statusClass(report.status)">
+              {{ report.status }}
+            </span>
+          </div>
+          <p class="mt-2 text-sm text-[#6b7280]">{{ report.message }}</p>
+          <p *ngIf="report.adminNote" class="mt-3 rounded-lg bg-[#f9fafb] p-3 text-sm text-[#374151]">
+            {{ report.adminNote }}
+          </p>
+          <p class="mt-3 text-xs text-[#9ca3af]">{{ formatDate(report.createdAt) }}</p>
+        </article>
+      </div>
+    </section>
+  </div>
+</main>

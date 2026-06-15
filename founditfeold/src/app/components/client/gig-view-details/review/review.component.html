@@ -1,0 +1,91 @@
+<div class="mx-auto mt-12 w-full max-w-7xl">
+  <div
+    class="rounded-[22px] border border-[#d9dce3] bg-white px-8 py-8 shadow-[0_2px_6px_rgba(15,23,42,0.06)]"
+  >
+    <h2 class="mb-7 text-[22px] font-semibold text-[#1f2937]">
+      {{ title }}
+    </h2>
+
+    <div *ngIf="isLoading" class="py-8 text-sm text-[#64748b]">Loading reviews...</div>
+
+    <div
+      *ngIf="!isLoading && errorMessage"
+      class="rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-700"
+    >
+      {{ errorMessage }}
+    </div>
+
+    <div
+      *ngIf="!isLoading && !errorMessage && reviews.length === 0"
+      class="rounded-2xl border border-dashed border-[#cbd5e1] p-8 text-center"
+    >
+      <h3 class="font-semibold text-[#111827]">No reviews yet</h3>
+      <p class="mt-2 text-sm text-[#64748b]">
+        Real client reviews for this freelancer will appear here.
+      </p>
+    </div>
+
+    <div *ngIf="!isLoading && !errorMessage && reviews.length > 0">
+      <div
+        *ngFor="let review of visibleReviews; let last = last; trackBy: trackByReviewId"
+        class="py-6"
+        [ngClass]="{ 'border-b border-[#eef1f4]': !last }"
+      >
+        <div class="flex items-start gap-4">
+          <div
+            class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#dde2e8] bg-[#f8fafc] text-sm font-semibold text-[#334155]"
+          >
+            <img
+              *ngIf="review.avatarUrl; else reviewInitials"
+              [src]="review.avatarUrl"
+              [alt]="review.name"
+              class="h-full w-full object-cover"
+            />
+            <ng-template #reviewInitials>{{ initials(review) }}</ng-template>
+          </div>
+
+          <div class="min-w-0 flex-1">
+            <div class="mb-2 flex flex-wrap items-center gap-2 text-[15px]">
+              <span class="font-semibold text-[#1f2937]">{{ review.name }}</span>
+              <span class="text-[#9aa3b2]">&bull;</span>
+              <span class="text-[#7b8698]">{{ review.timeAgo }}</span>
+            </div>
+
+            <div class="mb-3 flex flex-wrap items-center gap-2 text-[15px]">
+              <div class="flex items-center gap-0.5">
+                <lucide-angular
+                  *ngFor="let _ of [].constructor(review.rating)"
+                  [img]="icons.Star"
+                  class="h-4 w-4 fill-[#f4b400] text-[#f4b400]"
+                ></lucide-angular>
+              </div>
+
+              <span class="text-[#5f6b7a]">for {{ review.service }}</span>
+            </div>
+
+            <p class="max-w-none text-[15px] leading-8 text-[#5f6b7a]">
+              {{ review.comment }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!isLoading && reviews.length > initialVisibleCount" class="pt-8 text-center">
+      <button
+        type="button"
+        (click)="toggleShowMore()"
+        class="inline-flex items-center gap-2 text-[16px] font-semibold text-[#9333ea] transition hover:text-[#7e22ce]"
+      >
+        <span>
+          {{ showAll ? 'Show Less' : 'Show More (' + remainingCount + ' more)' }}
+        </span>
+
+        <lucide-angular
+          [img]="showAll ? icons.ChevronUp : icons.ChevronDown"
+          class="h-4 w-4"
+        ></lucide-angular>
+      </button>
+    </div>
+  </div>
+</div>

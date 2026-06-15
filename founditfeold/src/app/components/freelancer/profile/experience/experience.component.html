@@ -1,0 +1,146 @@
+<div class="w-full max-w-7xl mt-12 mx-auto">
+  <div
+    class="rounded-[22px] border border-[#d9dce3] bg-white px-8 py-9 shadow-[0_2px_6px_rgba(15,23,42,0.06)]"
+  >
+    <!-- Header -->
+    <div class="mb-8 flex items-center justify-between">
+      <h2 class="text-[22px] font-semibold text-[#111827]">
+        {{ title }}
+      </h2>
+
+      <button
+        type="button"
+        (click)="openCreateExperience()"
+        class="inline-flex items-center gap-2 text-[16px] font-semibold text-[#22c55e] transition hover:text-[#16a34a]"
+      >
+        <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular>
+        Add Experience
+      </button>
+    </div>
+
+    <!-- Experience List -->
+    <div class="space-y-10">
+      <div *ngFor="let experience of experiences" class="flex items-start gap-4">
+        <!-- Icon -->
+        <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#eaf7ee]">
+          <lucide-angular
+            [img]="icons.BriefcaseBusiness"
+            class="h-6 w-6 text-[#22c55e]"
+          ></lucide-angular>
+        </div>
+
+        <!-- Content -->
+        <div class="min-w-0">
+          <h3 class="text-[20px] font-semibold leading-tight text-[#111827]">
+            {{ experience.title }}
+          </h3>
+
+          <p class="mt-1 text-[16px] font-medium text-[#4b5563]">
+            {{ experience.company }}
+          </p>
+
+          <p class="mt-2 text-[15px] text-[#94a3b8]">
+            {{ experience.period }}
+          </p>
+
+          <p class="mt-3 max-w-225 text-[15px] leading-8 text-[#667085]">
+            {{ experience.description || experience.bio }}
+          </p>
+
+          <button
+            type="button"
+            (click)="openEditExperience(experience)"
+            class="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[#22c55e] transition hover:text-[#16a34a]"
+          >
+            <lucide-angular [img]="icons.Pencil" class="h-4 w-4"></lucide-angular>
+            Edit
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <p *ngIf="errorMessage" class="mt-4 text-sm text-[#dc2626]">
+      {{ errorMessage }}
+    </p>
+  </div>
+</div>
+
+<div *ngIf="isEditorOpen" class="fixed inset-0 z-40 bg-black/50" (click)="closeEditor()"></div>
+
+<div *ngIf="isEditorOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div
+    class="w-full max-w-160 overflow-hidden rounded-2xl bg-white shadow-2xl"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="flex items-center justify-between border-b border-[#e5e7eb] px-5 py-4">
+      <h3 class="text-[18px] font-semibold text-[#1f2937]">
+        {{ selectedExperienceId ? 'Edit Experience' : 'Add Experience' }}
+      </h3>
+
+      <button type="button" (click)="closeEditor()" class="text-[#94a3b8]">✕</button>
+    </div>
+
+    <div class="grid gap-4 px-5 py-5 md:grid-cols-2">
+      <div>
+        <label class="mb-2 block text-sm font-medium text-[#374151]">Title</label>
+        <input
+          type="text"
+          [(ngModel)]="experienceForm.title"
+          class="h-12 w-full rounded-xl border border-[#d1d5db] px-4 text-sm outline-none focus:border-[#16a34a]"
+        />
+      </div>
+
+      <div>
+        <label class="mb-2 block text-sm font-medium text-[#374151]">Company</label>
+        <input
+          type="text"
+          [(ngModel)]="experienceForm.company"
+          class="h-12 w-full rounded-xl border border-[#d1d5db] px-4 text-sm outline-none focus:border-[#16a34a]"
+        />
+      </div>
+
+      <div>
+        <label class="mb-2 block text-sm font-medium text-[#374151]">Period</label>
+        <input
+          type="text"
+          [(ngModel)]="experienceForm.period"
+          placeholder="2022 - Present"
+          class="h-12 w-full rounded-xl border border-[#d1d5db] px-4 text-sm outline-none focus:border-[#16a34a]"
+        />
+      </div>
+
+      <div class="md:col-span-2">
+        <label class="mb-2 block text-sm font-medium text-[#374151]">Bio</label>
+        <textarea
+          rows="4"
+          [(ngModel)]="experienceForm.bio"
+          class="w-full rounded-xl border border-[#d1d5db] px-4 py-3 text-sm outline-none focus:border-[#16a34a]"
+        ></textarea>
+      </div>
+
+      <div class="md:col-span-2">
+        <label class="mb-2 block text-sm font-medium text-[#374151]">Description</label>
+        <textarea
+          rows="5"
+          [(ngModel)]="experienceForm.description"
+          class="w-full rounded-xl border border-[#d1d5db] px-4 py-3 text-sm outline-none focus:border-[#16a34a]"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-end gap-3 border-t border-[#e5e7eb] px-5 py-4">
+      <button type="button" (click)="closeEditor()" class="text-sm font-medium text-[#374151]">
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        (click)="saveExperience()"
+        [disabled]="isSaving"
+        class="rounded-xl bg-[#16a34a] px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
+      >
+        {{ isSaving ? 'Saving...' : 'Save Changes' }}
+      </button>
+    </div>
+  </div>
+</div>

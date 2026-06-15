@@ -1,0 +1,495 @@
+<div class="min-h-screen bg-[#f8fafc] p-4 md:p-6">
+  <div class="mx-auto w-full space-y-6 pl-16 pr-16">
+    <!-- Header -->
+    <section class="rounded-2xl border border-[#e5e7eb] bg-white p-6">
+      <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <h1 class="text-[30px] font-semibold leading-none text-[#111827] md:text-[18px]">
+            Freelancer Dashboard
+          </h1>
+          <p class="mt-1 text-sm text-[#6b7280]">
+            Manage your services, track earnings, and grow your freelance business.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <button
+            routerLink="/freelancer/create-new-service"
+            class="inline-flex items-center gap-2 rounded-xl bg-[#16a34a] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#15803d]"
+          >
+            <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular>
+            Post a Gig
+          </button>
+
+          <button
+            routerLink="/freelancer/profile"
+            class="inline-flex items-center gap-2 rounded-xl border border-[#d1d5db] bg-white px-4 py-2.5 text-sm font-semibold text-[#16a34a] transition hover:bg-[#f9fafb]"
+          >
+            <lucide-angular [img]="icons.User" class="h-4 w-4"></lucide-angular>
+            View Profile
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div
+        *ngFor="let stat of stats"
+        class="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-sm"
+      >
+        <div class="flex items-start justify-between">
+          <div
+            class="flex h-11 w-11 items-center justify-center rounded-xl"
+            [ngClass]="stat.iconBg"
+          >
+            <lucide-angular
+              [img]="stat.icon"
+              class="h-5 w-5"
+              [ngClass]="stat.iconColor"
+            ></lucide-angular>
+          </div>
+
+          <span
+            class="rounded-full px-2.5 py-1 text-[11px] font-medium"
+            [ngClass]="stat.badgeClass"
+          >
+            {{ stat.badge }}
+          </span>
+        </div>
+
+        <p class="mt-4 text-sm text-[#6b7280]">{{ stat.label }}</p>
+        <h3 class="mt-1 text-[20px] font-bold text-[#111827]">{{ stat.value }}</h3>
+      </div>
+    </section>
+
+    <!-- Services + Earnings -->
+    <section class="grid grid-cols-1 gap-5 xl:grid-cols-3">
+      <!-- My Active Services -->
+      <div class="xl:col-span-2">
+        <div
+          class="flex h-[620px] flex-col overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-sm md:h-[680px]"
+        >
+          <div class="flex items-center justify-between border-b border-[#eef2f7] px-5 py-4">
+            <div class="flex items-center gap-2">
+              <lucide-angular [img]="icons.Box" class="h-5 w-5 text-[#16a34a]"></lucide-angular>
+              <h2 class="text-[16px] font-bold text-[#111827]">My Active Services</h2>
+            </div>
+
+            <button
+              type="button"
+              (click)="viewAllServices()"
+              class="text-sm font-semibold text-[#16a34a] transition hover:opacity-80"
+            >
+              View All
+            </button>
+          </div>
+
+          <div class="flex-1 overflow-y-auto divide-y divide-[#eef2f7]">
+            <div
+              *ngIf="previewServices.length === 0"
+              class="flex h-full items-center justify-center px-6 text-center text-sm font-medium text-[#6b7280]"
+            >
+              No gig available yet.
+            </div>
+
+            <div
+              *ngFor="let service of previewServices"
+              class="flex flex-col gap-4 px-5 py-4 md:flex-row md:items-center md:justify-between"
+            >
+              <div class="flex min-w-0 items-start gap-3">
+                <img
+                  [src]="service.image"
+                  [alt]="service.title"
+                  class="h-12 w-12 rounded-xl object-cover"
+                />
+
+                <div class="min-w-0">
+                  <h3 class="truncate text-sm font-semibold text-[#111827]">
+                    {{ service.title }}
+                  </h3>
+
+                  <div
+                    class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#6b7280]"
+                  >
+                    <span class="inline-flex items-center gap-1">
+                      <lucide-angular [img]="icons.Eye" class="h-3.5 w-3.5"></lucide-angular>
+                      {{ service.views }} views
+                    </span>
+
+                    <span class="inline-flex items-center gap-1">
+                      <lucide-angular
+                        [img]="icons.ShoppingBag"
+                        class="h-3.5 w-3.5"
+                      ></lucide-angular>
+                      {{ service.orders }} orders
+                    </span>
+
+                    <span class="inline-flex items-center gap-1">
+                      <lucide-angular
+                        [img]="icons.Star"
+                        class="h-3.5 w-3.5 text-[#f59e0b]"
+                      ></lucide-angular>
+                      {{ service.rating }}
+                    </span>
+
+                    <span class="font-semibold text-[#374151]">${{ service.price }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <span
+                class="inline-flex w-fit rounded-full px-3 py-1 text-xs font-medium"
+                [ngClass]="getServiceStatusClass(service.status)"
+              >
+                {{ service.status }}
+              </span>
+            </div>
+
+            <div
+              *ngIf="hasMoreServices"
+              class="px-5 py-3 text-center text-xs font-medium text-[#6b7280]"
+            >
+              Showing 6 of {{ services.length }} services. Click "View All" to see the rest.
+            </div>
+          </div>
+
+          <div class="p-4">
+            <button
+              routerLink="/freelancer/create-new-service"
+              class="flex items-center justify-center gap-2 rounded-xl bg-[#16a34a] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#15803d]"
+            >
+              <lucide-angular [img]="icons.PlusSquare" class="h-4 w-4"></lucide-angular>
+              Add New Service
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Earnings Summary -->
+      <div>
+        <div class="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-sm">
+          <div class="flex items-center gap-2 border-b border-[#eef2f7] px-5 py-4">
+            <lucide-angular
+              [img]="icons.DollarSign"
+              class="h-5 w-5 text-[#16a34a]"
+            ></lucide-angular>
+            <h2 class="text-[16px] font-bold text-[#111827]">Earnings Summary</h2>
+          </div>
+
+          <div class="divide-y divide-[#eef2f7]">
+            <div class="px-5 py-5">
+              <p class="text-sm text-[#6b7280]">This Month</p>
+              <h3 class="mt-1 text-[20px] font-bold text-[#111827]">
+                ${{ formatCurrency(earningsSummary.thisMonth) }}
+              </h3>
+              <p class="mt-1 text-sm text-[#22c55e]">Paid client orders this month</p>
+            </div>
+
+            <div class="px-5 py-5">
+              <p class="text-sm text-[#6b7280]">Pending Clearance</p>
+              <h3 class="mt-1 text-[20px] font-bold text-[#111827]">
+                ${{ formatCurrency(earningsSummary.pendingClearance) }}
+              </h3>
+              <p class="mt-1 text-sm text-[#6b7280]">Awaiting client approval</p>
+            </div>
+
+            <div class="px-5 py-5">
+              <p class="text-sm text-[#6b7280]">Available for Withdrawal</p>
+              <h3 class="mt-1 text-[20px] font-bold text-[#111827]">
+                ${{ formatCurrency(availableBalance) }}
+              </h3>
+              <p class="mt-1 text-sm text-[#6b7280]">Ready to withdraw</p>
+            </div>
+
+            <div class="px-5 py-5">
+              <p class="text-sm text-[#6b7280]">Last Paid Earning</p>
+              <h3 class="mt-1 text-[20px] font-bold text-[#111827]">{{ formatLastPaid() }}</h3>
+            </div>
+          </div>
+
+          <div class="space-y-3 p-5">
+            <button
+              routerLink="/freelancer/earnings"
+              class="inline-flex w-full items-center justify-center gap-2 text-sm font-semibold text-[#16a34a] transition hover:opacity-80"
+            >
+              View Earnings History
+              <lucide-angular [img]="icons.ChevronRight" class="h-4 w-4"></lucide-angular>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pending Payment Confirmations -->
+    <section
+      *ngIf="pendingPayments.length > 0"
+      class="overflow-hidden rounded-2xl border border-amber-200 bg-white shadow-sm"
+    >
+      <div class="flex flex-col gap-3 border-b border-amber-100 bg-amber-50 px-5 py-4 md:flex-row md:items-center md:justify-between">
+        <div class="flex items-center gap-2">
+          <lucide-angular [img]="icons.Wallet" class="h-5 w-5 text-amber-700"></lucide-angular>
+          <div>
+            <h2 class="text-[16px] font-bold text-[#111827]">Payments Waiting for Confirmation</h2>
+            <p class="text-sm text-amber-800">
+              Check your bank app, review proof, then confirm only received payments.
+            </p>
+          </div>
+        </div>
+
+        <button
+          routerLink="/freelancer/earnings"
+          class="inline-flex items-center gap-2 self-start rounded-xl border border-amber-200 bg-white px-4 py-2 text-sm font-semibold text-amber-800 transition hover:bg-amber-50"
+        >
+          View All Payments
+          <lucide-angular [img]="icons.ChevronRight" class="h-4 w-4"></lucide-angular>
+        </button>
+      </div>
+
+      <div class="divide-y divide-[#eef2f7]">
+        <div
+          *ngFor="let payment of pendingPayments"
+          class="flex flex-col gap-4 px-5 py-4 lg:flex-row lg:items-center lg:justify-between"
+        >
+          <div class="min-w-0">
+            <h3 class="truncate text-sm font-semibold text-[#111827]">
+              {{ payment.projectTitle }}
+            </h3>
+            <p class="mt-1 text-sm text-[#6b7280]">
+              {{ payment.clientName }} submitted {{ payment.currency }} payment
+            </p>
+            <div class="mt-2 space-y-1 text-xs text-[#6b7280]">
+              <p>Transaction ID: <span class="font-medium text-[#111827]">{{ payment.tranId }}</span></p>
+              <p *ngIf="payment.proofReference">
+                Reference: <span class="font-medium text-[#111827]">{{ payment.proofReference }}</span>
+              </p>
+              <p *ngIf="payment.submittedAt">Submitted: {{ formatDate(payment.submittedAt) }}</p>
+            </div>
+          </div>
+
+          <div class="flex shrink-0 flex-col gap-3 sm:flex-row sm:items-center">
+            <span class="text-[22px] font-bold text-[#111827]">
+              ${{ formatCurrency(payment.amount) }}
+            </span>
+
+            <button
+              *ngIf="payment.hasProofFile"
+              type="button"
+              (click)="downloadProof(payment)"
+              [disabled]="downloadingProofId === payment.tranId"
+              class="rounded-xl border border-[#d1d5db] bg-white px-4 py-2.5 text-sm font-semibold text-[#374151] transition hover:bg-[#f9fafb] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {{ downloadingProofId === payment.tranId ? 'Opening...' : 'View Proof' }}
+            </button>
+
+            <button
+              type="button"
+              (click)="confirmPayment(payment)"
+              [disabled]="confirmingPaymentId === payment.tranId"
+              class="rounded-xl bg-[#16a34a] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#15803d] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {{ confirmingPaymentId === payment.tranId ? 'Confirming...' : 'Confirm Payment' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Active Orders -->
+    <section class="grid grid-cols-1 gap-5 xl:grid-cols-3">
+      <div class="xl:col-span-2">
+        <div class="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-sm">
+          <div class="flex items-center justify-between border-b border-[#eef2f7] px-5 py-4">
+            <div class="flex items-center gap-2">
+              <lucide-angular
+                [img]="icons.LayoutGrid"
+                class="h-5 w-5 text-[#6b7280]"
+              ></lucide-angular>
+              <h2 class="text-[16px] font-bold text-[#111827]">Active Orders</h2>
+            </div>
+
+            <button
+              routerLink="/freelancer/active-work"
+              class="text-sm font-semibold text-[#16a34a] transition hover:opacity-80"
+            >
+              View All
+            </button>
+          </div>
+
+          <div class="divide-y divide-[#eef2f7]">
+            <div
+              *ngIf="loadingOrders"
+              class="px-5 py-8 text-center text-sm font-medium text-[#6b7280]"
+            >
+              Loading active orders...
+            </div>
+
+            <div
+              *ngIf="!loadingOrders && orders.length === 0"
+              class="px-5 py-8 text-center text-sm font-medium text-[#6b7280]"
+            >
+              No in-progress hire requests yet.
+            </div>
+
+            <div
+              *ngFor="let order of orders"
+              class="flex flex-col gap-4 px-5 py-4 md:flex-row md:items-center md:justify-between"
+            >
+              <div class="flex items-start gap-3">
+                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-[#dcfce7]">
+                  <lucide-angular
+                    [img]="icons.FileText"
+                    class="h-5 w-5 text-[#22c55e]"
+                  ></lucide-angular>
+                </div>
+
+                <div>
+                  <h3 class="text-sm font-semibold text-[#111827]">{{ order.title }}</h3>
+                  <p class="mt-1 text-sm text-[#6b7280]">
+                    {{ order.client }} <span class="mx-1">•</span> Due: {{ order.dueDate }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between gap-4 md:flex-col md:items-end">
+                <span class="text-[20px] font-bold text-[#111827]">
+                  ${{ formatCurrency(order.price) }}
+                </span>
+
+                <span
+                  class="inline-flex rounded-full px-3 py-1 text-xs font-medium"
+                  [ngClass]="getOrderStatusClass(order.status)"
+                >
+                  {{ order.status }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div></div>
+    </section>
+  </div>
+</div>
+
+<!-- Withdraw Modal -->
+<div
+  *ngIf="isWithdrawModalOpen"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-[#020817]/70 p-4"
+>
+  <div class="w-full max-w-[400px] overflow-hidden rounded-2xl bg-white shadow-2xl">
+    <!-- Modal Header -->
+    <div class="bg-gradient-to-r from-[#0ea54b] to-[#1dbf73] px-5 py-5 text-white">
+      <div class="flex items-start justify-between">
+        <div>
+          <h2 class="text-[18px] font-bold">Withdraw Funds</h2>
+          <p class="mt-1 text-sm text-white/90">Available: ${{ availableBalance.toFixed(2) }}</p>
+        </div>
+
+        <button
+          (click)="closeWithdrawModal()"
+          class="flex h-8 w-8 items-center justify-center rounded-full border border-white/50 text-white transition hover:bg-white/10"
+        >
+          <lucide-angular [img]="icons.X" class="h-4 w-4"></lucide-angular>
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="space-y-5 p-5">
+      <div>
+        <label class="mb-2 block text-sm font-semibold text-[#374151]">Withdraw to</label>
+        <select
+          [(ngModel)]="withdrawForm.method"
+          class="h-11 w-full rounded-xl border border-[#d1d5db] bg-white px-3 text-sm text-[#111827] outline-none focus:border-[#22c55e]"
+        >
+          <option value="">Select payment method</option>
+          <option *ngFor="let method of paymentMethods" [value]="method">
+            {{ method }}
+          </option>
+        </select>
+      </div>
+
+      <div>
+        <label class="mb-2 block text-sm font-semibold text-[#374151]">Amount ($)</label>
+        <input
+          type="number"
+          min="1"
+          step="0.01"
+          [(ngModel)]="withdrawForm.amount"
+          class="h-11 w-full rounded-xl border border-[#d1d5db] px-3 text-[16px] text-[#111827] outline-none focus:border-[#22c55e]"
+          placeholder="115.00"
+        />
+        <p class="mt-2 text-sm text-[#6b7280]">Maximum: ${{ availableBalance.toFixed(2) }}</p>
+      </div>
+
+      <div>
+        <label class="mb-3 block text-sm font-semibold text-[#374151]">Processing Speed</label>
+
+        <div class="space-y-3">
+          <button
+            type="button"
+            (click)="selectWithdrawSpeed('instant')"
+            class="flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition"
+            [ngClass]="
+              withdrawForm.speed === 'instant'
+                ? 'border-[#22c55e] bg-[#f0fdf4]'
+                : 'border-[#d1d5db] bg-white hover:bg-[#f9fafb]'
+            "
+          >
+            <div>
+              <p class="text-sm font-semibold text-[#111827]">Instant (2% fee)</p>
+              <p class="mt-1 text-sm text-[#6b7280]">Receive funds within minutes</p>
+            </div>
+            <span class="text-sm font-semibold text-[#16a34a]"> ~${{ getInstantFee() }} </span>
+          </button>
+
+          <button
+            type="button"
+            (click)="selectWithdrawSpeed('standard')"
+            class="flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition"
+            [ngClass]="
+              withdrawForm.speed === 'standard'
+                ? 'border-[#22c55e] bg-[#f0fdf4]'
+                : 'border-[#d1d5db] bg-white hover:bg-[#f9fafb]'
+            "
+          >
+            <div>
+              <p class="text-sm font-semibold text-[#111827]">Standard (Free)</p>
+              <p class="mt-1 text-sm text-[#6b7280]">1–3 business days</p>
+            </div>
+            <span class="text-sm font-semibold text-[#16a34a]">Free</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-[#bfdbfe] bg-[#eff6ff] px-4 py-3 text-sm text-[#1d4ed8]">
+        <span class="font-semibold">Note:</span>
+        Funds will be sent to your selected payment method. Standard withdrawals are free and arrive
+        in 1–3 business days.
+      </div>
+
+      <div *ngIf="withdrawError" class="rounded-xl bg-[#fef2f2] px-4 py-3 text-sm text-[#dc2626]">
+        {{ withdrawError }}
+      </div>
+
+      <div class="flex gap-3">
+        <button
+          (click)="confirmWithdrawal()"
+          class="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#16a34a] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#15803d]"
+        >
+          <lucide-angular [img]="icons.Wallet" class="h-4 w-4"></lucide-angular>
+          Confirm Withdrawal
+        </button>
+
+        <button
+          (click)="closeWithdrawModal()"
+          class="rounded-xl border border-[#d1d5db] bg-white px-6 py-3 text-sm font-semibold text-[#374151] transition hover:bg-[#f9fafb]"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

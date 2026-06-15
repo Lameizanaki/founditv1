@@ -1,0 +1,454 @@
+<div class="min-h-screen bg-[#f8fafc]">
+  <div class=" max-w-full">
+    <!-- Header -->
+    <div class="mb-6">
+      <h1 class="text-3xl font-semibold text-[#111827]">Reports & Moderation</h1>
+      <p class="mt-1 text-sm text-[#6b7280]">
+        Review suspended account requests from users
+      </p>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5">
+      <div class="flex items-start gap-3 rounded-2xl border border-[#e5e7eb] bg-white p-5">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
+          <lucide-angular [img]="icons.Flag" class="h-5 w-5 text-blue-500"></lucide-angular>
+        </div>
+        <div>
+          <p class="text-sm text-[#6b7280]">Total Reports</p>
+          <p class="text-2xl font-semibold text-[#111827]">{{ totalReports }}</p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-3 rounded-2xl border border-[#e5e7eb] bg-white p-5">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50">
+          <lucide-angular [img]="icons.Clock" class="h-5 w-5 text-orange-500"></lucide-angular>
+        </div>
+        <div>
+          <p class="text-sm text-[#6b7280]">Pending</p>
+          <p class="text-2xl font-semibold text-[#111827]">{{ pendingReports }}</p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-3 rounded-2xl border border-[#e5e7eb] bg-white p-5">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
+          <lucide-angular [img]="icons.Eye" class="h-5 w-5 text-blue-500"></lucide-angular>
+        </div>
+        <div>
+          <p class="text-sm text-[#6b7280]">Reviewed</p>
+          <p class="text-2xl font-semibold text-[#111827]">{{ reviewedReports }}</p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-3 rounded-2xl border border-[#e5e7eb] bg-white p-5">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-green-50">
+          <lucide-angular [img]="icons.CheckCircle" class="h-5 w-5 text-green-500"></lucide-angular>
+        </div>
+        <div>
+          <p class="text-sm text-[#6b7280]">Resolved</p>
+          <p class="text-2xl font-semibold text-[#111827]">{{ resolvedReports }}</p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-3 rounded-2xl border border-[#e5e7eb] bg-white p-5">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-100">
+          <lucide-angular [img]="icons.XCircle" class="h-5 w-5 text-gray-500"></lucide-angular>
+        </div>
+        <div>
+          <p class="text-sm text-[#6b7280]">Dismissed</p>
+          <p class="text-2xl font-semibold text-[#111827]">{{ dismissedReports }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="mt-5 rounded-2xl border border-[#e5e7eb] bg-white p-4">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-[1fr_180px_180px]">
+        <div class="relative">
+          <lucide-angular
+            [img]="icons.Search"
+            class="absolute mt-3.5 pt-1 left-3 h-5 w-5 -translate-y-1/2 text-[#9ca3af]"
+          ></lucide-angular>
+          <input
+            [(ngModel)]="search"
+            type="text"
+            placeholder="Search reports..."
+            class="h-11 w-full ml-3 rounded-xl border border-[#e5e7eb] bg-[#f9fafb] py-2 pr-4 pl-10 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#d946ef]"
+          />
+        </div>
+
+        <select
+          [(ngModel)]="selectedType"
+          class="h-11 w-full rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-4 text-sm text-[#111827] outline-none focus:border-[#d946ef]"
+        >
+          <option>All Types</option>
+          <option>Account</option>
+        </select>
+
+        <select
+          [(ngModel)]="selectedStatus"
+          class="h-11 w-full rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-4 text-sm text-[#111827] outline-none focus:border-[#d946ef]"
+        >
+          <option>All Status</option>
+          <option>Pending</option>
+          <option>Reviewed</option>
+          <option>Resolved</option>
+          <option>Dismissed</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Report List -->
+    <div *ngIf="errorMessage" class="mt-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      {{ errorMessage }}
+    </div>
+    <div *ngIf="loading" class="mt-5 rounded-2xl border border-[#e5e7eb] bg-white p-8 text-center text-sm text-[#6b7280]">
+      Loading reports...
+    </div>
+    <div class="mt-5 space-y-4">
+      <div
+        *ngFor="let report of filteredReports"
+        class="rounded-2xl border border-[#e5e7eb] bg-white p-5 transition"
+      >
+        <!-- Card Click Area -->
+        <div
+          class="cursor-pointer"
+          (click)="toggleCard(report.id)"
+        >
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex gap-3">
+              <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50">
+                <lucide-angular
+                  [img]="icons.AlertTriangle"
+                  class="h-5 w-5 text-red-500"
+                ></lucide-angular>
+              </div>
+
+              <div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <p class="font-medium text-[#111827]">{{ report.title }}</p>
+
+                  <span
+                    class="rounded-full px-2 py-0.5 text-xs font-medium"
+                    [ngClass]="getSeverityClass(report.severity)"
+                  >
+                    {{ report.severity }}
+                  </span>
+
+                  <span
+                    class="rounded-full px-2 py-0.5 text-xs font-medium"
+                    [ngClass]="getStatusClass(report.status)"
+                  >
+                    {{ report.status }}
+                  </span>
+                </div>
+
+                <div class="mt-2 flex flex-wrap items-center gap-2 text-xs text-[#6b7280]">
+                  <span>{{ report.type }}</span>
+                  <span>•</span>
+                  <span>Reported by: {{ report.reporter }}</span>
+                  <span>•</span>
+                  <span>{{ report.daysAgo }} days ago</span>
+                </div>
+
+                <div class="mt-3 text-sm">
+                  <p>
+                    <span class="font-medium text-red-500">Reason:</span>
+                    {{ report.reason }}
+                  </p>
+                  <p class="mt-1 text-[#6b7280]">{{ report.description }}</p>
+
+                  <p *ngIf="report.reviewedBy" class="mt-2 text-[#6b7280]">
+                    Reviewed by: {{ report.reviewedBy }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              class="flex h-8 w-8 items-center justify-center rounded-lg text-[#9ca3af] transition hover:bg-[#f3f4f6] hover:text-[#111827]"
+              (click)="$event.stopPropagation(); toggleCard(report.id)"
+            >
+              <lucide-angular
+                [img]="expandedReportId === report.id ? icons.ChevronUp : icons.ChevronDown"
+                class="h-4 w-4"
+              ></lucide-angular>
+            </button>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div
+          *ngIf="expandedReportId === report.id"
+          class="mt-5 border-t border-[#f3f4f6] pt-4"
+        >
+          <div
+            *ngIf="report.status === 'Pending' || report.status === 'Reviewed'"
+            class="grid grid-cols-1 gap-3 md:grid-cols-3"
+          >
+            <button
+              *ngIf="report.status === 'Pending'"
+              type="button"
+              (click)="openAction(report.id, 'review')"
+              class="inline-flex items-center justify-center gap-2 rounded-xl border border-[#e5e7eb] bg-white px-4 py-2.5 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+            >
+              <lucide-angular [img]="icons.Eye" class="h-4 w-4"></lucide-angular>
+              Review
+            </button>
+
+            <button
+              type="button"
+              (click)="openAction(report.id, 'resolve')"
+              class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#d946ef] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#c026d3]"
+            >
+              <lucide-angular [img]="icons.CheckCircle" class="h-4 w-4"></lucide-angular>
+              Resolve
+            </button>
+
+            <button
+              type="button"
+              (click)="openAction(report.id, 'dismiss')"
+              class="inline-flex items-center justify-center gap-2 rounded-xl border border-[#fecaca] bg-white px-4 py-2.5 text-sm font-medium text-red-500 transition hover:bg-red-50"
+            >
+              <lucide-angular [img]="icons.XCircle" class="h-4 w-4"></lucide-angular>
+              Dismiss
+            </button>
+          </div>
+
+          <!-- Review Panel -->
+          <div
+            *ngIf="activeAction === 'review' && expandedReportId === report.id"
+            class="mt-4 rounded-2xl border border-[#dbeafe] bg-[#f8fbff] p-4"
+          >
+            <div class="mb-4">
+              <h3 class="text-lg font-semibold text-[#111827]">Review Report</h3>
+              <p class="mt-1 text-sm text-[#6b7280]">
+                Review this report and mark it as reviewed
+              </p>
+            </div>
+
+            <div class="rounded-2xl border border-[#e5e7eb] bg-white p-4">
+              <p class="text-sm text-[#6b7280]">Reported Item</p>
+              <p class="mt-1 text-xl font-medium text-[#111827]">{{ report.title }}</p>
+
+              <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <p class="text-sm text-[#6b7280]">Type</p>
+                  <p class="mt-1 font-medium text-[#111827]">{{ report.type }}</p>
+                </div>
+                <div>
+                  <p class="text-sm text-[#6b7280]">Severity</p>
+                  <span
+                    class="mt-1 inline-flex rounded-full px-2 py-0.5 text-xs font-medium"
+                    [ngClass]="getSeverityClass(report.severity)"
+                  >
+                    {{ report.severity }}
+                  </span>
+                </div>
+                <div class="md:col-span-2">
+                  <p class="text-sm text-[#6b7280]">Reported By</p>
+                  <p class="mt-1 font-medium text-[#111827]">{{ report.reporter }}</p>
+                </div>
+                <div class="md:col-span-2">
+                  <p class="text-sm text-[#6b7280]">Reason</p>
+                  <p class="mt-1 font-medium text-red-500">{{ report.reason }}</p>
+                </div>
+                <div class="md:col-span-2">
+                  <p class="text-sm text-[#6b7280]">Description</p>
+                  <p class="mt-1 text-[#111827]">{{ report.description }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <label class="mb-2 block text-sm font-medium text-[#111827]">
+                Review Notes (Optional)
+              </label>
+              <textarea
+                [(ngModel)]="reviewNotes"
+                rows="4"
+                placeholder="Add notes about your review..."
+                class="w-full rounded-xl border border-[#e5e7eb] bg-white p-3 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#2563eb]"
+              ></textarea>
+            </div>
+
+            <div class="mt-4 flex justify-end gap-3">
+              <button
+                type="button"
+                (click)="cancelAction()"
+                class="rounded-xl border border-[#e5e7eb] bg-white px-4 py-2.5 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                (click)="markAsReviewed(report)"
+                class="inline-flex items-center gap-2 rounded-xl bg-[#2563eb] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#1d4ed8]"
+              >
+                <lucide-angular [img]="icons.Eye" class="h-4 w-4"></lucide-angular>
+                Mark as Reviewed
+              </button>
+            </div>
+          </div>
+
+          <!-- Resolve Panel -->
+          <div
+            *ngIf="activeAction === 'resolve' && expandedReportId === report.id"
+            class="mt-4 rounded-2xl border border-[#bbf7d0] bg-[#f0fdf4] p-4"
+          >
+            <div class="mb-4">
+              <h3 class="text-lg font-semibold text-[#111827]">Resolve Report</h3>
+              <p class="mt-1 text-sm text-[#6b7280]">
+                Mark this report as resolved and add resolution notes
+              </p>
+            </div>
+
+            <div class="rounded-2xl border border-[#bbf7d0] bg-white/70 p-4">
+              <p class="text-sm text-[#6b7280]">Reported Item</p>
+              <p class="mt-1 text-xl font-medium text-[#111827]">{{ report.title }}</p>
+
+              <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <p class="text-sm text-[#6b7280]">Type</p>
+                  <p class="mt-1 font-medium text-[#111827]">{{ report.type }}</p>
+                </div>
+                <div>
+                  <p class="text-sm text-[#6b7280]">Severity</p>
+                  <span
+                    class="mt-1 inline-flex rounded-full px-2 py-0.5 text-xs font-medium"
+                    [ngClass]="getSeverityClass(report.severity)"
+                  >
+                    {{ report.severity }}
+                  </span>
+                </div>
+                <div class="md:col-span-2">
+                  <p class="text-sm text-[#6b7280]">Reason</p>
+                  <p class="mt-1 font-medium text-red-500">{{ report.reason }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <label class="mb-2 block text-sm font-medium text-[#111827]">
+                Resolution Notes <span class="text-red-500">*</span>
+              </label>
+              <textarea
+                [(ngModel)]="resolveNotes"
+                rows="4"
+                placeholder="Describe the action taken to resolve this report..."
+                class="w-full rounded-xl border border-[#e5e7eb] bg-white p-3 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#16a34a]"
+              ></textarea>
+              <p class="mt-2 text-xs text-[#6b7280]">
+                Explain what action was taken (e.g., content removed, user warned, etc.)
+              </p>
+            </div>
+
+            <div class="mt-4 flex justify-end gap-3">
+              <button
+                type="button"
+                (click)="cancelAction()"
+                class="rounded-xl border border-[#e5e7eb] bg-white px-4 py-2.5 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                (click)="markAsResolved(report)"
+                class="inline-flex items-center gap-2 rounded-xl bg-[#16a34a] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#15803d]"
+              >
+                <lucide-angular [img]="icons.CheckCircle" class="h-4 w-4"></lucide-angular>
+                Mark as Resolved
+              </button>
+            </div>
+          </div>
+
+          <!-- Dismiss Panel -->
+          <div
+            *ngIf="activeAction === 'dismiss' && expandedReportId === report.id"
+            class="mt-4 rounded-2xl border border-[#fecaca] bg-[#fef2f2] p-4"
+          >
+            <div class="mb-4">
+              <h3 class="text-lg font-semibold text-[#111827]">Dismiss Report</h3>
+              <p class="mt-1 text-sm text-[#6b7280]">
+                Dismiss this report and provide a reason
+              </p>
+            </div>
+
+            <div class="rounded-2xl border border-[#fecaca] bg-white/70 p-4">
+              <p class="text-sm text-[#6b7280]">Reported Item</p>
+              <p class="mt-1 text-xl font-medium text-[#111827]">{{ report.title }}</p>
+
+              <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <p class="text-sm text-[#6b7280]">Type</p>
+                  <p class="mt-1 font-medium text-[#111827]">{{ report.type }}</p>
+                </div>
+                <div>
+                  <p class="text-sm text-[#6b7280]">Severity</p>
+                  <span
+                    class="mt-1 inline-flex rounded-full px-2 py-0.5 text-xs font-medium"
+                    [ngClass]="getSeverityClass(report.severity)"
+                  >
+                    {{ report.severity }}
+                  </span>
+                </div>
+                <div class="md:col-span-2">
+                  <p class="text-sm text-[#6b7280]">Reason</p>
+                  <p class="mt-1 font-medium text-red-500">{{ report.reason }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <label class="mb-2 block text-sm font-medium text-[#111827]">
+                Dismissal Reason <span class="text-red-500">*</span>
+              </label>
+              <textarea
+                [(ngModel)]="dismissNotes"
+                rows="4"
+                placeholder="Explain why this report is being dismissed..."
+                class="w-full rounded-xl border border-[#e5e7eb] bg-white p-3 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#ef4444]"
+              ></textarea>
+              <p class="mt-2 text-xs text-[#6b7280]">
+                Explain why no action is needed (e.g., report unfounded, duplicate report, etc.)
+              </p>
+            </div>
+
+            <div class="mt-4 flex justify-end gap-3">
+              <button
+                type="button"
+                (click)="cancelAction()"
+                class="rounded-xl border border-[#e5e7eb] bg-white px-4 py-2.5 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                (click)="markAsDismissed(report)"
+                class="inline-flex items-center gap-2 rounded-xl bg-[#ef4444] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#dc2626]"
+              >
+                <lucide-angular [img]="icons.XCircle" class="h-4 w-4"></lucide-angular>
+                Dismiss Report
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div
+      *ngIf="!loading && filteredReports.length === 0"
+      class="mt-5 rounded-2xl border border-dashed border-[#d1d5db] bg-white p-10 text-center"
+    >
+      <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[#f3f4f6]">
+        <lucide-angular [img]="icons.FileText" class="h-5 w-5 text-[#9ca3af]"></lucide-angular>
+      </div>
+      <h3 class="mt-4 text-lg font-semibold text-[#111827]">No reports found</h3>
+      <p class="mt-1 text-sm text-[#6b7280]">
+        Try changing your search or filter options.
+      </p>
+    </div>
+  </div>
+</div>

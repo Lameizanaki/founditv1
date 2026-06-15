@@ -1,0 +1,144 @@
+<div class="bg-[#f9fafb]">
+  <div class="w-full max-w-7xl mt-6 mx-auto">
+    <!-- Back -->
+    <button
+      type="button"
+      (click)="goBack()"
+      class="mb-6 inline-flex items-center gap-2 text-sm font-medium text-[#6b7280] transition hover:text-[#111827]"
+    >
+      <lucide-angular [img]="icons.ChevronLeft" class="h-4 w-4"></lucide-angular>
+      Back
+    </button>
+
+    <div class="grid grid-cols-1 gap-5 xl:grid-cols-[1.9fr_0.9fr]">
+      <!-- Left Column -->
+      <div class="space-y-5">
+        <!-- Top Profile Card -->
+        <div class="rounded-3xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+          <div class="flex flex-col gap-5 md:flex-row md:items-start">
+            <!-- Avatar -->
+            <div
+              class="h-16 w-16 shrink-0 overflow-hidden rounded-full border border-[#e5e7eb] bg-[#f9fafb] shadow-md"
+            >
+              <img
+                *ngIf="profileImageUrl"
+                [src]="profileImageUrl"
+                [alt]="profile.name"
+                class="h-full w-full object-cover"
+              />
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1">
+              <h1 class="text-[28px] font-semibold leading-tight text-[#111827]">
+                {{ profile.name }}
+              </h1>
+
+              <p class="mt-2 text-[17px] font-medium text-[#4b5563]">
+                {{ profile.title }}
+              </p>
+
+              <div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-[#6b7280]">
+                <span class="inline-flex items-center gap-1.5">
+                  <lucide-angular
+                    [img]="icons.Star"
+                    class="h-4 w-4 fill-current text-[#fbbf24]"
+                  ></lucide-angular>
+                  <span class="font-semibold text-[#374151]">{{ profile.rating }}</span>
+                  <span>rating</span>
+                </span>
+
+                <span class="inline-flex items-center gap-1.5">
+                  <lucide-angular
+                    [img]="icons.MapPin"
+                    class="h-4 w-4 text-[#6b7280]"
+                  ></lucide-angular>
+                  {{ profile.location }}
+                </span>
+
+                <span class="inline-flex items-center gap-1.5">
+                  <lucide-angular
+                    [img]="icons.BriefcaseBusiness"
+                    class="h-4 w-4 text-[#6b7280]"
+                  ></lucide-angular>
+                  {{ profile.experience }}
+                </span>
+
+                <span class="inline-flex items-center gap-1.5 text-[#16a34a]">
+                  <lucide-angular [img]="icons.Clock3" class="h-4 w-4"></lucide-angular>
+                  {{ profile.workStatus }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div
+          class="h-72 overflow-y-auto rounded-3xl border border-[#e5e7eb] bg-white p-6 shadow-sm"
+        >
+          <div class="flex items-center justify-between gap-3">
+            <h2 class="text-[18px] font-semibold text-[#111827]">Description</h2>
+          </div>
+
+          <p class="mt-5 max-w-[95%] text-[16px] leading-9 text-[#6b7280]">
+            {{ profile.about }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div class="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+        <div>
+          <div class="flex items-center gap-2 text-sm text-[#6b7280]">
+            <lucide-angular [img]="icons.MessageSquare" class="h-4 w-4"></lucide-angular>
+            <span>Response Time</span>
+          </div>
+
+          <p class="mt-2 text-sm font-semibold text-[#111827]">
+            {{ profile.responseTime }}
+          </p>
+        </div>
+
+        <div class="my-5 border-t border-[#e5e7eb]"></div>
+
+        <div>
+          <div class="flex items-center gap-2 text-sm text-[#6b7280]">
+            <lucide-angular [img]="icons.Calendar" class="h-4 w-4"></lucide-angular>
+            <span>Availability</span>
+          </div>
+
+          <p class="mt-2 text-sm font-semibold text-[#16a34a]">
+            {{ profile.availability }}
+          </p>
+        </div>
+
+        <div class="my-6 border-t border-[#e5e7eb]"></div>
+
+        <div class="text-center">
+          <p class="mx-auto max-w-60 text-[15px] leading-6 text-[#6b7280]">
+            Sign in to send offers and message freelancers
+          </p>
+
+          <div class="mt-5 flex flex-col gap-3">
+            <button
+              type="button"
+              (click)="signIn()"
+              class="inline-flex w-full items-center justify-center rounded-xl bg-[#0aad3b] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#089533]"
+            >
+              Sign In
+            </button>
+
+            <button
+              type="button"
+              (click)="signUp()"
+              class="inline-flex w-full items-center justify-center rounded-xl border border-[#d1d5db] bg-white px-4 py-3 text-sm font-semibold text-[#111827] transition hover:bg-[#f9fafb]"
+            >
+              Sign Up
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

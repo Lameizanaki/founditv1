@@ -1,0 +1,92 @@
+<div class="w-full max-w-7xl mt-12 mx-auto">
+  <div class="rounded-[22px] border border-[#d9dce3] bg-white px-8 py-8 shadow-[0_2px_6px_rgba(15,23,42,0.06)]">
+    <div class="mb-7 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-[#16a34a]">Client feedback</p>
+        <h2 class="mt-2 text-[22px] font-semibold text-[#1f2937]">{{ title }}</h2>
+      </div>
+      <p class="text-sm text-[#64748b]">{{ reviews.length }} comment{{ reviews.length === 1 ? '' : 's' }}</p>
+    </div>
+
+    <p *ngIf="errorMessage" class="mb-4 rounded-2xl bg-[#fee2e2] px-4 py-3 text-sm text-[#dc2626]">
+      {{ errorMessage }}
+    </p>
+
+    <div *ngIf="isLoading" class="rounded-2xl border border-dashed border-[#cbd5e1] p-8 text-center text-[#64748b]">
+      Loading reviews...
+    </div>
+
+    <div *ngIf="!isLoading && reviews.length === 0" class="rounded-2xl border border-dashed border-[#cbd5e1] p-8 text-center">
+      <h3 class="font-semibold text-[#111827]">No reviews yet</h3>
+      <p class="mt-2 text-sm text-[#64748b]">Client comments will appear here once they are posted.</p>
+    </div>
+
+    <div *ngIf="!isLoading">
+      <div
+        *ngFor="let review of visibleReviews; let last = last; trackBy: trackByReviewId"
+        class="py-6"
+        [ngClass]="{ 'border-b border-[#eef1f4]': !last }"
+      >
+        <div class="flex items-start gap-4">
+          <div class="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-full bg-[#ecfdf5] font-semibold text-[#16a34a]">
+            <img
+              *ngIf="review.avatarUrl"
+              [src]="review.avatarUrl"
+              [alt]="review.displayName || review.clientName || 'Client'"
+              class="h-full w-full object-cover"
+            />
+            <span *ngIf="!review.avatarUrl">{{ initials(review) }}</span>
+          </div>
+
+          <div class="min-w-0 flex-1">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <div class="mb-2 flex flex-wrap items-center gap-2 text-[15px]">
+                  <span class="font-semibold text-[#1f2937]">{{ review.displayName || review.clientName || 'Client' }}</span>
+                  <span class="text-[#9aa3b2]">&bull;</span>
+                  <span class="text-[#7b8698]">{{ formatDate(review.createdAt) }}</span>
+                </div>
+
+                <div class="mb-3 flex flex-wrap items-center gap-2 text-[15px]">
+                  <div class="flex items-center gap-0.5">
+                    <lucide-angular
+                      *ngFor="let _ of [].constructor(review.rating || 0)"
+                      [img]="icons.Star"
+                      class="h-4 w-4 fill-[#f4b400] text-[#f4b400]"
+                    ></lucide-angular>
+                  </div>
+
+                  <span class="text-[#5f6b7a]">for {{ review.service || 'Freelancer service' }}</span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                (click)="deleteReview(review)"
+                [disabled]="deletingReviewId === review.id"
+                class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#fee2e2] text-[#ef4444] transition hover:bg-[#fee2e2] disabled:cursor-not-allowed disabled:opacity-60"
+                aria-label="Delete review"
+              >
+                <lucide-angular [img]="icons.Trash2" class="h-4 w-4"></lucide-angular>
+              </button>
+            </div>
+
+            <p class="max-w-none text-[15px] leading-8 text-[#5f6b7a]">{{ review.comment }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="reviews.length > initialVisibleCount" class="pt-8 text-center">
+      <button
+        type="button"
+        (click)="toggleShowMore()"
+        class="inline-flex items-center gap-2 text-[16px] font-semibold text-[#22c55e] transition hover:text-[#16a34a]"
+      >
+        <span>{{ showAll ? 'Show Less' : 'Show More (' + remainingCount + ' more)' }}</span>
+
+        <lucide-angular [img]="showAll ? icons.ChevronUp : icons.ChevronDown" class="h-4 w-4"></lucide-angular>
+      </button>
+    </div>
+  </div>
+</div>

@@ -4,9 +4,6 @@
 
 FOUNDIT_FE/node_modules/
 FOUNDIT_FE/.next/
-founditfeold/node_modules/
-founditfeold/.angular/
-founditfeold/dist/
 
 EKYC_SERVICE/.venv/
 EKYC_SERVICE/__pycache__/

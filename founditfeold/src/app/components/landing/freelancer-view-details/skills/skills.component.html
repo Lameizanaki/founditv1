@@ -1,0 +1,16 @@
+<div class="w-full max-w-7xl mt-6 mx-auto">
+  <div class="rounded-[22px] border border-[#d9dce3] bg-white px-8 py-9 shadow-[0_2px_6px_rgba(15,23,42,0.06)]">
+    <h2 class="mb-6 text-[22px] font-semibold text-[#1f2937]">
+      {{ title }}
+    </h2>
+  
+    <div class="flex flex-wrap gap-4">
+      <span
+        *ngFor="let skill of skills"
+        class="rounded-[14px] border border-[#dfe3ea] bg-[#f4f6f8] px-5 py-3 text-[16px] font-medium leading-none text-[#4b5563]"
+      >
+        {{ skill }}
+      </span>
+    </div>
+  </div>
+</div>

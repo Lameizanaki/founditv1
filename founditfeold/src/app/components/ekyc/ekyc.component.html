@@ -1,0 +1,842 @@
+<div class="min-h-screen bg-[#f9fafb] text-[#111827]">
+  <!-- Top brand -->
+  <div class="flex justify-center border-[#e5e7eb] bg-white py-3">
+    <div class="h-16 w-32 flex items-center">
+      <img src="/assets/images/logo.png" alt="FOUNDIT" />
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="border-b border-[#e5e7eb] bg-white px-8 py-6">
+    <div class="mx-auto flex max-w-7xl items-start justify-between">
+      <div class="flex items-start gap-4">
+        <button
+          type="button"
+          class="mt-1 rounded-md p-1 text-[#374151] transition hover:bg-[#f3f4f6]"
+        >
+          <lucide-angular [img]="icons.ArrowLeft" class="h-4 w-4"></lucide-angular>
+        </button>
+
+        <div>
+          <h1 class="text-[32px] font-semibold leading-none text-[#111827]">
+            Identity Verification
+          </h1>
+          <p class="mt-2 text-[14px] text-[#6b7280]">Verify your identity to unlock all features</p>
+        </div>
+      </div>
+
+      <div
+        class="flex items-center gap-2 rounded-full border border-[#e5e7eb] bg-[#f9fafb] px-3 py-1.5 text-[12px] text-[#374151]"
+      >
+        <lucide-angular [img]="icons.ShieldCheck" class="h-3.5 w-3.5"></lucide-angular>
+        Secure &amp; Encrypted
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="mx-auto mt-8 max-w-7xl">
+      <div class="mb-2 flex items-center justify-between text-[14px]">
+        <span>Step {{ currentStep }} of {{ totalSteps }}</span>
+        <span class="text-[#6b7280]">{{ progress }}% Complete</span>
+      </div>
+
+      <div class="h-2 w-full rounded-full bg-[#d1fae5]">
+        <div
+          class="h-2 rounded-full bg-[#10b981] transition-all duration-300"
+          [style.width.%]="progress"
+        ></div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    *ngIf="!loadingSettings && !identityVerificationRequired"
+    class="mx-auto mt-6 max-w-7xl rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800"
+  >
+    Identity verification is currently disabled by the administrator. The eKYC form is unavailable until this setting is enabled again.
+  </div>
+
+  <!-- Stepper -->
+  <div class="border-b border-[#e5e7eb] bg-white px-8 py-5">
+    <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-4 md:gap-8">
+      <!-- Step 1 -->
+      <div class="flex items-center gap-3">
+        <div
+          class="flex h-8 w-8 items-center justify-center rounded-full border text-sm"
+          [ngClass]="
+            currentStep > 1
+              ? 'border-[#22c55e] bg-[#22c55e] text-white'
+              : currentStep === 1
+                ? 'border-[#10b981] bg-[#10b981] text-white'
+                : 'border-[#d1d5db] bg-[#f3f4f6] text-[#6b7280]'
+          "
+        >
+          <lucide-angular
+            [img]="currentStep > 1 ? icons.Check : icons.User"
+            class="h-4 w-4"
+          ></lucide-angular>
+        </div>
+        <span
+          class="text-[14px]"
+          [ngClass]="currentStep >= 1 ? 'text-[#111827]' : 'text-[#6b7280]'"
+        >
+          Personal Info
+        </span>
+        <span class="text-[#9ca3af]">›</span>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="flex items-center gap-3">
+        <div
+          class="flex h-8 w-8 items-center justify-center rounded-full border text-sm"
+          [ngClass]="
+            currentStep > 2
+              ? 'border-[#22c55e] bg-[#22c55e] text-white'
+              : currentStep === 2
+                ? 'border-[#10b981] bg-[#10b981] text-white'
+                : 'border-[#d1d5db] bg-[#f3f4f6] text-[#6b7280]'
+          "
+        >
+          <lucide-angular
+            [img]="currentStep > 2 ? icons.Check : icons.IdCard"
+            class="h-4 w-4"
+          ></lucide-angular>
+        </div>
+        <span
+          class="text-[14px]"
+          [ngClass]="currentStep >= 2 ? 'text-[#111827]' : 'text-[#6b7280]'"
+        >
+          ID Verification
+        </span>
+        <span class="text-[#9ca3af]">›</span>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="flex items-center gap-3">
+        <div
+          class="flex h-8 w-8 items-center justify-center rounded-full border text-sm"
+          [ngClass]="
+            currentStep > 3
+              ? 'border-[#22c55e] bg-[#22c55e] text-white'
+              : currentStep === 3
+                ? 'border-[#10b981] bg-[#10b981] text-white'
+                : 'border-[#d1d5db] bg-[#f3f4f6] text-[#6b7280]'
+          "
+        >
+          <lucide-angular
+            [img]="currentStep > 3 ? icons.Check : icons.ShieldCheck"
+            class="h-4 w-4"
+          ></lucide-angular>
+        </div>
+        <span
+          class="text-[14px]"
+          [ngClass]="currentStep >= 3 ? 'text-[#111827]' : 'text-[#6b7280]'"
+        >
+          Liveness Check
+        </span>
+        <span class="text-[#9ca3af]">›</span>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="flex items-center gap-3">
+        <div
+          class="flex h-8 w-8 items-center justify-center rounded-full border text-sm"
+          [ngClass]="
+            currentStep > 4
+              ? 'border-[#22c55e] bg-[#22c55e] text-white'
+              : currentStep === 4
+                ? 'border-[#10b981] bg-[#10b981] text-white'
+                : 'border-[#d1d5db] bg-[#f3f4f6] text-[#6b7280]'
+          "
+        >
+          <lucide-angular
+            [img]="currentStep > 4 ? icons.Check : icons.ShieldCheck"
+            class="h-4 w-4"
+          ></lucide-angular>
+        </div>
+        <span
+          class="text-[14px]"
+          [ngClass]="currentStep >= 4 ? 'text-[#111827]' : 'text-[#6b7280]'"
+        >
+          OCR Verification
+        </span>
+        <span class="text-[#9ca3af]">›</span>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="flex items-center gap-3">
+        <div
+          class="flex h-8 w-8 items-center justify-center rounded-full border text-sm"
+          [ngClass]="
+            currentStep > 5
+              ? 'border-[#22c55e] bg-[#22c55e] text-white'
+              : currentStep === 5
+                ? 'border-[#10b981] bg-[#10b981] text-white'
+                : 'border-[#d1d5db] bg-[#f3f4f6] text-[#6b7280]'
+          "
+        >
+          <lucide-angular
+            [img]="currentStep > 5 ? icons.Check : icons.MapPin"
+            class="h-4 w-4"
+          ></lucide-angular>
+        </div>
+        <span
+          class="text-[14px]"
+          [ngClass]="currentStep >= 5 ? 'text-[#111827]' : 'text-[#6b7280]'"
+        >
+          Address
+        </span>
+        <span class="text-[#9ca3af]">›</span>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="flex items-center gap-3">
+        <div
+          class="flex h-8 w-8 items-center justify-center rounded-full border text-sm"
+          [ngClass]="
+            currentStep === 6
+              ? 'border-[#10b981] bg-[#10b981] text-white'
+              : 'border-[#d1d5db] bg-[#f3f4f6] text-[#6b7280]'
+          "
+        >
+          <lucide-angular [img]="icons.Check" class="h-4 w-4"></lucide-angular>
+        </div>
+        <span
+          class="text-[14px]"
+          [ngClass]="currentStep >= 6 ? 'text-[#111827]' : 'text-[#6b7280]'"
+        >
+          Review
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="px-6 py-8 md:px-10">
+    <div class="mx-auto max-w-4xl">
+      <!-- Error alert -->
+      <div
+        *ngIf="errorMessage"
+        class="mb-6 rounded-xl border border-[#fecaca] bg-[#fef2f2] p-4 text-[14px] text-[#991b1b]"
+      >
+        {{ errorMessage }}
+      </div>
+
+      <!-- Success alert -->
+      <div
+        *ngIf="successMessage"
+        class="mb-6 rounded-xl border border-[#bbf7d0] bg-[#f0fdf4] p-4 text-[14px] text-[#166534]"
+      >
+        {{ successMessage }}
+      </div>
+
+      <!-- STEP 1 -->
+      <div
+        *ngIf="currentStep === 1"
+        class="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm"
+      >
+        <h2 class="text-[24px] font-medium text-[#111827]">Personal Information</h2>
+        <p class="mt-1 text-[14px] text-[#6b7280]">
+          Please provide your personal details as they appear on your government-issued ID
+        </p>
+
+        <div class="mt-6 space-y-4">
+          <div>
+            <label class="mb-2 block text-[14px] font-medium text-[#111827]"
+              >Full Legal Name *</label
+            >
+            <input
+              [(ngModel)]="fullName"
+              type="text"
+              placeholder="John Doe"
+              class="h-12 w-full rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-4 text-[14px] outline-none focus:border-[#10b981]"
+            />
+          </div>
+
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <label class="mb-2 block text-[14px] font-medium text-[#111827]"
+                >Date of Birth *</label
+              >
+              <input
+                [(ngModel)]="dob"
+                type="date"
+                class="h-12 w-full rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-4 text-[14px] outline-none focus:border-[#10b981]"
+              />
+            </div>
+
+            <div>
+              <label class="mb-2 block text-[14px] font-medium text-[#111827]">Nationality *</label>
+              <input
+                [ngModel]="nationality"
+                type="text"
+                readonly
+                class="h-12 w-full cursor-not-allowed rounded-xl border border-[#e5e7eb] bg-[#f3f4f6] px-4 text-[14px] text-[#374151] outline-none"
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <label class="mb-2 block text-[14px] font-medium text-[#111827]">Sex *</label>
+              <select
+                [(ngModel)]="gender"
+                class="h-12 w-full rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-4 text-[14px] text-[#6b7280] outline-none focus:border-[#10b981]"
+              >
+                <option value="">Select sex</option>
+                <option value="M">Male</option>
+                <option value="F">Female</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="mb-2 block text-[14px] font-medium text-[#111827]"
+                >Phone Number *</label
+              >
+              <div
+                class="flex h-12 w-full overflow-hidden rounded-xl border border-[#e5e7eb] bg-[#f9fafb] text-[14px] focus-within:border-[#10b981]"
+              >
+                <span class="flex items-center border-r border-[#e5e7eb] bg-[#f3f4f6] px-4 text-[#374151]">
+                  {{ phoneCountryCode }}
+                </span>
+                <input
+                  [ngModel]="phone"
+                  (ngModelChange)="phone = normalizeCambodianPhoneInput($event)"
+                  type="text"
+                  inputmode="tel"
+                  placeholder="12 345 678"
+                  class="h-full min-w-0 flex-1 bg-transparent px-4 outline-none"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-5 rounded-xl border border-[#bfdbfe] bg-[#eff6ff] p-4">
+          <div class="flex items-start gap-3">
+            <div class="mt-0.5 text-[#2563eb]">ⓘ</div>
+            <div>
+              <p class="text-[14px] font-medium text-[#1d4ed8]">Why do we need this information?</p>
+              <p class="mt-1 text-[14px] leading-6 text-[#1e40af]">
+                We verify your identity to ensure platform safety and comply with legal
+                requirements. Your data is encrypted and secure.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div
+        *ngIf="currentStep === 2"
+        class="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm"
+      >
+        <h2 class="text-[24px] font-medium text-[#111827]">Government-Issued ID</h2>
+        <p class="mt-1 text-[14px] text-[#6b7280]">
+          Upload a clear photo of your government-issued identification document
+        </p>
+
+        <div class="mt-6">
+          <label class="mb-2 block text-[14px] font-medium text-[#111827]">Choose ID Type *</label>
+
+          <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
+            <button
+              type="button"
+              (click)="selectIdType('National ID')"
+              class="h-12 rounded-xl border text-[14px] font-medium transition"
+              [ngClass]="
+                selectedIdType === 'National ID'
+                  ? 'border-[#10b981] bg-[#10b981] text-white'
+                  : 'border-[#e5e7eb] bg-white text-[#111827] hover:bg-[#f9fafb]'
+              "
+            >
+              National ID
+            </button>
+
+            <button
+              type="button"
+              disabled
+              class="h-12 cursor-not-allowed rounded-xl border border-[#e5e7eb] bg-[#f3f4f6] text-[14px] font-medium text-[#9ca3af] opacity-70"
+            >
+              Driver’s License
+            </button>
+
+            <button
+              type="button"
+              disabled
+              class="h-12 cursor-not-allowed rounded-xl border border-[#e5e7eb] bg-[#f3f4f6] text-[14px] font-medium text-[#9ca3af] opacity-70"
+            >
+              Passport
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <label class="mb-2 block text-[14px] font-medium text-[#111827]">ID Number *</label>
+          <input
+            [(ngModel)]="idNumber"
+            type="text"
+            placeholder="Enter your ID number"
+            class="h-12 w-full rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-4 text-[14px] outline-none focus:border-[#10b981]"
+          />
+        </div>
+
+        <div class="mt-4">
+          <label class="mb-2 block text-[14px] font-medium text-[#111827]"
+            >Upload Front of ID *</label
+          >
+
+          <label
+            class="flex min-h-52 w-full cursor-pointer flex-col items-center justify-center rounded-2xl border border-[#e5e7eb] bg-[#fcfcfd] text-center transition hover:bg-[#f9fafb]"
+          >
+            <input type="file" accept="image/jpeg,image/png,image/webp" class="hidden" (change)="onIdUpload($event)" />
+            <lucide-angular [img]="icons.IdCard" class="h-14 w-14 text-[#6b7280]"></lucide-angular>
+
+            <div
+              class="mt-4 inline-flex items-center gap-2 rounded-lg border border-[#d1d5db] bg-white px-4 py-2 text-[14px] text-[#111827]"
+            >
+              <lucide-angular [img]="icons.Upload" class="h-4 w-4"></lucide-angular>
+              Upload ID Front
+            </div>
+
+            <p class="mt-3 text-[12px] text-[#6b7280]">JPG or PNG • Max 2MB</p>
+            <p class="text-[12px] text-[#6b7280]">Make sure all corners are visible</p>
+
+            <p *ngIf="idFrontFile" class="mt-3 text-[13px] font-medium text-[#10b981]">
+              {{ idFrontFile.name }}
+            </p>
+          </label>
+        </div>
+
+        <div class="mt-4">
+          <label class="mb-2 block text-[14px] font-medium text-[#111827]"
+            >Upload Back of ID *</label
+          >
+
+          <label
+            class="flex min-h-52 w-full cursor-pointer flex-col items-center justify-center rounded-2xl border border-[#e5e7eb] bg-[#fcfcfd] text-center transition hover:bg-[#f9fafb]"
+          >
+            <input type="file" accept="image/jpeg,image/png,image/webp" class="hidden" (change)="onIdBackUpload($event)" />
+            <lucide-angular [img]="icons.IdCard" class="h-14 w-14 text-[#6b7280]"></lucide-angular>
+
+            <div
+              class="mt-4 inline-flex items-center gap-2 rounded-lg border border-[#d1d5db] bg-white px-4 py-2 text-[14px] text-[#111827]"
+            >
+              <lucide-angular [img]="icons.Upload" class="h-4 w-4"></lucide-angular>
+              Upload ID Back
+            </div>
+
+            <p class="mt-3 text-[12px] text-[#6b7280]">JPG or PNG • Max 2MB</p>
+            <p class="text-[12px] text-[#6b7280]">Make sure all corners are visible</p>
+
+            <p *ngIf="idBackFile" class="mt-3 text-[13px] font-medium text-[#10b981]">
+              {{ idBackFile.name }}
+            </p>
+          </label>
+        </div>
+
+        <div class="mt-5 rounded-xl border border-[#fde68a] bg-[#fffbeb] p-4">
+          <div class="flex items-start gap-3">
+            <div class="mt-0.5 text-[#d97706]">ⓘ</div>
+            <div>
+              <p class="text-[14px] font-medium text-[#b45309]">Tips for a clear photo:</p>
+              <ul class="mt-2 space-y-1 text-[14px] text-[#92400e]">
+                <li>Use good lighting</li>
+                <li>Place ID on a plain background</li>
+                <li>Ensure all text is readable</li>
+                <li>No glare or shadows</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3 (2.5) -->
+      <div
+        *ngIf="currentStep === 3"
+        class="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm"
+      >
+        <h2 class="text-[24px] font-medium text-[#111827]">Liveness Verification</h2>
+        <p class="mt-1 text-[14px] text-[#6b7280]">
+          Align your face in the frame and click Continue to verify.
+        </p>
+
+        <div class="mt-6">
+          <div class="relative overflow-hidden rounded-2xl border border-[#e5e7eb] bg-[#f9fafb]">
+            <div class="aspect-video w-full">
+              <video
+                #liveVideo
+                class="h-full w-full object-cover"
+                autoplay
+                muted
+                playsinline
+              ></video>
+            </div>
+
+            <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
+              <div class="h-56 w-56 rounded-full border-4 border-white/70"></div>
+            </div>
+          </div>
+
+          <canvas #liveCanvas class="hidden"></canvas>
+
+          <p *ngIf="liveFacePreviewUrl" class="mt-3 text-[13px] font-medium text-[#10b981]">
+            Face image captured.
+          </p>
+
+          <div class="mt-5 rounded-xl border border-[#e5e7eb] bg-[#fcfcfd] p-4">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <p class="text-[14px] font-medium text-[#111827]">Liveness status</p>
+                <p class="text-[12px] text-[#6b7280]">
+                  This stage only verifies that you are present.
+                </p>
+              </div>
+              <span [class]="getStatusBadgeClass(livenessStatus)">{{
+                getStatusLabel(livenessStatus)
+              }}</span>
+            </div>
+          </div>
+
+          <div class="mt-5 rounded-xl border border-[#bfdbfe] bg-[#eff6ff] p-4">
+            <div class="flex items-start gap-3">
+              <div class="mt-0.5 text-[#2563eb]">ⓘ</div>
+              <div>
+                <p class="text-[14px] font-medium text-[#1d4ed8]">Tips:</p>
+                <ul class="mt-2 space-y-1 text-[14px] text-[#1e40af]">
+                  <li>Use good lighting</li>
+                  <li>Remove hats/masks</li>
+                  <li>Look straight at the camera</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div
+        *ngIf="currentStep === 4"
+        class="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm"
+      >
+        <h2 class="text-[24px] font-medium text-[#111827]">OCR Verification</h2>
+        <p class="mt-1 text-[14px] text-[#6b7280]">
+          ID extraction runs in the background. You can continue with the form as usual.
+        </p>
+
+        <div class="mt-6 rounded-2xl border border-[#e5e7eb] bg-[#fcfcfd] p-5">
+          <p class="text-[14px] text-[#374151]">
+            We will handle OCR processing automatically after your ID upload.
+          </p>
+        </div>
+      </div>
+
+      <!-- STEP 5 -->
+      <div
+        *ngIf="currentStep === 5"
+        class="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm"
+      >
+        <h2 class="text-[24px] font-medium text-[#111827]">Address Verification</h2>
+        <p class="mt-1 text-[14px] text-[#6b7280]">
+          Provide your address in Cambodia
+        </p>
+
+        <div class="mt-6 space-y-4">
+          <div>
+            <label class="mb-2 block text-[14px] font-medium text-[#111827]"
+              >Address Line 1 *</label
+            >
+            <input
+              [(ngModel)]="addressLine1"
+              type="text"
+              placeholder="123 Main Street"
+              class="h-12 w-full rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-4 text-[14px] outline-none focus:border-[#10b981]"
+            />
+          </div>
+
+          <div>
+            <label class="mb-2 block text-[14px] font-medium text-[#111827]"
+              >Address Line 2 (optional)</label
+            >
+            <input
+              [(ngModel)]="addressLine2"
+              type="text"
+              placeholder="Apt 4B"
+              class="h-12 w-full rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-4 text-[14px] outline-none focus:border-[#10b981]"
+            />
+          </div>
+
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <label class="mb-2 block text-[14px] font-medium text-[#111827]">City *</label>
+              <select
+                [(ngModel)]="city"
+                class="h-12 w-full rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-4 text-[14px] outline-none focus:border-[#10b981]"
+              >
+                <option value="">Select city</option>
+                <option *ngFor="let cityOption of cambodianCities" [value]="cityOption">
+                  {{ cityOption }}
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label class="mb-2 block text-[14px] font-medium text-[#111827]"
+                >Province *</label
+              >
+              <select
+                [(ngModel)]="state"
+                class="h-12 w-full rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-4 text-[14px] outline-none focus:border-[#10b981]"
+              >
+                <option value="">Select province</option>
+                <option *ngFor="let province of cambodianProvinces" [value]="province">
+                  {{ province }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <label class="mb-2 block text-[14px] font-medium text-[#111827]"
+                >Postal Code (optional)</label
+              >
+              <input
+                [(ngModel)]="postalCode"
+                type="text"
+                placeholder="12000"
+                class="h-12 w-full rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-4 text-[14px] outline-none focus:border-[#10b981]"
+              />
+            </div>
+
+            <div>
+              <label class="mb-2 block text-[14px] font-medium text-[#111827]">Country</label>
+              <input
+                [ngModel]="country"
+                type="text"
+                readonly
+                class="h-12 w-full cursor-not-allowed rounded-xl border border-[#e5e7eb] bg-[#f3f4f6] px-4 text-[14px] text-[#374151] outline-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="false" class="mt-4">
+          <label class="mb-1 block text-[14px] font-medium text-[#111827]"
+            >Upload Proof of Address *</label
+          >
+          <p class="mb-2 text-[12px] text-[#6b7280]">
+            Utility bill, bank statement, or lease agreement (within last 3 months)
+          </p>
+
+          <label
+            class="flex min-h-52 w-full cursor-pointer flex-col items-center justify-center rounded-2xl border border-[#e5e7eb] bg-[#fcfcfd] text-center transition hover:bg-[#f9fafb]"
+          >
+            <input type="file" class="hidden" (change)="onAddressUpload($event)" />
+            <lucide-angular [img]="icons.IdCard" class="h-14 w-14 text-[#6b7280]"></lucide-angular>
+
+            <div
+              class="mt-4 inline-flex items-center gap-2 rounded-lg border border-[#d1d5db] bg-white px-4 py-2 text-[14px] text-[#111827]"
+            >
+              <lucide-angular [img]="icons.Upload" class="h-4 w-4"></lucide-angular>
+              Upload Document
+            </div>
+
+            <p class="mt-3 text-[12px] text-[#6b7280]">JPG, PNG or PDF • Max 10MB</p>
+
+            <p *ngIf="addressProofFile" class="mt-3 text-[13px] font-medium text-[#10b981]">
+              {{ addressProofFile?.name }}
+            </p>
+          </label>
+        </div>
+
+        <div *ngIf="false" class="mt-5 rounded-xl border border-[#fde68a] bg-[#fffbeb] p-4">
+          <div class="flex items-start gap-3">
+            <div class="mt-0.5 text-[#d97706]">ⓘ</div>
+            <div>
+              <p class="text-[14px] font-medium text-[#b45309]">Accepted documents:</p>
+              <ul class="mt-2 space-y-1 text-[14px] text-[#92400e]">
+                <li>Utility bill (electricity, water, gas)</li>
+                <li>Bank or credit card statement</li>
+                <li>Lease or rental agreement</li>
+                <li>Government-issued document</li>
+                <li>Document must be dated within the last 3 months</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 6 -->
+      <div
+        *ngIf="currentStep === 6"
+        class="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm"
+      >
+        <h2 class="text-[24px] font-medium text-[#111827]">Review Your Information</h2>
+        <p class="mt-1 text-[14px] text-[#6b7280]">
+          Please review all information before submitting
+        </p>
+
+        <div class="mt-5 grid grid-cols-1 gap-3 md:grid-cols-3" style="display: none">
+          <div class="rounded-xl border border-[#e5e7eb] bg-[#fcfcfd] p-4 text-[14px]">
+            <p class="text-[#6b7280]">Overall KYC</p>
+            <p class="mt-1 font-medium text-[#111827]">{{ getStatusLabel(ekycStatus) }}</p>
+            <span class="mt-2 inline-flex" [class]="getStatusBadgeClass(ekycStatus)">{{
+              getStatusLabel(ekycStatus)
+            }}</span>
+          </div>
+
+          <div class="rounded-xl border border-[#e5e7eb] bg-[#fcfcfd] p-4 text-[14px]">
+            <p class="text-[#6b7280]">Liveness</p>
+            <p class="mt-1 font-medium text-[#111827]">{{ getStatusLabel(livenessStatus) }}</p>
+            <span class="mt-2 inline-flex" [class]="getStatusBadgeClass(livenessStatus)">{{
+              getStatusLabel(livenessStatus)
+            }}</span>
+          </div>
+
+          <div class="rounded-xl border border-[#e5e7eb] bg-[#fcfcfd] p-4 text-[14px]">
+            <p class="text-[#6b7280]">OCR</p>
+            <p class="mt-1 font-medium text-[#111827]">{{ getStatusLabel(ocrStatus) }}</p>
+            <span class="mt-2 inline-flex" [class]="getStatusBadgeClass(ocrStatus)">{{
+              getStatusLabel(ocrStatus)
+            }}</span>
+          </div>
+        </div>
+
+        <div class="mt-6 space-y-6">
+          <!-- Personal -->
+          <div>
+            <div class="mb-3 flex items-center justify-between">
+              <h3 class="text-[18px] font-medium text-[#111827]">Personal Information</h3>
+              <button
+                type="button"
+                class="text-[14px] text-[#374151] hover:underline"
+                (click)="goToStep(1)"
+              >
+                Edit
+              </button>
+            </div>
+
+            <div class="rounded-xl bg-[#f9fafb] p-5 text-[14px]">
+              <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+                <div class="text-[#6b7280]">Full Name:</div>
+                <div class="text-right text-[#111827]">{{ fullName || 'John Doe' }}</div>
+
+                <div class="text-[#6b7280]">Date of Birth:</div>
+                <div class="text-right text-[#111827]">{{ dob || '1990-05-15' }}</div>
+
+                <div class="text-[#6b7280]">Sex:</div>
+                <div class="text-right text-[#111827]">{{ getGenderDisplay() }}</div>
+
+                <div class="text-[#6b7280]">Nationality:</div>
+                <div class="text-right text-[#111827]">{{ nationality }}</div>
+
+                <div class="text-[#6b7280]">Phone:</div>
+                <div class="text-right text-[#111827]">{{ getCambodianPhoneNumber() }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ID -->
+          <div class="border-t border-[#e5e7eb] pt-6">
+            <div class="mb-3 flex items-center justify-between">
+              <h3 class="text-[18px] font-medium text-[#111827]">ID Verification</h3>
+              <button
+                type="button"
+                class="text-[14px] text-[#374151] hover:underline"
+                (click)="goToStep(2)"
+              >
+                Edit
+              </button>
+            </div>
+
+            <div class="rounded-xl bg-[#f9fafb] p-5 text-[14px] text-[#111827]">
+              <p><span class="text-[#6b7280]">ID Type:</span> {{ selectedIdType }}</p>
+              <p class="mt-2">
+                <span class="text-[#6b7280]">ID Number:</span> {{ idNumber || '—' }}
+              </p>
+              <p class="mt-2">
+                <span class="text-[#6b7280]">Front:</span> {{ idFrontFile?.name || '—' }}
+              </p>
+              <p class="mt-2">
+                <span class="text-[#6b7280]">Back:</span> {{ idBackFile?.name || '—' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Address -->
+          <div class="border-t border-[#e5e7eb] pt-6">
+            <div class="mb-3 flex items-center justify-between">
+              <h3 class="text-[18px] font-medium text-[#111827]">Address Verification</h3>
+              <button
+                type="button"
+                class="text-[14px] text-[#374151] hover:underline"
+                (click)="goToStep(5)"
+              >
+                Edit
+              </button>
+            </div>
+
+            <div class="rounded-xl bg-[#f9fafb] p-5 text-[14px] text-[#111827]">
+              <p>
+                {{ addressLine1 || '—' }}{{ addressLine2 ? ', ' + addressLine2 : '' }}
+              </p>
+              <p class="mt-2">
+                {{ city || '—' }}{{ state ? ', ' + state : '' }} {{ postalCode }}
+              </p>
+              <p class="mt-2">{{ country }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-5 rounded-xl border border-[#bfdbfe] bg-[#eff6ff] p-4">
+          <div class="flex items-start gap-3">
+            <div class="mt-0.5 text-[#2563eb]">ⓘ</div>
+            <div>
+              <p class="text-[14px] font-medium text-[#1d4ed8]">What happens next?</p>
+              <p class="mt-1 text-[14px] leading-6 text-[#1e40af]">
+                Our team will review your documents within 24-48 hours. You'll receive an email
+                notification once your verification is complete. You can track the status in your
+                account settings.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer actions -->
+      <div class="mt-8 flex items-center justify-between">
+        <button
+          type="button"
+          (click)="prevStep()"
+          [disabled]="currentStep === 1 || submitting || !identityVerificationRequired"
+          class="rounded-lg border border-[#e5e7eb] bg-white px-5 py-2.5 text-[14px] text-[#374151] transition hover:bg-[#f9fafb] disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Back
+        </button>
+
+        <div class="flex items-center gap-3">
+          <button
+            *ngIf="currentStep < totalSteps"
+            type="button"
+            (click)="onContinue()"
+            [disabled]="submitting || loadingSettings || !identityVerificationRequired"
+            class="rounded-lg bg-[#10b981] px-5 py-2.5 text-[14px] font-medium text-white transition hover:bg-[#059669] disabled:opacity-60"
+          >
+            Continue
+          </button>
+
+          <button
+            *ngIf="currentStep === totalSteps"
+            type="button"
+            (click)="onSubmitForReview()"
+            [disabled]="submitting || loadingSettings || !identityVerificationRequired"
+            class="rounded-lg bg-[#10b981] px-5 py-2.5 text-[14px] font-medium text-white transition hover:bg-[#059669] disabled:opacity-60"
+          >
+            Submit for Review
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

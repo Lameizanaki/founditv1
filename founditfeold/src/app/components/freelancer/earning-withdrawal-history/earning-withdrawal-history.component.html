@@ -1,0 +1,460 @@
+<div class="min-h-screen bg-[#f8fafc] p-4 md:p-6">
+  <div class="mx-auto max-w-7xl">
+    <!-- Back -->
+    <a
+      routerLink="/freelancer/dashboard"
+      class="mb-3 inline-flex items-center gap-2 text-sm font-medium text-[#6b7280] transition hover:text-[#111827]"
+    >
+      <lucide-angular [img]="icons.ChevronLeft" class="h-4 w-4"></lucide-angular>
+      Back to Dashboard
+    </a>
+
+    <!-- Header -->
+    <div class="mb-5 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+      <div>
+        <h1 class="text-[28px] font-bold tracking-[-0.02em] text-[#111827]">
+          Earnings
+        </h1>
+        <p class="mt-1 text-sm text-[#6b7280]">
+          Track your income and confirm client payments
+        </p>
+      </div>
+
+      <button
+        type="button"
+        (click)="exportStatement()"
+        [disabled]="exporting"
+        class="inline-flex items-center gap-2 self-start rounded-xl border border-[#e5e7eb] bg-white px-4 py-2.5 text-sm font-semibold text-[#374151] shadow-sm transition hover:bg-[#f9fafb]"
+        [ngClass]="exporting ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'"
+      >
+        <lucide-angular [img]="icons.Download" class="h-4 w-4"></lucide-angular>
+        {{ exporting ? 'Exporting...' : 'Export Statement' }}
+      </button>
+    </div>
+
+    <!-- Summary cards -->
+    <section class="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div
+        *ngFor="let stat of stats"
+        class="rounded-2xl border border-[#e5e7eb] bg-white p-4 shadow-sm"
+      >
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-xl"
+          [ngClass]="stat.iconBg"
+        >
+          <lucide-angular
+            [img]="stat.icon"
+            class="h-4 w-4"
+            [ngClass]="stat.iconColor"
+          ></lucide-angular>
+        </div>
+
+        <h3 class="mt-4 text-[30px] font-bold leading-none tracking-[-0.03em] text-[#111827]">
+          {{ stat.value }}
+        </h3>
+        <p class="mt-2 text-sm font-medium text-[#374151]">{{ stat.label }}</p>
+        <p class="mt-1 text-xs text-[#9ca3af]">{{ stat.subLabel }}</p>
+      </div>
+    </section>
+
+    <!-- Chart + right cards -->
+    <section class="mt-5  grid grid-cols-1 gap-5 xl:grid-cols-3">
+      <!-- Chart -->
+      <div class="xl:col-span-2 ">
+        <div class="flex h-[445px] flex-col rounded-2xl border border-[#e5e7eb] bg-white shadow-sm">
+          <div class="flex items-center justify-between border-b border-[#eef2f7] px-5 py-4">
+            <div>
+              <h2 class="text-[16px] font-bold text-[#111827]">Earnings Overview</h2>
+              <div class="mt-3 flex items-center gap-4 text-xs">
+                <span class="inline-flex items-center gap-1.5 text-[#9b5cf6]">
+                  <span class="h-2 w-2 rounded-full bg-[#9b5cf6]"></span>
+                  Earnings
+                </span>
+              </div>
+            </div>
+
+            <div class="inline-flex rounded-lg bg-[#f3f4f6] p-1">
+              <button
+                type="button"
+                *ngFor="let filter of chartFilters"
+                (click)="selectChartFilter(filter)"
+                class="rounded-md px-3 py-1 text-xs font-semibold transition"
+                [ngClass]="
+                  selectedChartFilter === filter
+                    ? 'bg-white text-[#8b5cf6] shadow-sm'
+                    : 'text-[#6b7280] hover:text-[#111827]'
+                "
+              >
+                {{ filter }}
+              </button>
+            </div>
+          </div>
+
+          <div class="min-h-0 flex-1 p-5">
+            <div class="relative h-full w-full overflow-hidden rounded-xl bg-[linear-gradient(180deg,#ffffff_0%,#fafaff_100%)]">
+              <div class="pointer-events-none absolute inset-y-5 left-0 flex w-full flex-col justify-between px-3 text-[11px] text-[#9ca3af]">
+                <span *ngFor="let label of yAxisLabels">{{ label }}</span>
+              </div>
+
+              <div class="absolute inset-0 px-8 py-5">
+                <div class="flex h-full flex-col justify-between">
+                  <div class="border-t border-dashed border-[#eef2f7]"></div>
+                  <div class="border-t border-dashed border-[#eef2f7]"></div>
+                  <div class="border-t border-dashed border-[#eef2f7]"></div>
+                  <div class="border-t border-dashed border-[#eef2f7]"></div>
+                  <div class="border-t border-dashed border-[#eef2f7]"></div>
+                </div>
+              </div>
+
+              <div class="absolute inset-0 px-10 py-5">
+                <div class="flex h-full">
+                  <div *ngFor="let month of months" class="flex-1 border-r border-dashed border-[#f1f5f9] last:border-r-0"></div>
+                </div>
+              </div>
+
+              <div class="absolute inset-x-10 bottom-10 top-8">
+                <svg
+                  class="h-full w-full overflow-visible"
+                  viewBox="0 0 100 100"
+                  preserveAspectRatio="none"
+                  aria-label="Cumulative earnings chart"
+                >
+                  <defs>
+                    <linearGradient id="earningsAreaGradient" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.28"></stop>
+                      <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0.03"></stop>
+                    </linearGradient>
+                  </defs>
+                  <path
+                    *ngIf="earningsAreaPath"
+                    [attr.d]="earningsAreaPath"
+                    fill="url(#earningsAreaGradient)"
+                  ></path>
+                  <path
+                    *ngIf="earningsLinePath"
+                    [attr.d]="earningsLinePath"
+                    fill="none"
+                    stroke="#8b5cf6"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    vector-effect="non-scaling-stroke"
+                  ></path>
+                  <g *ngFor="let point of chartPoints">
+                    <circle
+                      [attr.cx]="point.x"
+                      [attr.cy]="point.y"
+                      r="1.7"
+                      fill="#ffffff"
+                      stroke="#8b5cf6"
+                      stroke-width="1.8"
+                      vector-effect="non-scaling-stroke"
+                    >
+                      <title>{{ point.label }}: ${{ formatCurrency(point.cumulative) }}</title>
+                    </circle>
+                  </g>
+                </svg>
+              </div>
+              <div class="absolute inset-x-8 bottom-4 flex text-center text-[11px] text-[#9ca3af]">
+                <span *ngFor="let month of months" class="min-w-0 flex-1">{{ month }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right panel -->
+      <div class="space-y-2">
+        <!-- Transactions -->
+        <div class="flex h-[445px] flex-col overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-sm">
+          <div class="border-b border-[#eef2f7]">
+            <div class="flex">
+              <div
+                role="button"
+                tabindex="0"
+                *ngFor="let tab of tabs"
+                (pointerdown)="$event.preventDefault(); selectTab(tab.value)"
+                (keydown.enter)="selectTab(tab.value)"
+                (keydown.space)="$event.preventDefault(); selectTab(tab.value)"
+                class="relative z-20 flex h-14 flex-1 cursor-pointer select-none items-center justify-center px-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#22c55e]"
+                [attr.aria-pressed]="selectedTab === tab.value"
+                [ngClass]="
+                  selectedTab === tab.value
+                    ? 'bg-[#f0fdf4] text-[#16a34a]'
+                    : 'bg-white text-[#6b7280] hover:bg-[#f9fafb] hover:text-[#111827]'
+                "
+              >
+                {{ tab.label }}
+                <span
+                  *ngIf="selectedTab === tab.value"
+                  class="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] bg-[#22c55e]"
+                ></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="min-h-0 flex-1 overflow-y-auto divide-y divide-[#eef2f7]">
+            <div
+              *ngIf="loading"
+              class="flex h-full items-center justify-center px-5 text-center text-sm font-medium text-[#6b7280]"
+            >
+              Loading earnings history...
+            </div>
+
+            <div
+              *ngIf="!loading && errorMessage"
+              class="flex h-full items-center justify-center px-5 text-center text-sm font-medium text-[#dc2626]"
+            >
+              {{ errorMessage }}
+            </div>
+
+            <div
+              *ngIf="!loading && !errorMessage && filteredTransactions.length === 0"
+              class="flex h-full items-center justify-center px-5 text-center"
+            >
+              <div>
+                <div
+                  class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#f3f4f6]"
+                >
+                  <lucide-angular [img]="icons.Circle" class="h-5 w-5 text-[#9ca3af]"></lucide-angular>
+                </div>
+                <h3 class="mt-3 text-sm font-semibold text-[#111827]">
+                  {{ getEmptyTransactionTitle() }}
+                </h3>
+                <p class="mt-1 max-w-sm text-sm text-[#6b7280]">
+                  {{ getEmptyTransactionMessage() }}
+                </p>
+              </div>
+            </div>
+
+            <div *ngFor="let item of filteredTransactions" class="px-5 py-4">
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                  <h3 class="truncate text-sm font-semibold text-[#111827]">
+                    {{ item.title }}
+                  </h3>
+                  <p class="mt-0.5 text-xs text-[#9ca3af]">{{ item.from }}</p>
+                </div>
+
+                <span
+                  class="shrink-0 text-[18px] font-bold leading-none tracking-[-0.02em]"
+                  [ngClass]="item.amount > 0 ? 'text-[#16a34a]' : 'text-[#ef4444]'"
+                >
+                  {{ item.amount > 0 ? '+' : '-' }}${{ getAbsoluteAmount(item.amount) }}
+                </span>
+              </div>
+
+              <div class="mt-2 space-y-1 text-[11px] leading-4 text-[#9ca3af]">
+                <p>{{ item.date }} - {{ item.ref }}</p>
+                <p>{{ item.note }}</p>
+                <p *ngIf="item.proofReference">
+                  Reference: <span class="text-[#4b5563]">{{ item.proofReference }}</span>
+                </p>
+                <p *ngIf="item.hasProofFile">
+                  Proof uploaded<span *ngIf="item.proofFileName">: {{ item.proofFileName }}</span>
+                </p>
+              </div>
+
+              <div class="mt-3 flex flex-wrap items-center gap-2">
+                <span
+                  class="rounded-full px-2.5 py-1 text-[11px] font-semibold"
+                  [ngClass]="getTransactionStatusClass(item.status)"
+                >
+                  {{ item.status }}
+                </span>
+
+                <button
+                  *ngIf="item.hasProofFile"
+                  type="button"
+                  (click)="downloadProof(item)"
+                  [disabled]="downloadingProofId === item.tranId"
+                  class="rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-xs font-semibold text-[#374151] transition hover:bg-[#f9fafb] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {{ downloadingProofId === item.tranId ? 'Opening...' : 'View Proof' }}
+                </button>
+
+                <button
+                  *ngIf="item.type === 'payment' && item.status === 'Pending'"
+                  type="button"
+                  (click)="confirmPayment(item)"
+                  [disabled]="confirmingPaymentId === item.tranId"
+                  class="rounded-xl bg-[#16a34a] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#15803d] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {{ confirmingPaymentId === item.tranId ? 'Confirming...' : 'Confirm Payment' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- Add Payment Method Modal -->
+<div
+  *ngIf="false"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-[#020817]/75 p-4"
+>
+  <div class="w-full max-w-[400px] overflow-hidden rounded-2xl bg-white shadow-2xl">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-[#0ea54b] to-[#059669] px-5 py-5 text-white">
+      <div class="flex items-start justify-between">
+        <div>
+          <h2 class="text-[18px] font-bold">Add Payment Method</h2>
+          <p class="mt-1 text-sm text-white/90">
+            Connect a new account to receive payments
+          </p>
+        </div>
+
+        <button
+          (click)="closeAddPaymentModal()"
+          class="flex h-8 w-8 items-center justify-center rounded-full border border-white/50 text-white transition hover:bg-white/10"
+        >
+          <lucide-angular [img]="icons.X" class="h-4 w-4"></lucide-angular>
+        </button>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="space-y-5 p-5">
+      <div>
+        <label class="mb-3 block text-sm font-semibold text-[#374151]">
+          Payment Method Type
+        </label>
+
+        <div class="grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            (click)="selectPaymentType('paypal')"
+            class="flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition"
+            [ngClass]="
+              addPaymentForm.type === 'paypal'
+                ? 'border-[#22c55e] bg-[#f0fdf4] text-[#15803d]'
+                : 'border-[#d1d5db] bg-white text-[#374151] hover:bg-[#f9fafb]'
+            "
+          >
+            <lucide-angular [img]="icons.CreditCard" class="h-4 w-4"></lucide-angular>
+            PayPal
+          </button>
+
+          <button
+            type="button"
+            (click)="selectPaymentType('bank')"
+            class="flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition"
+            [ngClass]="
+              addPaymentForm.type === 'bank'
+                ? 'border-[#22c55e] bg-[#f0fdf4] text-[#15803d]'
+                : 'border-[#d1d5db] bg-white text-[#374151] hover:bg-[#f9fafb]'
+            "
+          >
+            <lucide-angular [img]="icons.Landmark" class="h-4 w-4"></lucide-angular>
+            Bank Account
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <label class="mb-2 block text-sm font-semibold text-[#374151]">
+          Account Holder Name
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="addPaymentForm.accountHolder"
+          placeholder="John Doe"
+          class="h-11 w-full rounded-xl border border-[#d1d5db] px-3 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#22c55e]"
+        />
+      </div>
+
+      <div *ngIf="addPaymentForm.type === 'paypal'">
+        <label class="mb-2 block text-sm font-semibold text-[#374151]">
+          PayPal Email
+        </label>
+        <input
+          type="email"
+          [(ngModel)]="addPaymentForm.paypalEmail"
+          placeholder="john@example.com"
+          class="h-11 w-full rounded-xl border border-[#d1d5db] px-3 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#22c55e]"
+        />
+      </div>
+
+      <ng-container *ngIf="addPaymentForm.type === 'bank'">
+        <div>
+          <label class="mb-2 block text-sm font-semibold text-[#374151]">
+            Account Number
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="addPaymentForm.accountNumber"
+            placeholder="••••••••••1234"
+            class="h-11 w-full rounded-xl border border-[#d1d5db] px-3 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#22c55e]"
+          />
+        </div>
+
+        <div>
+          <label class="mb-2 block text-sm font-semibold text-[#374151]">
+            Routing Number
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="addPaymentForm.routingNumber"
+            placeholder="021000021"
+            class="h-11 w-full rounded-xl border border-[#d1d5db] px-3 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#22c55e]"
+          />
+        </div>
+
+        <div>
+          <label class="mb-2 block text-sm font-semibold text-[#374151]">
+            Bank Name
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="addPaymentForm.bankName"
+            placeholder="Chase Bank"
+            class="h-11 w-full rounded-xl border border-[#d1d5db] px-3 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#22c55e]"
+          />
+        </div>
+      </ng-container>
+
+      <label class="flex cursor-pointer items-center gap-3 px-1">
+        <input
+          type="checkbox"
+          [(ngModel)]="addPaymentForm.isPrimary"
+          class="h-4 w-4 rounded border-[#d1d5db] text-[#16a34a] focus:ring-[#16a34a]"
+        />
+        <span class="text-sm text-[#4b5563]">Set as primary payment method</span>
+      </label>
+
+      <div class="rounded-xl border border-[#bfdbfe] bg-[#eff6ff] px-4 py-3 text-sm text-[#1d4ed8]">
+        <span class="font-semibold">Security:</span>
+        Your payment information is encrypted and secured. We never store your full account details.
+      </div>
+
+      <div
+        *ngIf="addPaymentError"
+        class="rounded-xl border border-[#fecaca] bg-[#fef2f2] px-4 py-3 text-sm text-[#dc2626]"
+      >
+        {{ addPaymentError }}
+      </div>
+
+      <div class="flex gap-3">
+        <button
+          (click)="submitAddPaymentMethod()"
+          class="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#16a34a] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#15803d]"
+        >
+          <lucide-angular [img]="icons.CircleCheckBig" class="h-4 w-4"></lucide-angular>
+          Add Payment Method
+        </button>
+
+        <button
+          (click)="closeAddPaymentModal()"
+          class="rounded-xl border border-[#d1d5db] bg-white px-6 py-3 text-sm font-semibold text-[#374151] transition hover:bg-[#f9fafb]"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

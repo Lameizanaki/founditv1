@@ -1,0 +1,19 @@
+# FastAPI & Web Server
+fastapi==0.115.8
+uvicorn[standard]==0.34.0
+gunicorn==23.0.0
+python-multipart==0.0.20
+
+# Core ML/AI Libraries
+numpy==2.2.3
+opencv-contrib-python==4.11.0.86
+pillow==11.1.0
+
+# OCR - CPU only
+pytesseract==0.3.13
+easyocr==1.7.1
+
+# Utilities
+pydantic==2.10.6
+requests==2.32.3
+python-dotenv==1.0.0

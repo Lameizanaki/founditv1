@@ -1,0 +1,276 @@
+<div class="min-h-screen bg-[#f8fafc] px-4 py-6 md:px-6">
+  <div class="mx-auto max-w-7xl">
+    <!-- Back -->
+    <a
+      routerLink="/freelancer/dashboard"
+      class="mb-3 inline-flex items-center gap-2 text-sm font-medium text-[#6b7280] transition hover:text-[#111827]"
+    >
+      <lucide-angular [img]="icons.ChevronLeft" class="h-4 w-4"></lucide-angular>
+      Back to Dashboard
+    </a>
+
+    <!-- Header -->
+    <div class="mb-6">
+      <h1 class="text-[28px] font-bold tracking-[-0.02em] text-[#111827]">
+        Active Work
+      </h1>
+      <p class="mt-1 text-sm text-[#6b7280]">
+        Projects that are already agreed with clients and ready to work on
+      </p>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div
+        *ngFor="let stat of stats"
+        class="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-[0_2px_8px_rgba(15,23,42,0.04)]"
+      >
+        <div
+          class="mb-4 flex h-10 w-10 items-center justify-center rounded-xl"
+          [ngClass]="stat.iconBg"
+        >
+          <lucide-angular
+            [img]="stat.icon"
+            class="h-5 w-5"
+            [ngClass]="stat.iconColor"
+          ></lucide-angular>
+        </div>
+
+        <div class="text-[34px] font-bold leading-none text-[#111827]">
+          {{ stat.value }}
+        </div>
+        <div class="mt-2 text-[15px] font-medium text-[#374151]">{{ stat.label }}</div>
+        <div class="mt-1 text-xs text-[#9ca3af]">{{ stat.subtext }}</div>
+      </div>
+    </div>
+
+    <!-- Search + Filters -->
+    <div class="mt-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+      <div class="relative w-full xl:max-w-[420px]">
+        <lucide-angular
+          [img]="icons.Search"
+          class="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9ca3af]"
+        ></lucide-angular>
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          placeholder="Search by title or client"
+          class="h-12 w-full ml-4 rounded-xl border border-[#d1d5db] bg-white pl-11 pr-4 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#16a34a]"
+        />
+      </div>
+
+      <div class="flex flex-wrap gap-3">
+        <button
+          *ngFor="let tab of filterTabs"
+          type="button"
+          (click)="activeFilter = tab.key"
+          class="inline-flex h-11 items-center rounded-xl border px-4 text-sm font-medium transition"
+          [ngClass]="
+            activeFilter === tab.key
+              ? 'border-[#16a34a] bg-[#16a34a] text-white shadow-[0_6px_14px_rgba(22,163,74,0.16)]'
+              : 'border-[#d1d5db] bg-white text-[#374151] hover:bg-[#f9fafb]'
+          "
+        >
+          {{ tab.label }}
+          <span
+            *ngIf="getFilterCount(tab.key) > 0"
+            class="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-[11px] font-semibold"
+            [ngClass]="activeFilter === tab.key ? 'bg-white/20 text-white' : 'bg-[#f3f4f6] text-[#6b7280]'"
+          >
+            {{ getFilterCount(tab.key) }}
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <div
+      *ngIf="errorMessage"
+      class="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+    >
+      {{ errorMessage }}
+    </div>
+
+    <div
+      *ngIf="loading"
+      class="mt-5 rounded-2xl border border-[#e5e7eb] bg-white px-5 py-10 text-center text-sm text-[#6b7280]"
+    >
+      Loading your work...
+    </div>
+
+    <div
+      *ngIf="!loading && !errorMessage && filteredWorks.length === 0"
+      class="mt-5 rounded-2xl border border-dashed border-[#d1d5db] bg-white px-5 py-10 text-center text-sm text-[#6b7280]"
+    >
+      No active work found.
+    </div>
+
+    <!-- Work Cards -->
+    <div *ngIf="!loading && filteredWorks.length > 0" class="mt-5 space-y-4">
+      <div
+        *ngFor="let item of filteredWorks"
+        class="rounded-2xl border border-[#e5e7eb] bg-white px-5 py-4 shadow-[0_2px_8px_rgba(15,23,42,0.04)]"
+      >
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div class="flex min-w-0 gap-4">
+            <div
+              class="mt-1 flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#e5e7eb] bg-[#fafafa] text-sm font-semibold text-[#64748b]"
+            >
+              <img
+                *ngIf="item.clientAvatar; else clientInitial"
+                [src]="item.clientAvatar"
+                [alt]="item.client"
+                class="h-full w-full object-cover"
+              />
+              <ng-template #clientInitial>
+                {{ item.client.charAt(0).toUpperCase() }}
+              </ng-template>
+            </div>
+
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <h3 class="text-[16px] font-semibold text-[#111827]">
+                  {{ item.title }}
+                </h3>
+
+                <span
+                  class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium"
+                  [ngClass]="getStatusBadgeClass(item.status)"
+                >
+                  <lucide-angular
+                    [img]="getStatusIcon(item.status)"
+                    class="h-3.5 w-3.5"
+                  ></lucide-angular>
+                  {{ item.status }}
+                </span>
+              </div>
+
+              <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[#6b7280]">
+                <div class="inline-flex items-center gap-1.5">
+                  <lucide-angular [img]="icons.User" class="h-4 w-4"></lucide-angular>
+                  <a
+                    *ngIf="getClientProfileLink(item) as clientProfileLink; else plainClientName"
+                    [routerLink]="clientProfileLink"
+                    [queryParams]="{ returnUrl: '/freelancer/active-work' }"
+                    class="font-medium text-[#16a34a] transition hover:text-[#15803d] hover:underline"
+                  >
+                    {{ item.client }}
+                  </a>
+                  <ng-template #plainClientName>
+                    <span class="font-medium text-[#16a34a]">{{ item.client }}</span>
+                  </ng-template>
+                </div>
+
+                <span *ngIf="item.clientCompany" class="text-[#6b7280]">
+                  {{ item.clientCompany }}
+                </span>
+
+                <span *ngIf="item.clientLocation" class="text-[#6b7280]">
+                  {{ item.clientLocation }}
+                </span>
+
+                <span *ngIf="item.clientEmail" class="text-[#6b7280]">
+                  {{ item.clientEmail }}
+                </span>
+
+                <div class="inline-flex items-center gap-1.5">
+                  <lucide-angular [img]="icons.CalendarDays" class="h-4 w-4"></lucide-angular>
+                  <span>Due {{ item.dueDate }}</span>
+                </div>
+
+                <div class="inline-flex items-center gap-1.5">
+                  <lucide-angular [img]="icons.DollarSign" class="h-4 w-4"></lucide-angular>
+                  <span>${{ item.amount }}</span>
+                </div>
+
+                <span class="rounded-full bg-[#f3f4f6] px-2.5 py-1 text-[11px] font-medium text-[#6b7280]">
+                  {{ item.category }}
+                </span>
+              </div>
+
+              <div *ngIf="item.progress !== null" class="mt-4">
+                <div class="mb-1.5 flex items-center justify-between">
+                  <span class="text-xs font-medium text-[#6b7280]">Progress</span>
+                  <span class="text-xs font-semibold text-[#16a34a]">{{ item.progress }}%</span>
+                </div>
+
+                <div class="h-1.5 w-full rounded-full bg-[#e5e7eb]">
+                  <div
+                    class="h-1.5 rounded-full bg-[#16a34a]"
+                    [style.width.%]="item.progress"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex shrink-0 flex-col gap-3 lg:w-[128px]">
+            <a
+              *ngIf="getClientProfileLink(item) as clientProfileLink; else unavailableView"
+              [routerLink]="clientProfileLink"
+              [queryParams]="{ returnUrl: '/freelancer/active-work' }"
+              class="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#16a34a] px-4 text-sm font-semibold text-white transition hover:bg-[#15803d]"
+            >
+              <lucide-angular [img]="icons.Eye" class="h-4 w-4"></lucide-angular>
+              View
+            </a>
+            <ng-template #unavailableView>
+              <button
+                type="button"
+                disabled
+                class="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#16a34a] px-4 text-sm font-semibold text-white opacity-50"
+              >
+                <lucide-angular [img]="icons.Eye" class="h-4 w-4"></lucide-angular>
+                View
+              </button>
+            </ng-template>
+
+            <a
+              *ngIf="getChatLink(item) as chatLink; else unavailableMessage"
+              [routerLink]="chatLink"
+              class="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-[#d1d5db] bg-white px-4 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+            >
+              <lucide-angular [img]="icons.MessageSquare" class="h-4 w-4"></lucide-angular>
+              Message
+            </a>
+            <ng-template #unavailableMessage>
+              <button
+                type="button"
+                disabled
+                class="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-[#d1d5db] bg-white px-4 text-sm font-medium text-[#374151] opacity-50"
+              >
+                <lucide-angular [img]="icons.MessageSquare" class="h-4 w-4"></lucide-angular>
+                Message
+              </button>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom CTA -->
+    <div
+      class="mt-6 flex flex-col gap-4 rounded-2xl border border-[#eee7ff] bg-[#f5f0ff] px-5 py-5 md:flex-row md:items-center md:justify-between"
+    >
+      <div class="flex items-start gap-4">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#efe5ff]">
+          <lucide-angular [img]="icons.TrendingUp" class="h-5 w-5 text-[#9333ea]"></lucide-angular>
+        </div>
+
+        <div>
+          <h3 class="text-[18px] font-semibold text-[#1f2937]">Keep your momentum going</h3>
+          <p class="mt-1 text-sm text-[#6b7280]">
+            You have 3 active engagements. Stay on top of deadlines and communicate proactively with clients.
+          </p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="inline-flex items-center gap-2 self-start text-sm font-semibold text-[#9333ea] transition hover:text-[#7e22ce] md:self-center"
+      >
+        View Earnings
+        <lucide-angular [img]="icons.ArrowUpRight" class="h-4 w-4"></lucide-angular>
+      </button>
+    </div>
+  </div>
+</div>

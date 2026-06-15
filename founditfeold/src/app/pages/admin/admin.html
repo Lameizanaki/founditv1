@@ -1,0 +1,11 @@
+<div class="h-screen bg-[#f8f8f8]">
+  <app-admin-header-component></app-admin-header-component>
+
+  <div class="flex h-[calc(100vh-72px)]">
+    <app-admin-sidebar-component></app-admin-sidebar-component>
+
+    <main class="flex-1 overflow-y-auto p-6">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

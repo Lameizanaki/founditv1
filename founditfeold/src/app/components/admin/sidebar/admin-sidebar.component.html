@@ -1,0 +1,33 @@
+<!-- Toggle button (ONLY mobile) -->
+<button
+  (click)="toggleSidebar()"
+  class="fixed left-3 top-20 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow md:hidden"
+>
+  <lucide-angular
+    [img]="isSidebarOpen ? icons.ChevronLeft : icons.ChevronRight"
+    class="h-5 w-5"
+  ></lucide-angular>
+</button>
+
+<!-- Sidebar -->
+<aside
+  class="fixed top-0 z-40 h-full w-56 border-r border-[#e5e7eb] bg-white px-3 py-4 transition-transform duration-300 md:static md:translate-x-0"
+  [ngClass]="{
+    '-translate-x-full': !isSidebarOpen,
+    'translate-x-0': isSidebarOpen
+  }"
+>
+  <nav class="mt-16 space-y-2 md:mt-0">
+    <a
+      *ngFor="let item of menuItems"
+      [routerLink]="item.route"
+      routerLinkActive="bg-gradient-to-r from-[#b620e0] to-[#f538a0] text-white shadow-sm"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="flex items-center gap-3 rounded-xl px-4 py-3 text-[14px] font-medium text-[#222] transition hover:bg-[#f9fafb]"
+      (click)="isSidebarOpen = false"
+    >
+      <lucide-angular [img]="item.icon" class="h-4 w-4"></lucide-angular>
+      <span>{{ item.label }}</span>
+    </a>
+  </nav>
+</aside>

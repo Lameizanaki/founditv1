@@ -1,0 +1,521 @@
+<div class="relative bg-white">
+  <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div>
+        <button
+          type="button"
+          (click)="goBack()"
+          class="mb-3 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 shadow-sm transition hover:border-slate-300 hover:text-slate-900"
+        >
+          <lucide-angular [img]="icons.ArrowLeft" class="h-4 w-4"></lucide-angular>
+          {{ isViewerMode() ? 'Back to Chat' : 'Back to Dashboard' }}
+        </button>
+
+        <h1 class="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+          {{ isViewerMode() ? 'Client Profile' : 'My Profile' }}
+        </h1>
+        <p class="mt-2 max-w-2xl text-sm text-slate-600 sm:text-base">
+          {{
+            isViewerMode()
+              ? 'Review client details for this conversation.'
+              : 'Manage your client profile and showcase your business.'
+          }}
+        </p>
+      </div>
+
+      <div *ngIf="isViewerMode()" class="relative">
+        <button
+          type="button"
+          (click)="isReportMenuOpen.set(!isReportMenuOpen())"
+          class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
+          title="More options"
+          aria-label="More options"
+        >
+          <lucide-angular [img]="icons.MoreVertical" class="h-5 w-5"></lucide-angular>
+        </button>
+
+        @if (isReportMenuOpen()) {
+          <div
+            class="absolute right-0 z-20 mt-2 w-44 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-lg"
+          >
+            <button
+              type="button"
+              (click)="openReportModal()"
+              class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-50"
+            >
+              <lucide-angular [img]="icons.Flag" class="h-4 w-4 text-rose-600"></lucide-angular>
+              Report client
+            </button>
+          </div>
+        }
+      </div>
+
+      <div *ngIf="!isViewerMode()" class="flex flex-wrap gap-3">
+        @if (isEditing()) {
+          <button
+            type="button"
+            (click)="cancelEditing()"
+            class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+          >
+            <lucide-angular [img]="icons.RefreshCw" class="h-4 w-4"></lucide-angular>
+            Cancel Editing
+          </button>
+          <button
+            type="button"
+            (click)="saveChanges()"
+            [disabled]="isSaving()"
+            class="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700"
+            [class.opacity-70]="isSaving()"
+            [class.cursor-not-allowed]="isSaving()"
+          >
+            <lucide-angular [img]="icons.Save" class="h-4 w-4"></lucide-angular>
+            {{ isSaving() ? 'Saving...' : 'Save Profile Changes' }}
+          </button>
+        } @else {
+          <button
+            type="button"
+            (click)="enableEditing()"
+            class="inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700"
+          >
+            <lucide-angular [img]="icons.Edit3" class="h-4 w-4"></lucide-angular>
+            Edit Profile
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (isLoading()) {
+      <div class="grid gap-6 lg:grid-cols-[320px_1fr]">
+        <div class="space-y-6">
+          <div class="h-90 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+            <div
+              class="mx-auto h-28 w-28 rounded-full border-4 border-white bg-slate-100 shadow-sm animate-pulse"
+            ></div>
+            <div class="mt-6 space-y-3">
+              <div class="h-4 rounded-full bg-slate-100 animate-pulse"></div>
+              <div class="h-4 w-2/3 rounded-full bg-slate-100 animate-pulse"></div>
+              <div class="h-10 rounded-2xl bg-slate-100 animate-pulse"></div>
+              <div class="h-10 rounded-2xl bg-slate-100 animate-pulse"></div>
+              <div class="h-10 rounded-2xl bg-slate-100 animate-pulse"></div>
+            </div>
+          </div>
+          <div
+            class="h-52 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm animate-pulse"
+          ></div>
+        </div>
+        <div class="space-y-6">
+          <div
+            class="h-56 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm animate-pulse"
+          ></div>
+          <div
+            class="h-80 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm animate-pulse"
+          ></div>
+          <div
+            class="h-72 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm animate-pulse"
+          ></div>
+        </div>
+      </div>
+    } @else {
+      @if (errorMessage()) {
+        <div
+          class="mb-6 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700"
+        >
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <form class="grid gap-6 lg:grid-cols-[320px_1fr]" (ngSubmit)="saveChanges()">
+        <div class="space-y-6">
+          <section class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+            <div class="px-8 py-8">
+              <div class="flex flex-col items-center">
+                <div
+                  class="relative h-32 w-32 overflow-hidden rounded-full border-4 border-white bg-white shadow-xl ring-1 ring-slate-200"
+                >
+                  @if (avatarUrl()) {
+                    <img
+                      [src]="avatarUrl()"
+                      [alt]="displayName()"
+                      class="h-full w-full object-cover"
+                    />
+                  } @else {
+                    <div
+                      class="flex h-full w-full items-center justify-center bg-slate-100 text-xl font-semibold text-slate-500"
+                    >
+                      {{ initials() }}
+                    </div>
+                  }
+                </div>
+
+                @if (isEditing() && !isViewerMode()) {
+                  <input
+                    #avatarInput
+                    type="file"
+                    accept="image/*"
+                    class="hidden"
+                    (change)="handleAvatarSelection($event)"
+                  />
+                  <button
+                    type="button"
+                    (click)="avatarInput.click()"
+                    [disabled]="isLoading() || isUploadingAvatar()"
+                    class="mt-3 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 transition hover:bg-emerald-100"
+                    [class.cursor-not-allowed]="isLoading() || isUploadingAvatar()"
+                    [class.opacity-60]="isLoading() || isUploadingAvatar()"
+                  >
+                    <lucide-angular [img]="icons.Upload" class="h-4 w-4"></lucide-angular>
+                    @if (isUploadingAvatar()) {
+                      Uploading...
+                    } @else {
+                      Update Profile Picture
+                    }
+                  </button>
+                }
+              </div>
+
+              <div class="mt-6 space-y-3">
+                <div>
+                  <label
+                    class="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-slate-500"
+                    >Full Name</label
+                  >
+                  <input
+                    type="text"
+                    [value]="draft().fullName"
+                    (input)="updateDraftValue('fullName', $event)"
+                    [readOnly]="!isEditing()"
+                    class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 read-only:bg-slate-50 read-only:text-slate-700"
+                  />
+                </div>
+                <div>
+                  <label
+                    class="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-slate-500"
+                    >Company</label
+                  >
+                  <input
+                    type="text"
+                    [value]="draft().company"
+                    (input)="updateDraftValue('company', $event)"
+                    [readOnly]="!isEditing()"
+                    class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 read-only:bg-slate-50 read-only:text-slate-700"
+                  />
+                </div>
+                <div>
+                  <label
+                    class="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-slate-500"
+                    >Location</label
+                  >
+                  <input
+                    type="text"
+                    [value]="draft().location"
+                    (input)="updateDraftValue('location', $event)"
+                    [readOnly]="!isEditing()"
+                    class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 read-only:bg-slate-50 read-only:text-slate-700"
+                  />
+                </div>
+              </div>
+
+            </div>
+          </section>
+
+          <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-2 text-slate-900">
+              <lucide-angular
+                [img]="icons.TrendingUp"
+                class="h-4 w-4 text-blue-600"
+              ></lucide-angular>
+              <h2 class="text-base font-semibold">Project Statistics</h2>
+            </div>
+            <div class="mt-4 grid grid-cols-2 gap-3">
+              @for (stat of statistics(); track stat.label) {
+                <div
+                  class="rounded-2xl border p-4 shadow-sm"
+                  [class.border-blue-100]="stat.tone === 'blue'"
+                  [class.bg-blue-50]="stat.tone === 'blue'"
+                  [class.border-emerald-100]="stat.tone === 'emerald'"
+                  [class.bg-emerald-50]="stat.tone === 'emerald'"
+                  [class.border-violet-100]="stat.tone === 'violet'"
+                  [class.bg-violet-50]="stat.tone === 'violet'"
+                  [class.border-amber-100]="stat.tone === 'amber'"
+                  [class.bg-amber-50]="stat.tone === 'amber'"
+                >
+                  <p class="text-2xl font-semibold text-slate-900">{{ stat.value }}</p>
+                  <p class="mt-1 text-sm font-medium text-slate-700">{{ stat.label }}</p>
+                  <p class="mt-1 text-xs text-slate-500">{{ stat.hint }}</p>
+                </div>
+              }
+            </div>
+          </section>
+
+        </div>
+
+        <div class="grid gap-6 xl:grid-cols-2">
+          <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm xl:col-span-2">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <p class="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">
+                  About
+                </p>
+                <h2 class="mt-2 text-2xl font-semibold text-slate-900">
+                  {{ isViewerMode() ? 'About this client' : 'Tell freelancers about your business' }}
+                </h2>
+              </div>
+            </div>
+
+            <textarea
+              rows="6"
+              [value]="draft().about"
+              (input)="updateDraftValue('about', $event)"
+              [readOnly]="isViewerMode() || !isEditing()"
+              [attr.tabindex]="isViewerMode() ? -1 : null"
+              class="mt-5 w-full resize-none rounded-3xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-700 outline-none transition read-only:bg-slate-50"
+              [ngClass]="
+                isViewerMode()
+                  ? 'cursor-default focus:border-slate-200 focus:ring-0'
+                  : 'focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100'
+              "
+            ></textarea>
+          </section>
+
+          <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-2 text-slate-900">
+              <lucide-angular [img]="icons.Mail" class="h-4 w-4 text-blue-600"></lucide-angular>
+              <h2 class="text-base font-semibold">Contact Information</h2>
+            </div>
+            <div class="mt-4 space-y-3">
+              <div>
+                <label
+                  class="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-slate-500"
+                  >Email</label
+                >
+                <input
+                  type="email"
+                  [value]="draft().email"
+                  (input)="updateDraftValue('email', $event)"
+                  [readOnly]="!isEditing()"
+                  class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 read-only:bg-slate-50 read-only:text-slate-700"
+                />
+              </div>
+              <div>
+                <label
+                  class="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-slate-500"
+                  >Phone</label
+                >
+                <input
+                  type="text"
+                  [value]="draft().phone"
+                  (input)="updateDraftValue('phone', $event)"
+                  [readOnly]="!isEditing()"
+                  class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 read-only:bg-slate-50 read-only:text-slate-700"
+                />
+              </div>
+              <div>
+                <label
+                  class="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-slate-500"
+                  >Website</label
+                >
+                <input
+                  type="text"
+                  [value]="draft().website"
+                  (input)="updateDraftValue('website', $event)"
+                  [readOnly]="!isEditing()"
+                  class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 read-only:bg-slate-50 read-only:text-slate-700"
+                />
+              </div>
+            </div>
+          </section>
+
+          <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div class="flex items-center justify-between gap-4">
+              <div class="flex items-center gap-2 text-slate-900">
+                <lucide-angular
+                  [img]="icons.BriefcaseBusiness"
+                  class="h-4 w-4 text-blue-600"
+                ></lucide-angular>
+                <h2 class="text-base font-semibold">Project History</h2>
+              </div>
+              <button
+                type="button"
+                (click)="retry()"
+                class="text-sm font-medium text-blue-600 transition hover:text-blue-700"
+              >
+                Refresh
+              </button>
+            </div>
+
+            <div class="mt-4 max-h-[22rem] space-y-3 overflow-y-auto pr-1">
+              @if (projectHistory().length) {
+                @for (project of projectHistory(); track trackByProject($index, project)) {
+                  <article
+                    class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 transition hover:border-slate-300 hover:bg-white"
+                  >
+                    <div class="flex items-start justify-between gap-4">
+                      <div class="min-w-0">
+                        <h3 class="truncate text-base font-semibold text-slate-900">
+                          {{ project.title }}
+                        </h3>
+                        <p class="mt-1 text-sm text-slate-500">{{ project.collaborator }}</p>
+                        <p class="mt-2 line-clamp-2 text-sm leading-6 text-slate-600">
+                          {{ project.description }}
+                        </p>
+                      </div>
+
+                      <div class="shrink-0 text-right">
+                        <div
+                          class="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold"
+                          [class.bg-emerald-100]="project.statusTone === 'emerald'"
+                          [class.text-emerald-700]="project.statusTone === 'emerald'"
+                          [class.bg-amber-100]="project.statusTone === 'amber'"
+                          [class.text-amber-700]="project.statusTone === 'amber'"
+                          [class.bg-slate-200]="project.statusTone === 'slate'"
+                          [class.text-slate-700]="project.statusTone === 'slate'"
+                        >
+                          <lucide-angular [img]="icons.Star" class="h-3.5 w-3.5"></lucide-angular>
+                          {{ project.ratingLabel }}
+                        </div>
+                        <p class="mt-2 text-xs text-slate-500">{{ project.dateLabel }}</p>
+                        <div
+                          class="mt-3 flex items-center justify-end gap-2 text-xs font-medium text-slate-600"
+                        >
+                          <span
+                            class="rounded-full px-2 py-1"
+                            [class.bg-emerald-50]="project.statusTone === 'emerald'"
+                            [class.text-emerald-700]="project.statusTone === 'emerald'"
+                            [class.bg-amber-50]="project.statusTone === 'amber'"
+                            [class.text-amber-700]="project.statusTone === 'amber'"
+                            [class.bg-slate-100]="project.statusTone === 'slate'"
+                            [class.text-slate-600]="project.statusTone === 'slate'"
+                          >
+                            {{ project.statusLabel }}
+                          </span>
+                          <span>{{ project.amountLabel }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+                }
+              } @else {
+                <div
+                  class="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-8 text-center"
+                >
+                  <p class="text-sm font-semibold text-slate-900">No project history yet</p>
+                  <p class="mt-1 text-sm text-slate-500">
+                    {{
+                      isViewerMode()
+                        ? 'This client does not have completed or active projects yet.'
+                        : 'Once the backend returns project history for this client, it will appear here.'
+                    }}
+                  </p>
+                </div>
+              }
+            </div>
+          </section>
+
+          @if (false) {
+            <div class="mt-5 space-y-4">
+              @if (testimonials().length) {
+                @for (
+                  testimonial of testimonials();
+                  track trackByTestimonial($index, testimonial)
+                ) {
+                  <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+                    <div class="flex items-center justify-between gap-4">
+                      <div>
+                        <p class="font-semibold text-slate-900">{{ testimonial.author }}</p>
+                        <p class="text-xs text-slate-500">{{ testimonial.role }}</p>
+                      </div>
+                      <div class="flex items-center gap-1 text-amber-500">
+                        @for (star of [1, 2, 3, 4, 5]; track star) {
+                          <lucide-angular
+                            [img]="icons.Star"
+                            class="h-3.5 w-3.5 fill-current"
+                          ></lucide-angular>
+                        }
+                      </div>
+                    </div>
+                    <p class="mt-3 text-sm leading-6 text-slate-600">“{{ testimonial.quote }}”</p>
+                  </div>
+                }
+              } @else {
+                <div
+                  class="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-8 text-center"
+                >
+                  <p class="text-sm font-semibold text-slate-900">No testimonials yet</p>
+                  <p class="mt-1 text-sm text-slate-500">
+                    Testimonial content will appear here once the backend provides it.
+                  </p>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </form>
+    }
+  </div>
+</div>
+
+@if (isReportModalOpen()) {
+  <div class="fixed inset-0 z-40 bg-black/50" (click)="closeReportModal()"></div>
+
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div
+      class="w-full max-w-lg rounded-2xl bg-white shadow-2xl"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900">Report Client</h3>
+          <p class="mt-1 text-sm text-slate-500">Tell admin what happened with this client.</p>
+        </div>
+        <button
+          type="button"
+          (click)="closeReportModal()"
+          class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100"
+        >
+          <lucide-angular [img]="icons.X" class="h-4 w-4"></lucide-angular>
+        </button>
+      </div>
+
+      <div class="px-5 py-5">
+        <label class="mb-2 block text-sm font-medium text-slate-900">Issue details</label>
+        <textarea
+          [value]="reportMessage()"
+          (input)="updateReportMessage($event)"
+          rows="6"
+          placeholder="Example: I think I was scammed during payment, the client did not follow the agreement..."
+          class="w-full resize-none rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+        ></textarea>
+
+        @if (reportSuccessMessage()) {
+          <p class="mt-3 rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">
+            {{ reportSuccessMessage() }}
+          </p>
+        }
+        @if (reportErrorMessage()) {
+          <p class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+            {{ reportErrorMessage() }}
+          </p>
+        }
+      </div>
+
+      <div class="flex justify-end gap-3 border-t border-slate-200 px-5 py-4">
+        <button
+          type="button"
+          (click)="closeReportModal()"
+          class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          (click)="submitReport()"
+          [disabled]="isSubmittingReport() || !reportMessage().trim()"
+          class="inline-flex items-center gap-2 rounded-xl bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <lucide-angular [img]="icons.Send" class="h-4 w-4"></lucide-angular>
+          {{ isSubmittingReport() ? 'Sending...' : 'Send Report' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,40 @@
+<div class="w-full max-w-7xl mt-12 mx-auto">
+  <div class="rounded-[22px] border border-[#d9dce3] bg-white px-8 py-9 shadow-[0_2px_6px_rgba(15,23,42,0.06)]">
+    <h2 class="mb-8 text-[22px] font-semibold text-[#1f2937]">
+      {{ title }}
+    </h2>
+  
+    <div class="space-y-8">
+      <div
+        *ngFor="let experience of experiences"
+        class="flex items-start gap-4"
+      >
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#f3e8ff]">
+          <lucide-angular
+            [img]="icons.BriefcaseBusiness"
+            class="h-5 w-5 text-[#9333ea]"
+          ></lucide-angular>
+        </div>
+  
+        <div class="min-w-0">
+          <h3 class="text-[18px] font-semibold leading-tight text-[#1f2937]">
+            {{ experience.title }}
+          </h3>
+  
+          <p class="mt-1 text-[16px] font-medium text-[#4b5563]">
+            {{ experience.company }}
+          </p>
+  
+          <p class="mt-1 text-[15px] text-[#7b8698]">
+            {{ experience.period }}
+          </p>
+  
+          <p class="mt-3 max-w-none text-[15px] leading-7 text-[#5f6b7a]">
+            {{ experience.description }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

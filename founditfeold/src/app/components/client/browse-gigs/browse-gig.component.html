@@ -1,0 +1,208 @@
+<div class="w-full max-w-full overflow-x-hidden bg-[#f6f7f9] pl-16 pr-16 mt-12">
+  <div class="max-w-full overflow-x-hidden overflow-y-auto bg-[#f6f7f9] px-8">
+    <!-- Page header -->
+    <div class="mb-6">
+      <h1 class="text-[32px] font-semibold leading-tight text-[#111827]">Browse Gigs</h1>
+
+      <p class="mt-1 text-[14px] text-[#6b7280]">Discover services from talented freelancers</p>
+    </div>
+
+    <!-- Category + Search -->
+    <div class="mb-6 flex min-w-0 flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+      <!-- Categories -->
+      <div class="flex min-w-0 flex-wrap gap-2">
+        <button
+          *ngFor="let item of categories"
+          type="button"
+          class="rounded-full border px-4 py-2 text-[12px] font-medium transition"
+          [ngClass]="
+            selectedCategory === item
+              ? 'border-[#2563eb] bg-[#2563eb] text-white'
+              : 'border-[#e5e7eb] bg-white text-[#374151] hover:bg-gray-50'
+          "
+          (click)="selectCategory(item)"
+        >
+          {{ item }}
+        </button>
+      </div>
+
+      <!-- Search -->
+      <div class="flex w-full min-w-0 items-center gap-3 xl:w-auto xl:shrink-0">
+        <div class="relative w-full min-w-0 xl:w-64 xl:shrink-0">
+          <input
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="resetPagination()"
+            type="text"
+            placeholder="Search gigs..."
+            class="w-full rounded-lg border border-[#e5e7eb] ml-4 bg-white py-2 pl-10 pr-3 text-sm outline-none"
+          />
+
+          <lucide-angular
+            [img]="icons.Search"
+            class="pointer-events-none absolute ml-1 left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+          ></lucide-angular>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="mb-4 text-[13px] text-[#6b7280]">
+      Showing {{ visibleStart }}-{{ visibleEnd }} of {{ filteredGigs.length }} results
+    </div>
+
+    <!-- Gig cards -->
+    <div class="grid min-w-0 grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+      <div
+        *ngFor="let item of [1, 2, 3, 4]"
+        [class.hidden]="!isLoading"
+        class="min-h-[360px] overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white"
+      >
+        <div class="h-45 w-full animate-pulse bg-gray-200"></div>
+
+        <div class="p-4">
+          <div class="mb-3 flex items-center gap-2">
+            <div class="h-7 w-7 animate-pulse rounded-full bg-gray-200"></div>
+            <div class="h-3 w-24 animate-pulse rounded bg-gray-200"></div>
+          </div>
+
+          <div class="mb-3 space-y-2">
+            <div class="h-4 w-full animate-pulse rounded bg-gray-200"></div>
+            <div class="h-4 w-3/4 animate-pulse rounded bg-gray-200"></div>
+          </div>
+
+          <div class="mb-4 flex items-center gap-2">
+            <div class="h-4 w-4 animate-pulse rounded bg-gray-200"></div>
+            <div class="h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+          </div>
+
+          <div class="flex items-center justify-between border-t border-[#f0f0f0] pt-3">
+            <div class="h-3 w-20 animate-pulse rounded bg-gray-200"></div>
+            <div class="space-y-2 text-right">
+              <div class="ml-auto h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+              <div class="ml-auto h-5 w-14 animate-pulse rounded bg-gray-200"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        *ngIf="!isLoading && errorMessage"
+        class="flex min-h-[360px] items-center justify-center rounded-2xl border border-[#fecaca] bg-[#fef2f2] p-4 text-center text-sm text-[#b91c1c]"
+      >
+        {{ errorMessage }}
+      </div>
+
+      <div
+        *ngFor="let gig of paginatedGigs"
+        class="min-h-[360px] overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white transition hover:shadow-md"
+        [routerLink]="['/client/browse-gigs/gig', gig.id]"
+      >
+        <!-- Image -->
+        <div class="relative h-45 w-full overflow-hidden bg-gray-100">
+          <img [src]="gig.image" [alt]="gig.title" class="h-full w-full object-cover" />
+
+          <span
+            class="absolute left-3 top-3 rounded-full bg-white px-2.5 py-1 text-[11px] font-medium text-[#374151] shadow-sm"
+          >
+            {{ gig.category }}
+          </span>
+        </div>
+
+        <!-- Content -->
+        <div class="p-4">
+          <!-- Seller -->
+          <div class="mb-3 flex items-center gap-2">
+            <div
+              *ngIf="gig.sellerProfileImage"
+              class="h-7 w-7 rounded-full border border-[#e5e7eb] overflow-hidden bg-gray-100"
+            >
+              <img
+                [src]="gig.sellerProfileImage"
+                [alt]="gig.seller"
+                class="h-full w-full object-cover"
+              />
+            </div>
+            <div
+              *ngIf="!gig.sellerProfileImage"
+              class="h-7 w-7 rounded-full border border-[#e5e7eb] bg-gray-100"
+            ></div>
+            <span class="text-[12px] text-[#4b5563]">
+              {{ gig.seller }}
+            </span>
+          </div>
+
+          <!-- Title -->
+          <h3 class="mb-3 line-clamp-2 min-h-11 text-[14px] font-medium leading-6 text-[#111827]">
+            {{ gig.title }}
+          </h3>
+
+          <!-- Rating -->
+          <div class="mb-4 flex items-center gap-1 text-[13px] text-[#6b7280]">
+            <lucide-angular [img]="icons.Star" class="h-4 w-4 text-yellow-500"></lucide-angular>
+
+            <span class="font-medium text-[#111827]">{{ gig.rating }}</span>
+            <span>({{ gig.reviews }})</span>
+          </div>
+
+          <!-- Footer -->
+          <div class="flex items-center justify-between border-t border-[#f0f0f0] pt-3">
+            <div class="flex items-center gap-1 text-[12px] text-[#6b7280]">
+              <lucide-angular [img]="icons.Clock3" class="h-4 w-4"></lucide-angular>
+              <span>{{ gig.delivery }}</span>
+            </div>
+
+            <div class="text-right">
+              <p class="text-[11px] text-[#9ca3af]">Starting at</p>
+              <p class="text-[20px] font-semibold text-[#111827]">${{ gig.price }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      *ngIf="!isLoading && !errorMessage && filteredGigs.length === 0"
+      class="flex w-full h-96 max-w-full items-center justify-center rounded-2xl border border-[#e5e7eb] bg-white text-center text-sm text-[#6b7280]"
+    >
+      No gigs found.
+    </div>
+
+    <!-- Pagination -->
+    <div
+      *ngIf="!isLoading && !errorMessage && filteredGigs.length > itemsPerPage"
+      class="mt-12 flex flex-wrap items-center justify-center gap-2"
+    >
+      <button
+        type="button"
+        (click)="goToPreviousPage()"
+        [disabled]="currentPage === 1"
+        class="flex h-9 w-9 items-center justify-center rounded-lg border border-[#e5e7eb] bg-white text-sm text-[#374151] transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        &lt;
+      </button>
+
+      <button
+        *ngFor="let page of pageNumbers"
+        type="button"
+        (click)="goToPage(page)"
+        class="flex h-9 w-9 items-center justify-center rounded-lg border text-sm transition"
+        [ngClass]="
+          currentPage === page
+            ? 'border-[#2563eb] bg-[#2563eb] text-white'
+            : 'border-[#e5e7eb] bg-white text-[#374151] hover:bg-gray-50'
+        "
+      >
+        {{ page }}
+      </button>
+
+      <button
+        type="button"
+        (click)="goToNextPage()"
+        [disabled]="currentPage === totalPages"
+        class="flex h-9 w-9 items-center justify-center rounded-lg border border-[#e5e7eb] bg-white text-sm text-[#374151] transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        &gt;
+      </button>
+    </div>
+  </div>
+</div>

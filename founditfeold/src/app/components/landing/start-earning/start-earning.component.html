@@ -1,0 +1,129 @@
+<section class="bg-[#f5f4fb] py-24 pl-16 pr-16">
+  <div class="mx-auto grid w-full items-center gap-14 px-6 lg:grid-cols-2">
+    <!-- Left -->
+    <div class="relative" data-aos="zoom-in-up">
+      <!-- floating earnings card -->
+      <div
+        class="absolute right-2 top-0 z-20 flex items-center gap-3 rounded-[18px] bg-white px-5 py-4 shadow-[0_18px_38px_rgba(15,23,42,0.14)] md:right-4"
+      >
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-full bg-[#dcfce7] text-[#22c55e]"
+        >
+          <lucide-icon [img]="icons.ArrowUpRight" class="h-5 w-5"></lucide-icon>
+        </div>
+
+        <div>
+          <p class="text-[12px] text-[#8a8f98]">Avg. Earnings</p>
+          <p class="text-[18px] font-extrabold text-[#111827]">
+            $2,450<span class="text-[13px]">/mo</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- main mock card -->
+      <div class="rounded-[20px] bg-white p-6 shadow-[0_30px_55px_rgba(15,23,42,0.14)] md:p-7">
+        <h3 class="text-[24px] font-extrabold text-[#111827]">Create Your Gig</h3>
+
+        <div class="mt-6">
+          <label class="mb-2 block text-[14px] font-medium text-[#374151]">Gig Title</label>
+          <div
+            class="flex h-[52px] items-center rounded-[12px] border border-[#e6e7eb] bg-[#f8f8fa] px-4 text-[15px] text-[#8a8f98]"
+          >
+            I will design a modern UI/UX...
+          </div>
+        </div>
+
+        <div class="mt-5 grid gap-4 sm:grid-cols-2">
+          <div>
+            <label class="mb-2 block text-[14px] font-medium text-[#374151]">Price</label>
+            <div
+              class="flex h-[52px] items-center rounded-[12px] border border-[#e6e7eb] bg-[#f8f8fa] px-4 text-[15px] text-[#6b7280]"
+            >
+              $350
+            </div>
+          </div>
+
+          <div>
+            <label class="mb-2 block text-[14px] font-medium text-[#374151]">Delivery</label>
+            <div
+              class="flex h-[52px] items-center rounded-[12px] border border-[#e6e7eb] bg-[#f8f8fa] px-4 text-[15px] text-[#6b7280]"
+            >
+              3 days
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-5 grid grid-cols-3 gap-3">
+          <div class="h-[64px] rounded-[12px] bg-[#e6d8f3]"></div>
+          <div class="h-[64px] rounded-[12px] bg-[#d8def8]"></div>
+          <div class="h-[64px] rounded-[12px] bg-[#efd4e6]"></div>
+        </div>
+
+        <button
+          class="mt-5 flex h-[54px] w-full items-center justify-center gap-2 rounded-[12px] bg-[#4f46e5] text-[18px] font-semibold text-white shadow-[0_10px_24px_rgba(79,70,229,0.32)] transition hover:bg-[#4338ca]"
+        >
+          <lucide-icon [img]="icons.PlusSquare" class="h-5 w-5"></lucide-icon>
+          Publish Gig
+        </button>
+      </div>
+    </div>
+
+    <!-- Right -->
+    <div class="max-w-2xl" data-aos="zoom-in-up">
+      <div
+        class="inline-flex rounded-full bg-[#e1e4ff] px-4 py-1.5 text-[15px] font-medium text-[#4f46e5]"
+      >
+        For Freelancers
+      </div>
+
+      <h2
+        class="mt-5 text-[40px] font-extrabold leading-[1.05] tracking-[-0.03em] text-[#111827] md:text-[52px]"
+      >
+        Start earning by posting your gigs
+      </h2>
+
+      <p class="mt-6 text-[18px] leading-9 text-[#6b7280]">
+        Showcase your skills, set your own prices, and connect with clients looking for your
+        expertise. Join thousands of freelancers earning on FoundIt.
+      </p>
+
+      <div class="mt-8 space-y-5">
+        <div *ngFor="let benefit of benefits" class="flex items-start gap-3">
+          <div
+            class="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[#4f46e5]"
+          >
+            <lucide-icon [img]="icons.CheckCircle2" class="h-5 w-5"></lucide-icon>
+          </div>
+
+          <div>
+            <h3 class="text-[16px] font-bold text-[#111827]">
+              {{ benefit.title }}
+            </h3>
+            <p class="mt-1 text-[15px] leading-7 text-[#6b7280]">
+              {{ benefit.description }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-10 flex flex-col gap-4 sm:flex-row">
+        <button
+          type="button"
+          (click)="onPostFirstGig()"
+          class="flex h-[54px] items-center justify-center gap-2 rounded-[14px] bg-[#4f46e5] px-8 text-[18px] font-semibold text-white shadow-[0_10px_24px_rgba(79,70,229,0.32)] transition hover:bg-[#4338ca]"
+        >
+          <lucide-icon [img]="icons.PlusSquare" class="h-5 w-5"></lucide-icon>
+          Post Your First Gig
+        </button>
+
+        <button
+          type="button"
+          (click)="onBrowseGigs()"
+          class="h-[54px] rounded-[14px] border border-[#c7d2fe] bg-transparent px-8 text-[18px] font-semibold text-[#4f46e5] transition hover:bg-white"
+        >
+          Browse Gigs
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

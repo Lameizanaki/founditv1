@@ -1,0 +1,308 @@
+<div class="min-h-screen bg-[#f8fafc] p-4 md:p-6">
+  <div class="mx-auto max-w-[1200px]">
+    <!-- Back -->
+    <button
+      type="button"
+      (click)="goBack()"
+      class="mb-4 inline-flex items-center gap-2 text-sm font-medium text-[#6b7280] transition hover:text-[#111827]"
+    >
+      <lucide-angular [img]="icons.ArrowLeft" class="h-4 w-4"></lucide-angular>
+      Back to Orders
+    </button>
+
+    <!-- Top Header Card -->
+    <div class="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-sm">
+      <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div>
+          <p *ngIf="isLoading" class="mb-2 text-sm text-[#6b7280]">Loading order...</p>
+          <p *ngIf="errorMessage" class="mb-2 text-sm text-[#dc2626]">{{ errorMessage }}</p>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <h1 class="text-[18px] font-semibold text-[#111827]">
+              Order #{{ order.id }}
+            </h1>
+
+            <span
+              class="rounded-full px-3 py-1 text-xs font-semibold"
+              [ngClass]="statusClasses"
+            >
+              {{ statusLabel }}
+            </span>
+          </div>
+
+          <p class="mt-2 text-sm text-[#6b7280]">Placed on {{ order.placedOn }}</p>
+        </div>
+
+        <button
+          type="button"
+          (click)="messageFreelancer()"
+          class="inline-flex items-center justify-center gap-2 rounded-xl border border-[#d1d5db] bg-white px-4 py-2.5 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+        >
+          <lucide-angular [img]="icons.MessageCircle" class="h-4 w-4"></lucide-angular>
+          Message Freelancer
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Main Grid -->
+    <div class="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-[1.85fr_0.9fr]">
+      <!-- Left Column -->
+      <div class="space-y-5">
+        <!-- Service Details -->
+        <div class="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-sm">
+          <h2 class="text-[18px] font-semibold text-[#111827]">Service Details</h2>
+
+          <div class="mt-4 flex gap-4">
+            <img
+              *ngIf="order.image; else serviceImagePlaceholder"
+              [src]="order.image"
+              [alt]="order.serviceTitle"
+              class="h-[72px] w-[72px] rounded-xl object-cover"
+            />
+
+            <ng-template #serviceImagePlaceholder>
+              <div class="flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-xl bg-[#eef2ff] text-xs font-semibold text-[#2563eb]">
+                {{ (order.serviceTitle || 'Order').charAt(0).toUpperCase() }}
+              </div>
+            </ng-template>
+
+            <div class="min-w-0 flex-1">
+              <h3 class="text-[16px] font-semibold text-[#111827]">
+                {{ order.serviceTitle }}
+              </h3>
+
+              <div class="mt-2 flex items-center gap-3 text-sm text-[#6b7280]">
+                <img
+                  *ngIf="order.freelancerAvatar; else freelancerInitialAvatar"
+                  [src]="order.freelancerAvatar"
+                  [alt]="order.freelancerName"
+                  class="h-9 w-9 rounded-full border border-[#d1d5db] object-cover"
+                />
+
+                <ng-template #freelancerInitialAvatar>
+                  <div
+                    class="flex h-9 w-9 items-center justify-center rounded-full border border-[#d1d5db] bg-[#f9fafb] text-xs font-semibold text-[#374151]"
+                  >
+                    {{ freelancerInitials || 'F' }}
+                  </div>
+                </ng-template>
+
+                <div>
+                  <p class="text-sm font-medium text-[#111827]">{{ order.freelancerName }}</p>
+                  <div class="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[#6b7280]">
+                    <span *ngIf="order.freelancerJob">{{ order.freelancerJob }}</span>
+                    <span *ngIf="order.freelancerLocation">{{ order.freelancerLocation }}</span>
+                    <span *ngIf="order.freelancerExperience">
+                      {{ order.freelancerExperience }} yrs exp
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-1 text-xs text-[#f59e0b]">
+                    <span>★</span>
+                    <span>{{ order.rating }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-5 border-t border-[#eef2f7] pt-4">
+            <div class="inline-flex items-center gap-2 rounded-full bg-[#dcfce7] px-3 py-1 text-xs font-semibold text-[#16a34a]">
+              <lucide-angular [img]="icons.PackageCheck" class="h-3.5 w-3.5"></lucide-angular>
+              {{ order.packageName }}
+            </div>
+
+            <div *ngIf="order.includes.length" class="mt-4 space-y-2">
+              <div
+                *ngFor="let item of order.includes"
+                class="flex items-center gap-2 text-sm text-[#6b7280]"
+              >
+                <lucide-angular [img]="icons.CheckCircle2" class="h-4 w-4 text-[#16a34a]"></lucide-angular>
+                {{ item }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Requirements -->
+        <div class="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-sm">
+          <h2 class="text-[18px] font-semibold text-[#111827]">Your Requirements</h2>
+
+          <div class="mt-4 rounded-xl bg-[#f9fafb] p-4 text-sm leading-7 text-[#4b5563]">
+            {{ order.requirementText || 'No requirements were added for this order.' }}
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div>
+        <div class="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-sm xl:sticky xl:top-6">
+          <h2 class="text-[18px] font-semibold text-[#111827]">Order Summary</h2>
+
+          <div class="mt-5 space-y-3 text-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-[#6b7280]">{{ order.packageName }}</span>
+              <span class="font-medium text-[#111827]">${{ order.packagePrice }}</span>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span class="text-[#6b7280]">Service Fee</span>
+              <span class="font-medium text-[#111827]">${{ order.serviceFee }}</span>
+            </div>
+          </div>
+
+          <div class="my-5 border-t border-[#e5e7eb]"></div>
+
+          <div class="flex items-center justify-between">
+            <span class="text-[16px] font-semibold text-[#111827]">Total</span>
+            <span class="text-[30px] font-bold leading-none text-[#16a34a]">${{ total }}</span>
+          </div>
+
+          <!-- Buttons -->
+          <div class="mt-5 space-y-3">
+            <button
+              *ngIf="order.status === 'pending'"
+              type="button"
+              (click)="openCancelModal()"
+              [disabled]="isCancelling"
+              class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#ef4444] bg-white px-4 py-3 text-sm font-semibold text-[#ef4444] transition hover:bg-[#fef2f2]"
+            >
+              <lucide-angular [img]="icons.XCircle" class="h-4 w-4"></lucide-angular>
+              {{ isCancelling ? 'Cancelling...' : 'Cancel Order' }}
+            </button>
+
+            <button
+              *ngIf="order.status === 'in-progress' || order.status === 'in-review'"
+              type="button"
+              (click)="openRevisionModal()"
+              class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1d4ed8]"
+            >
+              <lucide-angular [img]="icons.CircleAlert" class="h-4 w-4"></lucide-angular>
+              Request Revision
+            </button>
+          </div>
+
+          <div class="mt-5 space-y-3 border-t border-[#e5e7eb] pt-5 text-sm">
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center gap-2 text-[#6b7280]">
+                <lucide-angular [img]="icons.CalendarDays" class="h-4 w-4"></lucide-angular>
+                Order Date
+              </span>
+              <span class="font-medium text-[#111827]">{{ order.placedOn }}</span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cancel Modal -->
+    <div
+      *ngIf="showCancelModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+    >
+      <div class="w-full max-w-[720px] rounded-2xl bg-white shadow-2xl">
+        <div class="border-b border-[#e5e7eb] px-6 py-5">
+          <h3 class="text-[20px] font-semibold text-[#111827]">Cancel Order</h3>
+          <p class="mt-1 text-sm text-[#6b7280]">
+            Provide feedback and reason for cancelling the order
+          </p>
+        </div>
+
+        <div class="px-6 py-5">
+          <div>
+            <label class="mb-2 block text-sm font-medium text-[#111827]">Reason for Cancellation</label>
+            <input
+              [(ngModel)]="cancelForm.reason"
+              type="text"
+              class="h-[46px] w-full rounded-xl border border-[#d1d5db] px-4 text-sm text-[#111827] outline-none focus:border-[#2563eb]"
+            />
+          </div>
+
+          <div class="mt-5">
+            <label class="mb-2 block text-sm font-medium text-[#111827]">Additional Details</label>
+            <textarea
+              [(ngModel)]="cancelForm.details"
+              rows="5"
+              placeholder="Describe the specific issues or reasons for cancellation..."
+              class="w-full rounded-xl border border-[#d1d5db] px-4 py-3 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#2563eb]"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-3 border-t border-[#e5e7eb] px-6 py-5 sm:flex-row">
+          <button
+            type="button"
+            (click)="closeCancelModal()"
+            class="h-[46px] flex-1 rounded-xl border border-[#d1d5db] bg-white px-4 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            (click)="submitCancellation()"
+            class="h-[46px] flex-1 rounded-xl bg-[#ef4444] px-4 text-sm font-semibold text-white transition hover:bg-[#dc2626]"
+          >
+            Submit Cancellation Request
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Revision Modal -->
+    <div
+      *ngIf="showRevisionModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+    >
+      <div class="w-full max-w-[620px] rounded-2xl bg-white shadow-2xl">
+        <div class="border-b border-[#e5e7eb] px-6 py-5">
+          <h3 class="text-[20px] font-semibold text-[#111827]">Request Revision</h3>
+          <p class="mt-1 text-sm text-[#6b7280]">
+            Provide feedback and request changes from the freelancer
+          </p>
+        </div>
+
+        <div class="px-6 py-5">
+          <div>
+            <label class="mb-2 block text-sm font-medium text-[#111827]">Reason for Revision</label>
+            <input
+              [(ngModel)]="revisionForm.reason"
+              type="text"
+              class="h-[46px] w-full rounded-xl border border-[#d1d5db] px-4 text-sm text-[#111827] outline-none focus:border-[#2563eb]"
+            />
+          </div>
+
+          <div class="mt-5">
+            <label class="mb-2 block text-sm font-medium text-[#111827]">Additional Details</label>
+            <textarea
+              [(ngModel)]="revisionForm.details"
+              rows="5"
+              placeholder="Describe the specific issues or changes you need..."
+              class="w-full rounded-xl border border-[#d1d5db] px-4 py-3 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#2563eb]"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-3 border-t border-[#e5e7eb] px-6 py-5 sm:flex-row">
+          <button
+            type="button"
+            (click)="closeRevisionModal()"
+            class="h-[46px] flex-1 rounded-xl border border-[#d1d5db] bg-white px-4 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            (click)="submitRevision()"
+            class="h-[46px] flex-1 rounded-xl bg-[#2563eb] px-4 text-sm font-semibold text-white transition hover:bg-[#1d4ed8]"
+          >
+            Submit Revision Request
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

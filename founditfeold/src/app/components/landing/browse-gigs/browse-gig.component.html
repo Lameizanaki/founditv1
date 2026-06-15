@@ -1,0 +1,236 @@
+<div class="w-full bg-[#f6f7f9]">
+  <landing-header />
+
+  <div class="overflow-y-auto bg-[#f6f7f9] px-8 py-6">
+    <!-- Page header -->
+    <div class="mb-6">
+      <h1 class="text-[32px] font-semibold leading-tight text-[#111827]">Browse Gigs</h1>
+
+      <p class="mt-1 text-[14px] text-[#6b7280]">Discover services from talented freelancers</p>
+    </div>
+
+    <!-- Category + Search -->
+    <div class="mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+      <!-- Categories -->
+      <div class="flex flex-wrap gap-2">
+        <button
+          *ngFor="let item of categories"
+          type="button"
+          class="rounded-full border px-4 py-2 text-[12px] font-medium transition"
+          [ngClass]="
+            selectedCategory === item
+              ? 'border-[#16a34a] bg-[#16a34a] text-white'
+              : 'border-[#e5e7eb] bg-white text-[#374151] hover:bg-gray-50'
+          "
+          (click)="selectCategory(item)"
+        >
+          {{ item }}
+        </button>
+      </div>
+
+      <!-- Search + Filter -->
+      <div class="flex items-center gap-3">
+        <div class="relative">
+          <input
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="currentPage = 1"
+            type="text"
+            placeholder="Search gigs..."
+            class="w-full rounded-lg border border-[#e5e7eb] ml-3 bg-white py-2 pl-10 pr-3 text-sm outline-none"
+          />
+
+          <lucide-angular
+            [img]="icons.Search"
+            class="absolute left-3 mt-3.5 h-4 w-4 -translate-y-1/2 text-gray-400"
+          ></lucide-angular>
+        </div>
+
+        <button
+          type="button"
+          (click)="toggleFilters()"
+          class="flex items-center ml-3 gap-2 rounded-lg border border-[#e5e7eb] bg-white px-4 py-2 text-sm text-[#374151] transition hover:bg-gray-50"
+        >
+          <lucide-angular [img]="icons.Filter" class="h-4 w-4"></lucide-angular>
+
+          {{ showFilters ? 'Hide Filters' : 'Filters' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Filters section -->
+    <div *ngIf="showFilters" class="mb-8 rounded-xl border border-[#e5e7eb] bg-white p-5">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div>
+          <label class="mb-2 block text-sm font-medium text-[#6b7280]"> Budget Range </label>
+          <input
+            [(ngModel)]="budgetRange"
+            (ngModelChange)="currentPage = 1"
+            type="text"
+            placeholder=""
+            class="w-full rounded-lg border border-[#d1d5db] px-3 py-2 text-sm outline-none focus:border-[#16a34a]"
+          />
+        </div>
+
+        <div>
+          <label class="mb-2 block text-sm font-medium text-[#6b7280]"> Delivery Time </label>
+          <input
+            [(ngModel)]="deliveryTime"
+            (ngModelChange)="currentPage = 1"
+            type="text"
+            placeholder=""
+            class="w-full rounded-lg border border-[#d1d5db] px-3 py-2 text-sm outline-none focus:border-[#16a34a]"
+          />
+        </div>
+
+        <div>
+          <label class="mb-2 block text-sm font-medium text-[#6b7280]"> Seller Level </label>
+          <input
+            [(ngModel)]="sellerLevel"
+            (ngModelChange)="currentPage = 1"
+            type="text"
+            placeholder=""
+            class="w-full rounded-lg border border-[#d1d5db] px-3 py-2 text-sm outline-none focus:border-[#16a34a]"
+          />
+        </div>
+
+        <div>
+          <label class="mb-2 block text-sm font-medium text-[#6b7280]"> Sort By </label>
+          <input
+            [(ngModel)]="sortBy"
+            (ngModelChange)="currentPage = 1"
+            type="text"
+            placeholder=""
+            class="w-full rounded-lg border border-[#d1d5db] px-3 py-2 text-sm outline-none focus:border-[#16a34a]"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="mb-4 text-[13px] text-[#6b7280]">Showing {{ filteredGigs.length }} results</div>
+
+    <div
+      *ngIf="isLoading"
+      class="mb-6 rounded-xl border border-[#e5e7eb] bg-white p-5 text-sm text-[#6b7280]"
+    >
+      Loading gigs...
+    </div>
+
+    <div
+      *ngIf="errorMessage"
+      class="mb-6 rounded-xl border border-[#fecaca] bg-[#fef2f2] p-5 text-sm text-[#b91c1c]"
+    >
+      {{ errorMessage }}
+    </div>
+
+    <!-- Gig cards -->
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+      <div
+        *ngFor="let gig of paginatedGigs"
+        class="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white transition hover:shadow-md"
+        [routerLink]="['/browse-gigs/gig', gig.id]"
+      >
+        <!-- Image -->
+        <div class="relative h-45 w-full overflow-hidden bg-gray-100">
+          <img [src]="gig.image" [alt]="gig.title" class="h-full w-full object-cover" />
+
+          <span
+            class="absolute left-3 top-3 rounded-full bg-white px-2.5 py-1 text-[11px] font-medium text-[#374151] shadow-sm"
+          >
+            {{ gig.category }}
+          </span>
+        </div>
+
+        <!-- Content -->
+        <div class="p-4">
+          <!-- Seller -->
+          <div class="mb-3 flex items-center gap-2">
+            <div class="h-7 w-7 rounded-full border border-[#e5e7eb] bg-gray-100 overflow-hidden">
+              <img
+                *ngIf="gig.sellerProfileImage"
+                [src]="gig.sellerProfileImage"
+                [alt]="gig.seller"
+                class="h-full w-full object-cover"
+              />
+            </div>
+            <span class="text-[12px] text-[#4b5563]">
+              {{ gig.seller }}
+            </span>
+          </div>
+
+          <!-- Title -->
+          <h3 class="mb-3 line-clamp-2 min-h-11 text-[14px] font-medium leading-6 text-[#111827]">
+            {{ gig.title }}
+          </h3>
+
+          <!-- Rating -->
+          <div class="mb-4 flex items-center gap-1 text-[13px] text-[#6b7280]">
+            <lucide-angular [img]="icons.Star" class="h-4 w-4 text-yellow-500"></lucide-angular>
+
+            <span class="font-medium text-[#111827]">{{ gig.rating }}</span>
+            <span>({{ gig.reviews }})</span>
+          </div>
+
+          <!-- Footer -->
+          <div class="flex items-center justify-between border-t border-[#f0f0f0] pt-3">
+            <div class="flex items-center gap-1 text-[12px] text-[#6b7280]">
+              <lucide-angular [img]="icons.Clock3" class="h-4 w-4"></lucide-angular>
+              <span>{{ gig.delivery }}</span>
+            </div>
+
+            <div class="text-right">
+              <p class="text-[11px] text-[#9ca3af]">Starting at</p>
+              <p class="text-[20px] font-semibold text-[#111827]">${{ gig.price }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      *ngIf="!isLoading && !errorMessage && filteredGigs.length === 0"
+      class="mt-6 rounded-xl border border-[#e5e7eb] bg-white p-5 text-sm text-[#6b7280]"
+    >
+      No gigs found.
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-12 flex items-center justify-center gap-2">
+      <button
+        type="button"
+        (click)="goToPreviousPage()"
+        [disabled]="currentPage === 1"
+        class="flex h-9 w-9 items-center justify-center rounded-lg border border-[#e5e7eb] bg-white text-sm text-[#374151] transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        &lt;
+      </button>
+
+      <button
+        *ngFor="let page of visiblePages"
+        type="button"
+        (click)="goToPage(page)"
+        class="flex h-9 w-9 items-center justify-center rounded-lg border text-sm transition"
+        [ngClass]="
+          currentPage === page
+            ? 'border-[#16a34a] bg-[#16a34a] text-white'
+            : 'border-[#e5e7eb] bg-white text-[#374151] hover:bg-gray-50'
+        "
+      >
+        {{ page }}
+      </button>
+
+      <button
+        type="button"
+        (click)="goToNextPage()"
+        [disabled]="currentPage === totalPages"
+        class="flex h-9 w-9 items-center justify-center rounded-lg border border-[#e5e7eb] bg-white text-sm text-[#374151] transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        &gt;
+      </button>
+    </div>
+
+    <div class="mt-12">
+      <landing-footer />
+    </div>
+  </div>
+</div>

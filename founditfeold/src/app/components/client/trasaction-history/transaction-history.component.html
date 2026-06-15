@@ -1,0 +1,206 @@
+<div class="min-h-screen bg-[#f8fafc] p-4 md:p-6">
+  <div class="mx-auto w-full pl-16 pr-16">
+    <!-- Header -->
+    <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+      <div>
+        <h1 class="text-[40px] font-semibold leading-none text-[#111827]">Transaction History</h1>
+        <p class="mt-3 text-[17px] text-[#6b7280]">
+          View and manage all your payment transactions
+        </p>
+      </div>
+
+      <button
+        type="button"
+        (click)="exportStatement()"
+        class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#1d4ed8]"
+      >
+        <lucide-angular [img]="icons.Download" class="h-4 w-4"></lucide-angular>
+        Export Statement
+      </button>
+    </div>
+
+    <div
+      *ngIf="loadError"
+      class="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+    >
+      {{ loadError }}
+    </div>
+
+    <!-- Summary cards -->
+    <div class="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div class="rounded-2xl border border-[#bfdbfe] bg-[#eff6ff] p-6">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#2563eb] text-white">
+          <lucide-angular [img]="icons.DollarSign" class="h-5 w-5"></lucide-angular>
+        </div>
+
+        <h3 class="mt-4 text-[22px] font-semibold text-[#2563eb]">Total Spent</h3>
+        <p class="mt-3 text-[46px] font-bold leading-none text-[#1e3a8a]">
+          ${{ totalSpent.toLocaleString('en-US') }}
+        </p>
+        <p class="mt-3 text-sm text-[#2563eb]">Lifetime payments</p>
+      </div>
+
+      <div class="rounded-2xl border border-[#bbf7d0] bg-[#f0fdf4] p-6">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#16a34a] text-white">
+          <lucide-angular [img]="icons.RotateCcw" class="h-5 w-5"></lucide-angular>
+        </div>
+
+        <h3 class="mt-4 text-[22px] font-semibold text-[#166534]">Total Refunded</h3>
+        <p class="mt-3 text-[46px] font-bold leading-none text-[#166534]">
+          ${{ totalRefunded.toLocaleString('en-US') }}
+        </p>
+        <p class="mt-3 text-sm text-[#16a34a]">Refunds received</p>
+      </div>
+
+      <div class="rounded-2xl border border-[#e9d5ff] bg-[#faf5ff] p-6">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#9333ea] text-white">
+          <lucide-angular [img]="icons.FileText" class="h-5 w-5"></lucide-angular>
+        </div>
+
+        <h3 class="mt-4 text-[22px] font-semibold text-[#6b21a8]">Total Transactions</h3>
+        <p class="mt-3 text-[46px] font-bold leading-none text-[#6b21a8]">
+          {{ totalTransactions }}
+        </p>
+        <p class="mt-3 text-sm text-[#a855f7]">All time</p>
+      </div>
+    </div>
+
+    <!-- Table card -->
+    <div class="mt-6 overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white">
+      <!-- Tabs -->
+      <div class="grid grid-cols-3 border-b border-[#e5e7eb]">
+        <button
+          type="button"
+          (click)="setTab('all')"
+          [ngClass]="
+            activeTab === 'all'
+              ? 'border-b-2 border-[#4f46e5] bg-[#f8fbff] text-[#2563eb]'
+              : 'text-[#4b5563] hover:bg-[#f9fafb]'
+          "
+          class="px-4 py-5 text-center text-[17px] font-semibold transition"
+        >
+          All Transactions ({{ totalTransactions }})
+        </button>
+
+        <button
+          type="button"
+          (click)="setTab('payment')"
+          [ngClass]="
+            activeTab === 'payment'
+              ? 'border-b-2 border-[#4f46e5] bg-[#f8fbff] text-[#2563eb]'
+              : 'text-[#4b5563] hover:bg-[#f9fafb]'
+          "
+          class="px-4 py-5 text-center text-[17px] font-semibold transition"
+        >
+          Payments ({{ paymentCount }})
+        </button>
+
+        <button
+          type="button"
+          (click)="setTab('refund')"
+          [ngClass]="
+            activeTab === 'refund'
+              ? 'border-b-2 border-[#4f46e5] bg-[#f8fbff] text-[#2563eb]'
+              : 'text-[#4b5563] hover:bg-[#f9fafb]'
+          "
+          class="px-4 py-5 text-center text-[17px] font-semibold transition"
+        >
+          Refunds ({{ refundCount }})
+        </button>
+      </div>
+
+      <!-- List -->
+      <div>
+        <div *ngIf="isLoading" class="px-6 py-14 text-center text-sm text-[#6b7280]">
+          Loading transactions...
+        </div>
+
+        <ng-container *ngIf="!isLoading">
+        <ng-container *ngIf="filteredTransactions.length; else emptyState">
+          <div
+            *ngFor="let item of filteredTransactions; trackBy: trackByTransactionId"
+            class="flex flex-col gap-4 border-b border-[#eef2f7] px-5 py-6 md:flex-row md:items-start md:justify-between"
+          >
+            <div class="flex min-w-0 gap-4">
+              <div
+                class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#d1d5db] bg-[#f9fafb] text-sm font-semibold text-[#374151]"
+              >
+                <img
+                  *ngIf="item.freelancerAvatar; else transactionInitials"
+                  [src]="item.freelancerAvatar"
+                  [alt]="item.freelancer"
+                  class="h-full w-full object-cover"
+                />
+                <ng-template #transactionInitials>
+                  {{ getInitials(item.freelancer) }}
+                </ng-template>
+              </div>
+
+              <div class="min-w-0">
+                <h3 class="truncate text-[18px] font-semibold text-[#111827]">
+                  {{ item.title }}
+                </h3>
+
+                <p class="mt-1 text-sm text-[#6b7280]">by {{ item.freelancer }}</p>
+
+                <div class="mt-3 flex flex-wrap items-center gap-2 text-xs text-[#6b7280]">
+                  <span class="inline-flex items-center gap-1">
+                    <lucide-angular [img]="icons.Clock3" class="h-3.5 w-3.5"></lucide-angular>
+                    {{ item.date }}
+                  </span>
+
+                  <span>&bull;</span>
+                  <span>$ &bull;&bull;&bull;&bull; {{ item.cardLast4 }}</span>
+                  <span>&bull;</span>
+                  <span>{{ item.transactionCode }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-4 md:min-w-44 md:justify-end">
+              <p
+                class="text-[18px] font-semibold"
+                [ngClass]="getAmountClass(item.type)"
+              >
+                {{ formatAmount(item.type, item.amount) }}
+              </p>
+
+              <span
+                class="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
+                [ngClass]="getStatusClass(item.status)"
+              >
+                {{ getStatusLabel(item.status) }}
+              </span>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-template #emptyState>
+          <div class="px-6 py-14 text-center">
+            <h3 class="text-lg font-semibold text-[#111827]">No transactions found</h3>
+            <p class="mt-2 text-sm text-[#6b7280]">
+              There are no items in this tab yet.
+            </p>
+          </div>
+        </ng-template>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- Support CTA -->
+    <div class="mt-6 rounded-2xl bg-gradient-to-r from-[#2563eb] to-[#4338ca] p-8 text-white shadow-lg">
+      <h2 class="text-[30px] font-semibold leading-none">Need help with a transaction?</h2>
+      <p class="mt-4  text-[16px] text-white/85">
+        Our support team is available 24/7 to assist you with any payment-related questions or concerns.
+      </p>
+
+      <button
+        type="button"
+        (click)="contactSupport()"
+        class="mt-6 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-[#2563eb] transition hover:bg-[#f8fafc]"
+      >
+        Contact Support
+      </button>
+    </div>
+  </div>
+</div>

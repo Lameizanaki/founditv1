@@ -1,0 +1,308 @@
+<div class="min-h-screen bg-[#f8fafc] p-4 md:p-6">
+  <div class="mx-auto max-w-7xl">
+    <!-- Header -->
+    <div class="flex rounded-2xl border justify-between border-[#e5e7eb] bg-white p-5 shadow-sm">
+
+      <div class="flex items-center gap-3">
+        <button
+          type="button"
+          class="h-8 w-8 items-center align-middle justify-center rounded-full text-[#6b7280] transition hover:bg-[#f3f4f6] hover:text-[#111827]"
+        >
+          <lucide-angular [img]="icons.ChevronLeft" class="h-4 w-4"></lucide-angular>
+        </button>
+
+        <div>
+          <h1 class="text-[18px] font-bold text-[#111827] md:text-[20px]">My Services</h1>
+          <p class="mt-1 text-sm text-[#6b7280]">
+            Manage your services, track performance and orders.
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center  gap-3">
+          <a
+            class="inline-flex h-10 items-center gap-2 rounded-xl border border-[#e5e7eb] bg-white px-3 text-sm font-medium text-[#374151] shadow-sm transition hover:bg-[#f9fafb]"
+            routerLink="/freelancer/profile"
+          >
+            View Profile
+          </a>
+
+          <a
+            class="inline-flex h-10 items-center gap-2 rounded-xl bg-[#111827] px-3 text-sm font-medium text-white shadow-sm transition hover:bg-[#0b1220]"
+            routerLink="/freelancer/create-new-service"
+          >
+            Add New Service
+          </a>
+        </div>
+    </div>
+
+    <!-- Search + Filter -->
+    <div class="relative mt-6 flex flex-col gap-3 md:flex-row md:items-center">
+      <!-- Search -->
+      <div class="relative flex-1">
+        <lucide-angular
+          [img]="icons.Search"
+          class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9ca3af]"
+        ></lucide-angular>
+
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="applyFilters()"
+          placeholder="Search your service listings"
+          class="h-12 w-full ml-4 rounded-xl border border-[#e5e7eb] bg-white pl-11 pr-4 text-sm text-[#111827] outline-none transition placeholder:text-[#9ca3af] focus:border-[#d1d5db] focus:ring-2 focus:ring-[#e5e7eb]"
+        />
+      </div>
+
+      <!-- Filter Button -->
+      <div class="relative">
+        <button
+          type="button"
+          (click)="toggleFilter()"
+          class="inline-flex h-12 items-center gap-2 rounded-xl border border-[#e5e7eb] bg-white px-4 text-sm font-medium text-[#374151] shadow-sm transition hover:bg-[#f9fafb]"
+        >
+          <lucide-angular [img]="icons.Filter" class="h-4 w-4"></lucide-angular>
+          Filter
+        </button>
+
+        <!-- Filter Dropdown -->
+        <div
+          *ngIf="showFilter"
+          class="absolute right-0 z-20 mt-3 w-56 rounded-2xl bg-[#0f172a] p-4 text-white shadow-2xl"
+        >
+          <div>
+            <p class="mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#94a3b8]">
+              Status
+            </p>
+
+            <div class="space-y-3">
+              <button
+                type="button"
+                (click)="setStatusFilter('all')"
+                class="block text-left text-sm transition"
+                [ngClass]="
+                  selectedStatus === 'all'
+                    ? 'text-white font-medium'
+                    : 'text-[#e5e7eb] hover:text-white'
+                "
+              >
+                All Services
+              </button>
+
+              <button
+                type="button"
+                (click)="setStatusFilter('active')"
+                class="block text-left text-sm transition"
+                [ngClass]="
+                  selectedStatus === 'active'
+                    ? 'text-white font-medium'
+                    : 'text-[#e5e7eb] hover:text-white'
+                "
+              >
+                Active
+              </button>
+
+              <button
+                type="button"
+                (click)="setStatusFilter('paused')"
+                class="block text-left text-sm transition"
+                [ngClass]="
+                  selectedStatus === 'paused'
+                    ? 'text-white font-medium'
+                    : 'text-[#e5e7eb] hover:text-white'
+                "
+              >
+                Paused
+              </button>
+            </div>
+          </div>
+
+          <div class="my-5 border-t border-white/10"></div>
+
+          <div>
+            <p class="mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#94a3b8]">
+              Sort By
+            </p>
+
+            <div class="space-y-3">
+              <button
+                type="button"
+                (click)="setSortBy('newest')"
+                class="block text-left text-sm transition"
+                [ngClass]="
+                  sortBy === 'newest' ? 'text-white font-medium' : 'text-[#e5e7eb] hover:text-white'
+                "
+              >
+                Newest First
+              </button>
+
+              <button
+                type="button"
+                (click)="setSortBy('priceHigh')"
+                class="block text-left text-sm transition"
+                [ngClass]="
+                  sortBy === 'priceHigh'
+                    ? 'text-white font-medium'
+                    : 'text-[#e5e7eb] hover:text-white'
+                "
+              >
+                Price: High to Low
+              </button>
+
+              <button
+                type="button"
+                (click)="setSortBy('rating')"
+                class="block text-left text-sm transition"
+                [ngClass]="
+                  sortBy === 'rating' ? 'text-white font-medium' : 'text-[#e5e7eb] hover:text-white'
+                "
+              >
+                Rating
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      *ngIf="errorMessage"
+      class="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+    >
+      {{ errorMessage }}
+    </div>
+
+    <!-- Table -->
+    <div class="mt-5 overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-sm">
+      <!-- Table Header -->
+      <div
+        class="grid grid-cols-12 gap-4 border-b border-[#e5e7eb] bg-[#f9fafb] px-5 py-4 text-sm font-semibold text-[#4b5563]"
+      >
+        <div class="col-span-5">Service Detail</div>
+        <div class="col-span-2">Status</div>
+        <div class="col-span-1">Price</div>
+        <div class="col-span-2">Performance</div>
+        <div class="col-span-2 text-right">Actions</div>
+      </div>
+
+      <!-- Rows -->
+      <div
+        *ngFor="let service of filteredServices; let last = last"
+        class="grid grid-cols-12 gap-4 px-5 py-4"
+        [ngClass]="!last ? 'border-b border-[#f1f5f9]' : ''"
+      >
+        <!-- Service Detail -->
+        <div class="col-span-5 flex items-center gap-4">
+          <img
+            [src]="service.image"
+            [alt]="service.title"
+            class="h-10 w-16 rounded-lg object-cover"
+          />
+
+          <div>
+            <h3 class="text-sm font-semibold text-[#111827]">
+              {{ service.title }}
+            </h3>
+
+            <div class="mt-1 flex items-center gap-1 text-xs text-[#6b7280]">
+              <lucide-angular
+                [img]="icons.Star"
+                class="h-3.5 w-3.5 fill-[#facc15] text-[#facc15]"
+              ></lucide-angular>
+              <span class="font-medium text-[#374151]">{{ service.rating }}</span>
+              <span>({{ service.activeOrders }} active orders)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status -->
+        <div class="col-span-2 flex items-center">
+          <span
+            class="inline-flex rounded-full px-3 py-1 text-xs font-medium"
+            [ngClass]="
+              service.status === 'Active'
+                ? 'bg-[#dcfce7] text-[#16a34a]'
+                : 'bg-[#fef3c7] text-[#d97706]'
+            "
+          >
+            {{ service.status }}
+          </span>
+        </div>
+
+        <!-- Price -->
+        <div class="col-span-1 flex items-center text-sm font-semibold text-[#111827]">
+          ${{ service.price }}
+        </div>
+
+        <!-- Performance -->
+        <div class="col-span-2 flex items-center gap-8">
+          <div>
+            <p class="text-sm font-semibold text-[#111827]">{{ service.impressions }}</p>
+            <p class="text-xs text-[#9ca3af]">Impressions</p>
+          </div>
+
+          <div>
+            <p class="text-sm font-semibold text-[#111827]">{{ service.clicks }}</p>
+            <p class="text-xs text-[#9ca3af]">Clicks</p>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="col-span-2 flex items-center justify-end gap-4 text-[#9ca3af]">
+          <a
+            class="transition hover:text-[#111827]"
+            title="View"
+            [routerLink]="['/freelancer/gigs', service.id]"
+          >
+            <lucide-angular [img]="icons.Eye" class="h-4 w-4"></lucide-angular>
+          </a>
+
+          <button
+            type="button"
+            class="transition hover:text-[#111827]"
+            title="Edit"
+            (click)="editService(service.id)"
+          >
+            <lucide-angular [img]="icons.Pencil" class="h-4 w-4"></lucide-angular>
+          </button>
+
+          <button
+            type="button"
+            class="transition hover:text-[#111827]"
+            [title]="service.status === 'Active' ? 'Pause' : 'Resume'"
+            (click)="toggleServiceStatus(service.id)"
+          >
+            <lucide-angular
+              [img]="service.status === 'Active' ? icons.Pause : icons.Play"
+              class="h-4 w-4"
+            ></lucide-angular>
+          </button>
+
+          <button
+            type="button"
+            class="transition hover:text-red-500"
+            title="Delete"
+            (click)="deleteService(service.id)"
+          >
+            <lucide-angular [img]="icons.Trash2" class="h-4 w-4"></lucide-angular>
+          </button>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        *ngIf="loading"
+        class="px-5 py-10 text-center text-sm text-[#6b7280]"
+      >
+        Loading services...
+      </div>
+
+      <div
+        *ngIf="!loading && filteredServices.length === 0"
+        class="px-5 py-10 text-center text-sm text-[#6b7280]"
+      >
+        No services found.
+      </div>
+    </div>
+  </div>
+</div>

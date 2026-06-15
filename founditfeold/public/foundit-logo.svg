@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100" width="400" height="100">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F0173A"/>
+      <stop offset="100%" stop-color="#A80025"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Angular shield, 80x88, centered at x=48, y=50 -->
+  <polygon points="48,6 88,20 88,52 48,94 8,52 8,20" fill="url(#g)"/>
+  <!-- IT inside shield -->
+  <text x="48" y="62" text-anchor="middle"
+    font-family="'Helvetica Neue',Arial,sans-serif"
+    font-size="32" font-weight="800" fill="white" letter-spacing="-1">IT</text>
+
+  <!-- Wordmark: Found in dark, IT in red -->
+  <text x="106" y="68"
+    font-family="'Helvetica Neue',Arial,sans-serif"
+    font-size="52" font-weight="800" fill="#1a1a2e" letter-spacing="1">Found<tspan fill="#DD0031" font-weight="300">IT</tspan></text>
+</svg>

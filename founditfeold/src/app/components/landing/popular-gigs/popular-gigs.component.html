@@ -1,0 +1,95 @@
+<section class="bg-[#f7f7f7] py-20 pl-16 pr-16">
+  <div class="mx-auto w-full px-6">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-10">
+      <div>
+        <h2
+          class="hidden xl:block lg:block md:block xl:text-3xl xl:font-extrabold xl:text-[#0f172a] md:text-3xl md:font-extrabold md:text-[#0f172a] lg:text-3xl lg:font-extrabold lg:text-[#0f172a]"
+        >
+          Popular Gigs
+        </h2>
+
+        <p
+          class="hidden xl:block lg:block md:block xl:text-gray-500 xl:mt-2 lg:text-gray-500 lg:mt-2 md:text-gray-500 md:mt-2"
+        >
+          Explore the most in-demand services from our talented community.
+        </p>
+      </div>
+
+      <a
+        routerLink="/browse-gigs"
+        class="hidden xl:flex xl:items-center xl:gap-2 xl:text-green-600 xl:font-medium xl:hover:underline xl:cursor-pointer lg:flex lg:items-center lg:gap-2 lg:text-green-600 lg:font-medium lg:hover:underline lg:cursor-pointer md:flex md:items-center md:gap-2 md:text-green-600 md:font-medium md:hover:underline md:cursor-pointer"
+      >
+        Browse all gigs
+        <lucide-icon [img]="icons.ArrowRight" class="w-4 h-4"></lucide-icon>
+      </a>
+    </div>
+
+    <!-- Gig cards -->
+    <div class="mb-4 text-sm text-gray-500" *ngIf="isLoading">Loading popular gigs...</div>
+
+    <div
+      class="hidden xl:flex xl:gap-6 xl:overflow-x-auto xl:pb-4 xl:scroll-smooth lg:flex lg:gap-6 lg:overflow-x-auto lg:pb-4 lg:scroll-smooth md:flex md:gap-6 md:overflow-x-auto md:pb-4 md:scroll-smooth"
+      *ngIf="!isLoading && gigs.length > 0"
+    >
+      <div
+        *ngFor="let gig of gigs"
+        data-aos="fade-left"
+        class="w-lg rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-md transition"
+        [routerLink]="['/browse-gigs/gig', gig.id]"
+      >
+        <!-- Image -->
+        <div class="relative">
+          <img [src]="gig.image" class="h-40 w-full object-cover" />
+
+          <span class="absolute top-3 left-3 text-xs bg-white px-3 py-1 rounded-full shadow">
+            {{ gig.category }}
+          </span>
+        </div>
+
+        <!-- Content -->
+        <div class="p-4">
+          <div class="flex items-center gap-2 text-sm text-gray-600">
+            <div class="h-6 w-6 rounded-full border border-gray-300">
+              <img [src]="gig.image" class="h-full w-full rounded-full object-cover" />
+            </div>
+            {{ gig.author }}
+          </div>
+
+          <p class="mt-3 text-sm text-gray-900 font-medium leading-snug">
+            {{ gig.title }}
+          </p>
+
+          <!-- Rating -->
+          <div class="flex items-center gap-1 mt-3 text-sm text-gray-600">
+            <lucide-icon [img]="icons.Star" class="w-4 h-4 text-yellow-400"></lucide-icon>
+
+            {{ gig.rating }}
+
+            <span class="text-gray-400"> ({{ gig.reviews }}) </span>
+          </div>
+
+          <!-- Footer -->
+          <div
+            class="flex items-center justify-between mt-4 pt-4 border-t border-t-gray-300 text-sm"
+          >
+            <div class="flex items-center gap-1 text-gray-500">
+              <lucide-icon [img]="icons.Clock" class="w-4 h-4"></lucide-icon>
+
+              {{ gig.delivery }}
+            </div>
+
+            <div class="text-right">
+              <div class="text-xs text-gray-400">Starting at</div>
+              <div class="font-semibold text-gray-900">${{ gig.price }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-sm text-gray-500" *ngIf="!isLoading && gigs.length === 0">
+      No popular gigs available yet.
+    </div>
+  </div>
+</section>

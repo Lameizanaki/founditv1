@@ -1,0 +1,303 @@
+<header
+  class="mx-auto flex w-full h-16 border-b border-b-gray-300 justify-between items-center px-6 py-4 lg:px-10 sticky top-0 z-50 bg-white"
+>
+  <!-- Logo -->
+  <div class="w-32 h-16 flex items-center">
+    <img src="/assets/images/logo.png" alt="FOUNDIT" />
+  </div>
+
+  <!-- Left Nav -->
+  <div class="flex items-center gap-8">
+    <nav class="hidden items-center gap-2 lg:flex">
+      <a
+        routerLink="dashboard"
+        (click)="menuToggle = 'dashboard'"
+        [ngClass]="
+          menuToggle === 'dashboard'
+            ? 'inline-flex cursor-pointer items-center gap-2 rounded-xl bg-[#eef2ff] px-4 py-3 text-[15px] font-medium text-[#2563eb]'
+            : 'inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-3 text-[15px] font-medium text-[#4b5563] transition hover:bg-[#f9fafb]'
+        "
+      >
+        <lucide-angular [img]="icons.House" class="h-4 w-4"></lucide-angular>
+        Dashboard
+      </a>
+
+      <a
+        routerLink="active-work"
+        (click)="menuToggle = 'my-work'"
+        [ngClass]="
+          menuToggle === 'my-work'
+            ? 'inline-flex cursor-pointer items-center gap-2 rounded-xl bg-[#eef2ff] px-4 py-3 text-[15px] font-medium text-[#2563eb]'
+            : 'inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-3 text-[15px] font-medium text-[#4b5563] transition hover:bg-[#f9fafb]'
+        "
+      >
+        <lucide-angular [img]="icons.Search" class="h-4 w-4"></lucide-angular>
+        My Work
+      </a>
+
+      <a
+        routerLink="my-services"
+        (click)="menuToggle = 'my-services'"
+        [ngClass]="
+          menuToggle === 'my-services'
+            ? 'inline-flex cursor-pointer items-center gap-2 rounded-xl bg-[#eef2ff] px-4 py-3 text-[15px] font-medium text-[#2563eb]'
+            : 'inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-3 text-[15px] font-medium text-[#4b5563] transition hover:bg-[#f9fafb]'
+        "
+      >
+        <lucide-angular [img]="icons.SquarePlus" class="h-4 w-4"></lucide-angular>
+        My Services
+      </a>
+
+      <a
+        routerLink="hire-requests"
+        (click)="menuToggle = 'incoming-requests'"
+        [ngClass]="
+          menuToggle === 'incoming-requests'
+            ? 'inline-flex cursor-pointer items-center gap-2 rounded-xl bg-[#eef2ff] px-4 py-3 text-[15px] font-medium text-[#2563eb]'
+            : 'inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-3 text-[15px] font-medium text-[#4b5563] transition hover:bg-[#f9fafb]'
+        "
+      >
+        <lucide-angular [img]="icons.ClipboardList" class="h-4 w-4"></lucide-angular>
+        Incoming Requests
+      </a>
+
+      <a
+        routerLink="earnings"
+        (click)="menuToggle = 'payments'"
+        [ngClass]="
+          menuToggle === 'payments'
+            ? 'inline-flex cursor-pointer items-center gap-2 rounded-xl bg-[#eef2ff] px-4 py-3 text-[15px] font-medium text-[#2563eb]'
+            : 'inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-3 text-[15px] font-medium text-[#4b5563] transition hover:bg-[#f9fafb]'
+        "
+      >
+        <lucide-angular [img]="icons.CreditCard" class="h-4 w-4"></lucide-angular>
+        Payments
+      </a>
+    </nav>
+  </div>
+
+  <!-- Right -->
+  <div class="flex items-center gap-5">
+    <!-- Divider -->
+    <div class="hidden h-12 w-px bg-[#e5e7eb] lg:block"></div>
+
+    <!-- Messages -->
+    <a
+      routerLink="/freelancer/chat"
+      (click)="onMessagesClick()"
+      class="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-[#6b7280] transition hover:bg-[#f9fafb] hover:text-[#111827]"
+    >
+      <lucide-angular [img]="icons.MessageSquareMore" class="h-5 w-5"></lucide-angular>
+      <span
+        *ngIf="hasUnreadMessages()"
+        class="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-red-500"
+      ></span>
+    </a>
+
+    <!-- Notifications -->
+    <a
+      routerLink="/freelancer/notification"
+      (click)="onNotificationClick()"
+      class="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-[#6b7280] transition hover:bg-[#f9fafb] hover:text-[#111827]"
+    >
+      <lucide-angular [img]="icons.Bell" class="h-5 w-5"></lucide-angular>
+      <span
+        *ngIf="hasUnreadNotifications()"
+        class="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-red-500"
+      ></span>
+    </a>
+
+    <!-- ── User Profile Button + Dropdown Panel ── -->
+    <div class="relative">
+      <!-- Trigger Button -->
+      <button
+        type="button"
+        (click)="toggleProfilePanel()"
+        class="flex items-center gap-3 rounded-xl px-2 py-1.5 border transition-all duration-200"
+        [ngClass]="
+          profilePanelOpen()
+            ? 'border-gray-200 bg-white shadow-md'
+            : 'border-transparent hover:border-gray-200 hover:shadow-sm hover:bg-[#f9fafb]'
+        "
+        [attr.aria-expanded]="profilePanelOpen()"
+      >
+        <!-- Loading skeleton -->
+        <ng-container *ngIf="loading(); else avatarBlock">
+          <div class="h-10 w-10 rounded-full bg-gray-100 animate-pulse"></div>
+        </ng-container>
+
+        <!-- Avatar -->
+        <ng-template #avatarBlock>
+          <img
+            [src]="user()?.avatarUrl && !avatarError() ? user()!.avatarUrl : defaultAvatarUrl"
+            [alt]="displayName"
+            class="h-10 w-10 rounded-full object-cover shadow-sm shrink-0"
+            (error)="onAvatarError()"
+          />
+        </ng-template>
+
+        <!-- Name & Role -->
+        <div class="hidden text-left sm:block pr-1">
+          <ng-container *ngIf="loading(); else nameBlock">
+            <div class="h-3.5 w-24 bg-gray-100 rounded animate-pulse mb-1.5"></div>
+            <div class="h-3 w-12 bg-gray-100 rounded animate-pulse"></div>
+          </ng-container>
+          <ng-template #nameBlock>
+            <p class="text-[15px] font-semibold leading-5 text-[#111827] whitespace-nowrap">
+              {{ displayName }}
+            </p>
+            <p class="text-sm leading-5 text-[#6b7280]">Freelancer</p>
+          </ng-template>
+        </div>
+
+        <!-- Chevron -->
+        <lucide-angular
+          [img]="icons.ChevronDown"
+          class="h-4 w-4 text-gray-400 shrink-0 transition-transform duration-300"
+          [ngClass]="{ 'rotate-180': profilePanelOpen() }"
+        >
+        </lucide-angular>
+      </button>
+
+      <!-- ── Dropdown Panel ── -->
+      <div
+        class="absolute top-[calc(100%+10px)] right-0 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 transition-all duration-200 origin-top-right"
+        [ngClass]="
+          profilePanelOpen()
+            ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto'
+            : 'opacity-0 scale-95 -translate-y-1 pointer-events-none'
+        "
+        role="menu"
+      >
+        <!-- Dark Header -->
+        <div
+          class="relative overflow-hidden bg-linear-to-br from-slate-800 to-slate-600 px-5 pt-5 pb-6"
+        >
+          <div class="absolute -top-6 -right-6 h-28 w-28 rounded-full bg-white/5"></div>
+          <div class="absolute -bottom-8 -left-4 h-24 w-24 rounded-full bg-white/5"></div>
+
+          <div class="relative flex items-center gap-3">
+            <img
+              [src]="user()?.avatarUrl && !avatarError() ? user()!.avatarUrl : defaultAvatarUrl"
+              [alt]="displayName"
+              class="h-14 w-14 rounded-full object-cover shadow-sm shrink-0"
+              (error)="onAvatarError()"
+            />
+
+            <div>
+              <p class="text-[15px] font-semibold text-white leading-5">{{ displayName }}</p>
+              <p class="text-sm text-slate-300 mt-0.5">{{ user()?.email ?? '—' }}</p>
+              <!-- KYC Badge -->
+              <span
+                class="inline-flex items-center gap-1.5 mt-2 px-2.5 py-0.5 rounded-full text-[11px] font-semibold"
+                [ngClass]="kycBadge.classes"
+              >
+                <span
+                  class="h-1.5 w-1.5 rounded-full shrink-0"
+                  [ngClass]="kycBadge.dotClass"
+                ></span>
+                {{ kycBadge.label }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Menu Items -->
+        <div class="p-2">
+          <button
+            *ngFor="let item of menuItems"
+            type="button"
+            (click)="selectMenuItem(item.key)"
+            [routerLink]="
+              item.key === 'ekyc' && hasSubmittedEkyc
+                ? null
+                : item.key === 'ekyc'
+                  ? '/index/ekyc'
+                  : null
+            "
+            [disabled]="item.key === 'ekyc' && hasSubmittedEkyc"
+            class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border-none cursor-pointer transition-colors duration-150 group"
+            [ngClass]="
+              item.key === 'ekyc' && hasSubmittedEkyc
+                ? 'bg-emerald-50/60 opacity-70 cursor-not-allowed'
+                : activeMenuItem() === item.key
+                  ? 'bg-slate-100'
+                  : 'bg-transparent hover:bg-gray-50'
+            "
+            role="menuitem"
+          >
+            <!-- My Profile -->
+            <span
+              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors duration-150"
+              [ngClass]="
+                item.accent
+                  ? 'bg-violet-50 text-violet-600 group-hover:bg-violet-100'
+                  : 'bg-gray-100 text-gray-500 group-hover:bg-gray-200 group-hover:text-gray-800'
+              "
+            >
+              <lucide-angular [img]="item.icon" class="h-5 w-5"></lucide-angular>
+            </span>
+
+            <!-- Setting -->
+            <div class="flex-1 min-w-0 text-left">
+              <p class="text-[14px] font-semibold text-gray-800 leading-5">{{ item.label }}</p>
+              <p class="text-[12px] text-gray-400 mt-0.5 leading-4 truncate">
+                {{ item.key === 'ekyc' ? ekycMenuDescription : item.desc }}
+              </p>
+            </div>
+
+            <!-- eKYC alert -->
+            <span
+              *ngIf="item.key === 'ekyc' && showKycAlert"
+              class="shrink-0 rounded-full bg-rose-500 px-2 py-0.5 text-[10px] font-bold leading-4 text-white"
+            >
+              !
+            </span>
+
+            <span
+              *ngIf="item.key === 'ekyc' && showKycPending"
+              class="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold leading-4 text-amber-700"
+            >
+              In Review
+            </span>
+
+            <span
+              *ngIf="item.key === 'ekyc' && showKycDone"
+              class="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold leading-4 text-emerald-700"
+            >
+              Completed
+            </span>
+
+            <lucide-angular
+              [img]="icons.ChevronRight"
+              class="h-4 w-4 shrink-0 text-gray-300 transition-colors duration-150 group-hover:text-gray-400"
+            >
+            </lucide-angular>
+          </button>
+        </div>
+
+        <!-- Divider + Logout -->
+        <div class="px-2 pb-3">
+          <div class="mx-2 mb-2 h-px bg-gray-100"></div>
+          <button
+            type="button"
+            (click)="logout()"
+            class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border-none bg-transparent cursor-pointer transition-colors duration-150 group hover:bg-rose-50"
+            role="menuitem"
+          >
+            <span
+              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-500 transition-colors duration-150 group-hover:bg-rose-100"
+            >
+              <lucide-angular [img]="icons.LogOut" class="h-5 w-5"></lucide-angular>
+            </span>
+            <div class="flex-1 text-left">
+              <p class="text-[14px] font-semibold text-rose-500 leading-5">Logout</p>
+              <p class="text-[12px] text-rose-300 mt-0.5 leading-4">End your session</p>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- ── End User Profile ── -->
+  </div>
+</header>

@@ -1,0 +1,105 @@
+<div class="min-h-screen bg-[#f8fafc] p-4 md:p-6">
+  <div class="mx-auto max-w-140">
+    <div class="rounded-3xl border border-[#e5e7eb] bg-white px-6 py-8 shadow-sm md:px-9 md:py-10">
+      <!-- Success Icon -->
+      <div class="flex justify-center">
+        <div class="flex h-23 w-23 items-center justify-center rounded-full bg-[#dcfce7]">
+          <div
+            class="flex h-11.5 w-11.5 items-center justify-center rounded-full border-[3px] border-[#16a34a]"
+          >
+            <lucide-angular [img]="icons.Check" class="h-7 w-7 text-[#16a34a]"></lucide-angular>
+          </div>
+        </div>
+      </div>
+
+      <!-- Title -->
+      <div class="mt-6 text-center">
+        <h1 class="text-[28px] font-semibold leading-tight text-[#111827] md:text-[30px]">
+          {{
+            mode === 'pay' ? 'Payment Started Successfully!' : 'Order Request Sent Successfully!'
+          }}
+        </h1>
+        <p class="mt-4 text-[15px] leading-7 text-[#6b7280] md:text-[16px]">
+          {{
+            mode === 'pay'
+              ? 'Your payment has been initiated. Complete the payment to continue.'
+              : 'Your request has been sent to the freelancer for approval.'
+          }}
+        </p>
+      </div>
+
+      <!-- Order ID Card -->
+      <div class="mt-7 rounded-[18px] bg-[#f9fafb] px-5 py-6 text-center">
+        <div class="flex justify-center">
+          <div class="inline-flex items-center gap-2 text-[16px] text-[#4b5563]">
+            <lucide-angular [img]="icons.Package" class="h-5 w-5 text-[#16a34a]"></lucide-angular>
+            <span
+              >Order ID: <span class="font-semibold text-[#111827]">{{ orderId }}</span></span
+            >
+          </div>
+        </div>
+
+        <p class="mx-auto mt-4 max-w-90 text-[14px] leading-6 text-[#6b7280]">
+          {{
+            mode === 'pay'
+              ? 'Once the payment is completed, the project can move forward.'
+              : 'Once the freelancer accepts, you can proceed to payment.'
+          }}
+        </p>
+      </div>
+
+      <!-- Actions -->
+      <div class="mt-7 space-y-3">
+        <button
+          type="button"
+          (click)="trackOrder()"
+          class="inline-flex h-13.5 w-full items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-4 text-[16px] font-semibold text-white transition hover:bg-[#1d4ed8]"
+        >
+          Track My Order
+          <lucide-angular [img]="icons.ArrowRight" class="h-4 w-4"></lucide-angular>
+        </button>
+
+        <button
+          type="button"
+          (click)="viewAllOrders()"
+          class="inline-flex h-13.5 w-full items-center justify-center gap-2 rounded-xl border-2 border-[#2563eb] bg-white px-4 text-[16px] font-semibold text-[#2563eb] transition hover:bg-[#eff6ff]"
+        >
+          <lucide-angular [img]="icons.Package" class="h-4 w-4"></lucide-angular>
+          View All Orders
+        </button>
+
+        <button
+          type="button"
+          (click)="messageFreelancer()"
+          class="inline-flex h-13.5 w-full items-center justify-center gap-2 rounded-xl border border-[#d1d5db] bg-white px-4 text-[16px] font-semibold text-[#374151] transition hover:bg-[#f9fafb]"
+        >
+          <lucide-angular [img]="icons.Flag" class="h-4 w-4"></lucide-angular>
+          Message Freelancer
+        </button>
+      </div>
+
+      <!-- Back Home -->
+      <div class="mt-6 text-center">
+        <button
+          type="button"
+          (click)="backToHome()"
+          class="inline-flex items-center gap-2 text-[15px] font-medium text-[#4b5563] transition hover:text-[#111827]"
+        >
+          <lucide-angular [img]="icons.House" class="h-4 w-4"></lucide-angular>
+          Back to Home
+        </button>
+      </div>
+
+      <!-- Footer note -->
+      <div class="mt-8 border-t border-[#e5e7eb] pt-6 text-center">
+        <p class="mx-auto max-w-105 text-[13px] leading-6 text-[#6b7280]">
+          {{
+            mode === 'pay'
+              ? 'Your payment is being processed securely through the payment gateway.'
+              : 'The freelancer will review your request and respond through the chat flow.'
+          }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

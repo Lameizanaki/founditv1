@@ -1,0 +1,224 @@
+<div class="min-h-screen bg-[#f8f8f8] px-6 py-8 md:px-10 lg:px-16">
+  <div class="mx-auto w-full">
+    <!-- Logo -->
+    <div class="flex justify-center mb-3">
+      <div class="w-32 h-16 flex items-center">
+        <img class="w-full h-full object-contain" src="/assets/images/logo.png" alt="FOUNDIT" />
+      </div>   
+    </div>
+
+    <!-- Main content -->
+    <div class="grid grid-cols-1 lg:grid-cols-[1.08fr_0.92fr]">
+      <!-- Left -->
+      <div class="flex items-start justify-center px-2 pt-8 md:px-6 lg:px-4 xl:px-8">
+        <div class="w-full max-w-2xl">
+          <h1 class="text-[42px] font-bold leading-tight text-[#1b1b1b]">
+            Create an account
+          </h1>
+          <p class="mt-2 text-[18px] text-[#7b7b7b]">
+            Sign Up With FoundIT
+          </p>
+
+          <!-- Social buttons -->
+          <div class="mt-8 space-y-3">
+            <button
+              type="button"
+              (click)="continueWithGoogle()"
+              class="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-[#e3e3e3] bg-white text-[14px] font-medium text-[#222] transition hover:bg-gray-50"
+            >
+              <img
+                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                alt="Google"
+                class="h-4 w-4"
+              />
+              <span>Continue with Google</span>
+            </button>
+
+          </div>
+
+          <!-- Divider -->
+          <div class="my-6 flex items-center gap-4">
+            <div class="h-px flex-1 bg-[#e5e5e5]"></div>
+            <span class="text-[13px] text-[#8a8a8a]">or use email</span>
+            <div class="h-px flex-1 bg-[#e5e5e5]"></div>
+          </div>
+
+          <!-- Form -->
+          <form (ngSubmit)="onSubmit()" class="space-y-4">
+            <div
+              *ngIf="errorMessage"
+              class="rounded-xl border border-[#fecaca] bg-[#fef2f2] px-4 py-3 text-[14px] text-[#991b1b]"
+            >
+              {{ errorMessage }}
+            </div>
+
+            <!-- Full name -->
+            <div>
+              <label
+                for="fullName"
+                class="mb-2 block text-[14px] font-medium text-[#6f6f6f]"
+              >
+                Full name
+              </label>
+              <input
+                id="fullName"
+                name="fullName"
+                type="text"
+                [(ngModel)]="fullName"
+                placeholder="Your name"
+                class="h-12 w-full rounded-xl border border-transparent bg-[#f1f1f3] px-4 text-[14px] text-[#222] outline-none placeholder:text-[#9ca3af] focus:border-[#11a63a] focus:bg-white"
+              />
+            </div>
+
+            <!-- Email -->
+            <div>
+              <label
+                for="email"
+                class="mb-2 block text-[14px] font-medium text-[#6f6f6f]"
+              >
+                Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                [(ngModel)]="email"
+                placeholder="you@example.com"
+                class="h-12 w-full rounded-xl border border-transparent bg-[#f1f1f3] px-4 text-[14px] text-[#222] outline-none placeholder:text-[#9ca3af] focus:border-[#11a63a] focus:bg-white"
+              />
+            </div>
+
+            <!-- Password -->
+            <div>
+              <label
+                for="password"
+                class="mb-2 block text-[14px] font-medium text-[#6f6f6f]"
+              >
+                Password
+              </label>
+
+              <div class="relative">
+                <input
+                  id="password"
+                  name="password"
+                  [type]="showPassword ? 'text' : 'password'"
+                  [(ngModel)]="password"
+                  placeholder="Enter your password"
+                  class="h-12 w-full rounded-xl border border-transparent bg-[#f1f1f3] px-4 pr-12 text-[14px] text-[#222] outline-none placeholder:text-[#9ca3af] focus:border-[#11a63a] focus:bg-white"
+                />
+
+                <button
+                  type="button"
+                  (click)="togglePasswordVisibility()"
+                  class="absolute right-4 top-1/2 -translate-y-1/2 text-[#9ca3af] hover:text-[#6b7280]"
+                >
+                  <lucide-angular
+                    [img]="icons.Eye"
+                    class="h-4 w-4"
+                  ></lucide-angular>
+                </button>
+              </div>
+
+              <p *ngIf="password && password.length < 8" class="mt-2 text-[13px] text-[#dc2626]">
+                Password must be at least 8 characters.
+              </p>
+            </div>
+
+            <!-- Confirm password -->
+            <div>
+              <label
+                for="confirmPassword"
+                class="mb-2 block text-[14px] font-medium text-[#6f6f6f]"
+              >
+                Confirm password
+              </label>
+
+              <div class="relative">
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  [type]="showConfirmPassword ? 'text' : 'password'"
+                  [(ngModel)]="confirmPassword"
+                  placeholder="Re-enter your password"
+                  class="h-12 w-full rounded-xl border border-transparent bg-[#f1f1f3] px-4 pr-12 text-[14px] text-[#222] outline-none placeholder:text-[#9ca3af] focus:border-[#11a63a] focus:bg-white"
+                />
+
+                <button
+                  type="button"
+                  (click)="toggleConfirmPasswordVisibility()"
+                  class="absolute right-4 top-1/2 -translate-y-1/2 text-[#9ca3af] hover:text-[#6b7280]"
+                >
+                  <lucide-angular
+                    [img]="icons.Eye"
+                    class="h-4 w-4"
+                  ></lucide-angular>
+                </button>
+              </div>
+
+              <p *ngIf="passwordsDoNotMatch" class="mt-2 text-[13px] text-[#dc2626]">
+                Password and confirm password do not match.
+              </p>
+            </div>
+
+            <!-- Checkboxes -->
+            <div class="space-y-2 pt-1">
+              <label class="flex items-center gap-2 text-[14px] text-[#333]">
+                <input
+                  type="checkbox"
+                  name="rememberMe"
+                  [(ngModel)]="rememberMe"
+                  class="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                />
+                <span>Remember me</span>
+              </label>
+
+              <label class="flex items-center gap-2 text-[14px] text-[#333]">
+                <input
+                  type="checkbox"
+                  name="agreeTerms"
+                  [(ngModel)]="agreeTerms"
+                  class="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                />
+                <span>
+                  I agree to
+                  <a href="#" class="text-[#2563eb] hover:underline">Terms</a>
+                  &
+                  <a href="#" class="text-[#2563eb] hover:underline">Privacy</a>
+                </span>
+              </label>
+            </div>
+
+            <!-- Submit -->
+            <div class="pt-2">
+              <button
+                type="submit"
+                [disabled]="isLoading"
+                class="mx-auto block h-12 w-full rounded-xl bg-[#08b239] text-[15px] font-semibold text-white transition hover:bg-[#069d32] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {{ isLoading ? 'Signing up...' : 'Sign up' }}
+              </button>
+            </div>
+
+            <!-- Bottom link -->
+            <p class="text-center text-[14px] text-[#8a8a8a]">
+              Already have an account?<a routerLink="/auth/sign-in" class="ml-1 text-[#2563eb] hover:underline">
+                Sign in
+              </a>
+            </p>
+          </form>
+        </div>
+      </div>
+
+      <!-- Right -->
+      <div class="hidden lg:flex lg:border-l lg:border-gray-200">
+        <div class="flex w-full items-center justify-center p-8">
+          <div class="flex h-full w-full items-center justify-center rounded-none bg-transparent">
+            <div class="text-center text-gray-400">
+              <img class="w-full h-full object-contain" src="assets/images/auth.png" alt="auth.image">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

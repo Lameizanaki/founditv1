@@ -1,0 +1,58 @@
+<section class="bg-[#f7f7f7] py-24 pl-16 pr-16">
+    <div class="mx-auto w-full px-6">
+        <!-- Heading -->
+        <div class="text-center">
+            <h2
+                class="text-[34px] font-extrabold tracking-[-0.03em] text-[#111827] md:text-[48px]"
+            >
+                Loved by businesses worldwide
+            </h2>
+        </div>
+
+        <!-- Cards -->
+        <div class="mt-14 grid gap-6 md:grid-cols-3">
+        <div
+            *ngFor="let testimonial of testimonials"
+            data-aos="fade-right"
+            class="rounded-[20px] bg-[#f1f2f4] px-6 py-7"
+        >
+            <!-- Top icons -->
+            <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+                <lucide-icon
+                *ngFor="let star of filledStars"
+                [img]="icons.Star"
+                class="h-4 w-4 fill-[#f4c20d] text-[#f4c20d]"
+                ></lucide-icon>
+            </div>
+
+            <lucide-icon
+                [img]="icons.StarOff"
+                class="h-6 w-6 text-[#9ff0bf]"
+            ></lucide-icon>
+            </div>
+
+            <!-- Quote -->
+            <p class="mt-6 text-[16px] italic leading-10 text-[#4b5563] md:text-[17px]">
+            {{ testimonial.quote }}
+            </p>
+
+            <!-- Person -->
+            <div class="mt-8 flex items-center gap-4">
+            <div
+                class="h-10 w-10 rounded-full border border-[#e5e7eb] bg-[#f8f8f8] shadow-[0_4px_10px_rgba(15,23,42,0.08)]"
+            ></div>
+
+            <div>
+                <h3 class="text-[16px] font-bold text-[#111827]">
+                {{ testimonial.name }}
+                </h3>
+                <p class="text-[15px] text-[#8a8f98]">
+                {{ testimonial.role }}
+                </p>
+            </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,100 @@
+<div class="mx-auto mt-6 w-full max-w-7xl">
+  <div
+    class="rounded-[22px] border border-[#d9dce3] bg-white px-8 py-8 shadow-[0_2px_6px_rgba(15,23,42,0.06)]"
+  >
+    <!-- Header -->
+    <div class="mb-5 flex items-start justify-between">
+      <h2 class="text-[18px] font-semibold text-[#1f2937]">
+        {{ title }}
+      </h2>
+
+      <button
+        type="button"
+        (click)="openEditor()"
+        class="inline-flex items-center gap-1.5 text-[14.5px] font-medium text-[#22c55e] transition hover:text-[#16a34a]"
+      >
+        <lucide-angular [img]="icons.Plus" class="h-4 w-4"></lucide-angular>
+        <span>Add Skill</span>
+      </button>
+    </div>
+
+    <!-- Skills List -->
+    <div class="flex flex-wrap gap-3">
+      <div
+        *ngFor="let skill of skills; let i = index"
+        class="inline-flex items-center gap-2 rounded-xl border border-[#e5e7eb] bg-[#f3f4f6] px-4 py-2.5 text-[14px] font-medium text-[#374151]"
+      >
+        <span>{{ skill }}</span>
+      </div>
+    </div>
+
+    <p *ngIf="errorMessage" class="mt-4 text-sm text-[#dc2626]">
+      {{ errorMessage }}
+    </p>
+  </div>
+</div>
+
+<div
+  *ngIf="isEditOpen"
+  class="fixed inset-0 z-40 bg-black/50"
+  (click)="!isSaving && closeEditor()"
+></div>
+
+<div *ngIf="isEditOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="w-full max-w-140 rounded-2xl bg-white shadow-2xl" (click)="$event.stopPropagation()">
+    <div class="flex items-center justify-between border-b border-[#e5e7eb] px-5 py-4">
+      <h3 class="text-[18px] font-semibold text-[#1f2937]">Edit Skills</h3>
+      <button type="button" (click)="closeEditor()" class="text-[#94a3b8]">✕</button>
+    </div>
+
+    <div class="px-5 py-5">
+      <div class="flex gap-2">
+        <input
+          type="text"
+          [(ngModel)]="newSkill"
+          (keydown.enter)="addSkill()"
+          placeholder="Add a skill"
+          [disabled]="isSaving"
+          class="h-12 flex-1 rounded-xl border border-[#d1d5db] px-4 text-sm outline-none focus:border-[#16a34a] disabled:opacity-50"
+        />
+
+        <button
+          type="button"
+          (click)="addSkill()"
+          [disabled]="isSaving"
+          class="rounded-xl bg-[#eaf7ef] px-4 py-3 text-sm font-semibold text-[#16a34a] disabled:opacity-50"
+        >
+          Add
+        </button>
+      </div>
+
+      <div class="mt-4 flex flex-wrap gap-2">
+        <span
+          *ngFor="let skill of editedSkills"
+          class="inline-flex items-center gap-2 rounded-full bg-[#f3f4f6] px-4 py-2 text-sm text-[#374151]"
+        >
+          {{ skill }}
+        </span>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-end gap-3 border-t border-[#e5e7eb] px-5 py-4">
+      <button
+        type="button"
+        (click)="closeEditor()"
+        [disabled]="isSaving"
+        class="text-sm font-medium text-[#374151] disabled:opacity-50"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        (click)="saveSkills()"
+        [disabled]="isSaving"
+        class="rounded-xl bg-[#16a34a] px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
+      >
+        {{ isSaving ? 'Saving...' : 'Save Changes' }}
+      </button>
+    </div>
+  </div>
+</div>

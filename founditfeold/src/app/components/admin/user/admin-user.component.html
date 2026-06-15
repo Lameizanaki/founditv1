@@ -1,0 +1,202 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div>
+    <h1 class="text-[26px] font-semibold text-[#111827]">
+      User Management
+    </h1>
+    <p class="text-[14px] text-[#6b7280]">
+      Manage all platform users, roles, and permissions
+    </p>
+  </div>
+
+  <!-- Search + Filters -->
+  <div class="flex flex-col gap-3 rounded-xl border border-[#e5e7eb] bg-white p-4 md:flex-row md:items-center md:justify-between">
+    <div class="relative w-full md:max-w-80">
+      <input
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange($event)"
+        type="text"
+        placeholder="Search by name or email..."
+        class="w-full rounded-lg border border-[#e5e7eb] bg-white py-2 pl-10 pr-3 text-sm text-[#111827] outline-none placeholder:text-gray-400 focus:border-[#16a34a]"
+      />
+
+      <lucide-angular
+        [img]="icons.Search"
+        class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+      ></lucide-angular>
+    </div>
+
+    <div class="flex w-full flex-col gap-2 sm:flex-row md:w-auto">
+      <select
+        [(ngModel)]="selectedRole"
+        (change)="onRoleChange()"
+        class="rounded-lg border border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#111827] outline-none focus:border-[#16a34a]"
+      >
+        <option value="ALL">All Roles</option>
+        <option value="CLIENT">Client</option>
+        <option value="FREELANCER">Freelancer</option>
+      </select>
+
+      <select
+        [(ngModel)]="selectedStatus"
+        (change)="applyFilters()"
+        class="rounded-lg border border-[#e5e7eb] bg-white px-3 py-2 text-sm text-[#111827] outline-none focus:border-[#16a34a]"
+      >
+        <option value="ALL">All Status</option>
+        <option value="ACTIVE">Active</option>
+        <option value="PENDING">Pending</option>
+        <option value="SUSPENDED">Suspended</option>
+      </select>
+
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Table -->
+  <div class="overflow-hidden rounded-xl border border-[#e5e7eb] bg-white">
+    <div class="flex items-center justify-between border-b border-[#e5e7eb] px-5 py-3 text-sm text-[#6b7280]">
+      <span>
+        {{ totalUsers }} users found
+        <ng-container *ngIf="totalUsers > 0">
+          · Showing {{ pageStart }}-{{ pageEnd }}
+        </ng-container>
+      </span>
+      <span *ngIf="loading">Loading...</span>
+    </div>
+    <div class="max-h-[620px] overflow-auto">
+      <table class="w-full min-w-[860px] text-sm">
+        <thead class="bg-[#f9fafb] text-left text-[#6b7280]">
+          <tr>
+            <th class="px-5 py-3 font-medium">User</th>
+            <th class="px-5 py-3 font-medium">Role</th>
+            <th class="px-5 py-3 font-medium">Account Status</th>
+            <th class="px-5 py-3 font-medium">Account Rating</th>
+            <th class="px-5 py-3 font-medium">User Location</th>
+            <th class="px-5 py-3 font-medium">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr
+            *ngFor="let user of users"
+            class="cursor-pointer border-t border-[#e5e7eb] hover:bg-[#f9fafb]"
+            [routerLink]="['/admin/users', user.id]"
+          >
+            <!-- User -->
+            <td class="px-5 py-4">
+              <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-[#e5e7eb]">
+                  <img
+                    *ngIf="avatarSrc(user) as avatar"
+                    [src]="avatar"
+                    [alt]="user.username"
+                    class="h-full w-full rounded-full object-cover"
+                  />
+                  <lucide-angular
+                    *ngIf="!avatarSrc(user)"
+                    [img]="icons.User"
+                    class="h-4 w-4 text-[#6b7280]"
+                  ></lucide-angular>
+                </div>
+
+                <div>
+                  <p class="font-medium text-[#111827]">
+                    {{ user.username }}
+                  </p>
+                  <p class="text-xs text-gray-500">
+                    {{ user.email }}
+                  </p>
+                </div>
+              </div>
+            </td>
+
+            <td class="px-5 py-4">
+              <span class="rounded-full bg-[#eef2ff] px-2.5 py-1 text-xs font-medium text-[#4338ca]">
+                {{ user.role }}
+              </span>
+            </td>
+
+            <!-- Status -->
+            <td class="px-5 py-4">
+              <span
+                class="inline-flex min-w-20 items-center justify-center rounded-full px-2.5 py-1 text-xs font-medium"
+                [ngClass]="statusClass(user.status)"
+              >
+                {{ statusLabel(user.status) }}
+              </span>
+            </td>
+
+            <!-- Rating -->
+            <td class="px-5 py-4">
+              <div *ngIf="user.rating; else noRating" class="flex items-center gap-1 text-[#111827]">
+                <lucide-angular
+                  [img]="icons.Star"
+                  class="h-4 w-4 text-yellow-500"
+                ></lucide-angular>
+                <span>{{ user.rating }}</span>
+              </div>
+
+              <ng-template #noRating>
+                <span class="text-gray-400">No rating</span>
+              </ng-template>
+            </td>
+
+            <td class="px-5 py-4 text-[#374151]">
+              {{ user.location || 'Not set' }}
+            </td>
+
+            <!-- Actions -->
+            <td class="px-5 py-4">
+              <button
+                type="button"
+                (click)="toggleSuspension(user, $event)"
+                [disabled]="updatingUserId === user.id"
+                [attr.aria-label]="actionLabel(user)"
+                [title]="actionLabel(user)"
+                class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#e5e7eb] bg-white text-[#374151] transition hover:border-[#16a34a] hover:bg-[#f0fdf4] hover:text-[#16a34a] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <lucide-angular
+                  [img]="icons.Pencil"
+                  class="h-4 w-4 text-current"
+                ></lucide-angular>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="!loading && users.length === 0">
+            <td colspan="6" class="px-5 py-12 text-center text-[#6b7280]">
+              No users match the selected filters.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="flex flex-col gap-3 border-t border-[#e5e7eb] px-5 py-4 text-sm text-[#6b7280] sm:flex-row sm:items-center sm:justify-between">
+      <span>
+        Page {{ totalPages ? currentPage + 1 : 0 }} of {{ totalPages }}
+      </span>
+
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          (click)="goToPage(currentPage - 1)"
+          [disabled]="loading || currentPage === 0"
+          class="rounded-lg border border-[#e5e7eb] bg-white px-3 py-2 font-medium text-[#374151] transition hover:bg-[#f9fafb] disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Previous
+        </button>
+
+        <button
+          type="button"
+          (click)="goToPage(currentPage + 1)"
+          [disabled]="loading || currentPage + 1 >= totalPages"
+          class="rounded-lg border border-[#e5e7eb] bg-white px-3 py-2 font-medium text-[#374151] transition hover:bg-[#f9fafb] disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

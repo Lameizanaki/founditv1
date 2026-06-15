@@ -1,0 +1,205 @@
+<div class="bg-[#f8f8f8]">
+  <div class="mb-8">
+    <h1 class="text-[28px] font-semibold leading-tight text-[#222]">
+      Dashboard Overview
+    </h1>
+
+    <p class="mt-2 text-[15px] text-[#6b7280]">
+      Monitor platform activity and manage key metrics
+    </p>
+  </div>
+
+  <div *ngIf="errorMessage" class="mb-4 rounded-lg border border-[#fed7aa] bg-[#fff7ed] p-4 text-sm text-[#9a3412]">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="actionMessage" class="mb-4 rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] p-4 text-sm text-[#166534]">
+    {{ actionMessage }}
+  </div>
+
+  <div class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+    <div
+      *ngFor="let stat of stats"
+      class="min-h-40 rounded-2xl border border-[#e5e7eb] bg-white px-5 py-5"
+    >
+      <div class="mb-10 flex items-start justify-between">
+        <div
+          class="flex h-12 w-12 items-center justify-center rounded-xl"
+          [ngClass]="stat.iconBg"
+        >
+          <lucide-angular
+            [img]="stat.icon"
+            class="h-5 w-5"
+            [ngClass]="stat.iconColor"
+          ></lucide-angular>
+        </div>
+
+        <span
+          class="inline-flex min-w-10 items-center justify-center rounded-full px-2 py-1 text-[12px] font-medium leading-none"
+          [ngClass]="
+            stat.badgeType === 'danger'
+              ? 'bg-[#e11d48] text-white'
+              : 'bg-[#f3f4f6] text-[#4b5563]'
+          "
+        >
+          {{ stat.badge }}
+        </span>
+      </div>
+
+      <div>
+        <p class="text-[15px] text-[#6b7280]">
+          {{ stat.title }}
+        </p>
+
+        <h2 class="mt-1 text-[24px] font-medium leading-none text-[#222]">
+          {{ stat.value }}
+        </h2>
+      </div>
+    </div>
+  </div>
+
+  <section class="mt-6 overflow-hidden rounded-lg border border-[#e5e7eb] bg-white">
+    <div class="flex flex-col gap-2 border-b border-[#e5e7eb] px-5 py-4 md:flex-row md:items-center md:justify-between">
+      <div>
+        <h2 class="text-[18px] font-semibold text-[#111827]">Pending E-KYC Reviews</h2>
+        <p class="text-sm text-[#6b7280]">Identity verification requests waiting for admin review</p>
+      </div>
+      <span class="inline-flex w-fit rounded-full bg-[#fff7ed] px-3 py-1 text-xs font-medium text-[#c2410c]">
+        {{ pendingReviews.length }} pending
+      </span>
+    </div>
+
+    <div class="max-h-[420px] min-h-64 overflow-auto">
+      <table class="w-full min-w-[860px] text-left text-sm">
+        <thead class="sticky top-0 bg-[#f9fafb] text-[#6b7280]">
+          <tr>
+            <th class="px-5 py-3 font-medium">User</th>
+            <th class="px-5 py-3 font-medium">Role</th>
+            <th class="px-5 py-3 font-medium">Identity</th>
+            <th class="px-5 py-3 font-medium">Contact</th>
+            <th class="px-5 py-3 font-medium">Failure</th>
+            <th class="px-5 py-3 font-medium">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let review of pendingReviews" class="border-t border-[#e5e7eb]">
+            <td class="px-5 py-4">
+              <p class="font-medium text-[#111827]">{{ review.username || 'Unknown user' }}</p>
+              <p class="text-xs text-[#6b7280]">{{ review.email || 'No email' }}</p>
+            </td>
+            <td class="px-5 py-4">
+              <span class="rounded-full bg-[#eef2ff] px-2.5 py-1 text-xs font-medium text-[#4338ca]">
+                {{ review.role || 'Unknown' }}
+              </span>
+            </td>
+            <td class="px-5 py-4">
+              <p class="font-medium text-[#111827]">{{ review.fullName || 'No full name' }}</p>
+              <p class="text-xs text-[#6b7280]">{{ review.nationality || 'No nationality' }} · {{ review.country || 'No country' }}</p>
+            </td>
+            <td class="px-5 py-4 text-[#374151]">{{ review.phoneNumber || 'No phone' }}</td>
+            <td class="max-w-md px-5 py-4">
+              <p class="line-clamp-2 text-[#6b7280]">{{ review.failureReason || 'Waiting for admin review' }}</p>
+            </td>
+            <td class="px-5 py-4">
+              <div class="flex items-center gap-2">
+                <button
+                  type="button"
+                  (click)="openReviewDetail(review)"
+                  [disabled]="detailLoadingId === review.ekycId"
+                  class="rounded-md border border-[#d1d5db] bg-white px-3 py-1.5 text-xs font-medium text-[#374151] disabled:opacity-60"
+                >
+                  View
+                </button>
+                <button
+                  type="button"
+                  (click)="approveReview(review)"
+                  [disabled]="actionLoadingId === review.ekycId"
+                  class="rounded-md bg-[#10b981] px-3 py-1.5 text-xs font-medium text-white disabled:opacity-60"
+                >
+                  Approve
+                </button>
+                <button
+                  type="button"
+                  (click)="rejectReview(review)"
+                  [disabled]="actionLoadingId === review.ekycId"
+                  class="rounded-md border border-[#fecaca] bg-white px-3 py-1.5 text-xs font-medium text-[#b91c1c] disabled:opacity-60"
+                >
+                  Reject
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="!loading && pendingReviews.length === 0">
+            <td colspan="6" class="px-5 py-12 text-center text-sm text-[#6b7280]">
+              No E-KYC reviews are waiting.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div
+    *ngIf="selectedReview"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-6"
+    (click)="closeReviewDetail()"
+  >
+    <div
+      class="max-h-[92vh] w-full max-w-6xl overflow-auto rounded-lg bg-white shadow-xl"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="flex items-start justify-between border-b border-[#e5e7eb] px-6 py-4">
+        <div>
+          <h3 class="text-[18px] font-semibold text-[#111827]">E-KYC Review Detail</h3>
+          <p class="text-sm text-[#6b7280]">{{ selectedReview.username || 'Unknown user' }} · {{ selectedReview.email || 'No email' }}</p>
+        </div>
+        <button type="button" class="rounded-md px-3 py-1.5 text-sm text-[#374151] hover:bg-[#f3f4f6]" (click)="closeReviewDetail()">
+          Close
+        </button>
+      </div>
+
+      <div class="grid gap-6 px-6 py-5 lg:grid-cols-[320px_1fr]">
+        <div class="space-y-3 text-sm">
+          <div class="rounded-lg border border-[#e5e7eb] p-4">
+            <p class="text-xs font-medium uppercase text-[#6b7280]">Identity</p>
+            <dl class="mt-3 space-y-2">
+              <div class="flex justify-between gap-3"><dt class="text-[#6b7280]">Full name</dt><dd class="text-right font-medium text-[#111827]">{{ selectedReview.fullName || 'N/A' }}</dd></div>
+              <div class="flex justify-between gap-3"><dt class="text-[#6b7280]">Document ID</dt><dd class="text-right font-medium text-[#111827]">{{ selectedReview.documentId || 'Not extracted' }}</dd></div>
+              <div class="flex justify-between gap-3"><dt class="text-[#6b7280]">DOB</dt><dd class="text-right text-[#111827]">{{ selectedReview.dateOfBirth || 'N/A' }}</dd></div>
+              <div class="flex justify-between gap-3"><dt class="text-[#6b7280]">Gender</dt><dd class="text-right text-[#111827]">{{ selectedReview.gender || 'N/A' }}</dd></div>
+              <div class="flex justify-between gap-3"><dt class="text-[#6b7280]">Nationality</dt><dd class="text-right text-[#111827]">{{ selectedReview.nationality || 'N/A' }}</dd></div>
+              <div class="flex justify-between gap-3"><dt class="text-[#6b7280]">Country</dt><dd class="text-right text-[#111827]">{{ selectedReview.country || 'N/A' }}</dd></div>
+            </dl>
+          </div>
+
+          <div class="rounded-lg border border-[#e5e7eb] p-4">
+            <p class="text-xs font-medium uppercase text-[#6b7280]">Checks</p>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <span class="rounded-full px-2.5 py-1 text-xs font-medium" [ngClass]="selectedReview.ocrVerified ? 'bg-[#dcfce7] text-[#166534]' : 'bg-[#fff7ed] text-[#9a3412]'">OCR {{ selectedReview.ocrVerified ? 'passed' : 'review' }}</span>
+              <span class="rounded-full px-2.5 py-1 text-xs font-medium" [ngClass]="selectedReview.faceVerified ? 'bg-[#dcfce7] text-[#166534]' : 'bg-[#fff7ed] text-[#9a3412]'">Face {{ selectedReview.faceVerified ? 'passed' : 'review' }}</span>
+            </div>
+            <p class="mt-3 max-h-32 overflow-auto rounded-md bg-[#f9fafb] p-3 text-xs text-[#6b7280]">{{ selectedReview.failureReason || 'No failure reason recorded.' }}</p>
+          </div>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-3">
+          <div class="rounded-lg border border-[#e5e7eb] p-3">
+            <p class="mb-2 text-sm font-medium text-[#111827]">Front ID</p>
+            <img *ngIf="imageSrc(selectedReview.frontIdData, selectedReview.frontIdType) as src" [src]="src" class="aspect-[4/3] w-full rounded-md object-contain bg-[#f9fafb]" alt="Front ID" />
+            <p *ngIf="!imageSrc(selectedReview.frontIdData, selectedReview.frontIdType)" class="py-16 text-center text-sm text-[#6b7280]">No image</p>
+          </div>
+          <div class="rounded-lg border border-[#e5e7eb] p-3">
+            <p class="mb-2 text-sm font-medium text-[#111827]">Back ID</p>
+            <img *ngIf="imageSrc(selectedReview.backIdData, selectedReview.backIdType) as src" [src]="src" class="aspect-[4/3] w-full rounded-md object-contain bg-[#f9fafb]" alt="Back ID" />
+            <p *ngIf="!imageSrc(selectedReview.backIdData, selectedReview.backIdType)" class="py-16 text-center text-sm text-[#6b7280]">No image</p>
+          </div>
+          <div class="rounded-lg border border-[#e5e7eb] p-3">
+            <p class="mb-2 text-sm font-medium text-[#111827]">Live Face</p>
+            <img *ngIf="imageSrc(selectedReview.liveFaceData, selectedReview.liveFaceType) as src" [src]="src" class="aspect-[4/3] w-full rounded-md object-contain bg-[#f9fafb]" alt="Live face" />
+            <p *ngIf="!imageSrc(selectedReview.liveFaceData, selectedReview.liveFaceType)" class="py-16 text-center text-sm text-[#6b7280]">No image</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,70 @@
+<section class="bg-[#f7f7f7] xl:py-20 lg:py-20 md:py-20 pl-16 pr-16">
+  <div class="mx-auto grid grid-cols-1 w-full items-center gap-12 px-6 lg:grid-cols-2">
+    <!-- Left -->
+    <div class="w-full">
+      <h2
+        class="xl:text-[34px] lg:text-[34px] text-2xl font-extrabold leading-[1.05] tracking-[-0.03em] text-[#111827] md:text-[44px]"
+      >
+        Why businesses choose
+        <br />
+        FoundIt
+      </h2>
+
+      <p class="mt-6 xl:text-[18px] lg:text-[18px] md:text-[18px] text-sm leading-8 text-[#6b7280]">
+        We've built a platform that prioritizes trust, speed, and quality. Experience a frictionless
+        hiring process designed for modern teams.
+      </p>
+
+      <div class="mt-10 grid gap-x-8 gap-y-8 sm:grid-cols-2">
+        <div *ngFor="let reason of reasons" data-aos="fade-right" class="flex items-start gap-4">
+          <div
+            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
+            [ngClass]="reason.boxClass"
+          >
+            <lucide-icon [img]="reason.icon" class="h-5 w-5"></lucide-icon>
+          </div>
+
+          <div>
+            <h3
+              class="xl:text-[22px] lg:text-[22px] md:text-xl text-lg font-bold leading-7 text-[#111827]"
+            >
+              {{ reason.title }}
+            </h3>
+            <p
+              class="mt-1 xl:text-[15px] lg:text-[15px] md:text-lg text-sm leading-7 text-[#6b7280]"
+            >
+              {{ reason.description }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right -->
+    <div class="relative mx-auto w-2xl">
+      <!-- Decorative circles -->
+      <div
+        class="absolute hidden xl:block lg:block md:block -right-4 top-0 h-24 w-24 rounded-full bg-[#f4eaa4]"
+      ></div>
+      <div
+        class="absolute hidden xl:block lg:block md:block -left-5 bottom-12 h-36 w-36 rounded-3xl bg-[#d7f5df]"
+      ></div>
+
+      <!-- Main card -->
+      <div
+        class="relative overflow-hidden rounded-[20px] bg-white shadow-[0_26px_45px_rgba(15,23,42,0.16)]"
+        data-aos="zoom-in-up"
+      >
+        <div
+          class="hidden xl:flex xl:w-full xl:h-full lg:flex lg:h-96 lg:w-lg md:flex md:h-96 items-center justify-center"
+        >
+          <img
+            src="/foundit-logo.svg"
+            alt="FoundIt logo"
+            class="h-60 w-60 object-contain xl:h-72 xl:w-72"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

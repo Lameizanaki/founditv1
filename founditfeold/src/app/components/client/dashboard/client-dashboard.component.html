@@ -1,0 +1,394 @@
+<div class="min-h-screen bg-[#f8fafc] p-4 md:p-6">
+  <div class="mx-auto w-full pl-16 pr-16">
+    <section class="rounded-2xl border border-[#e5e7eb] bg-white p-5">
+      <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <h1 class="text-[30px] font-semibold leading-none text-[#111827] md:text-[18px]">
+            Client Dashboard
+          </h1>
+          <p class="mt-2 text-sm text-[#6b7280]">
+            Manage your projects, hire freelancers, and track your orders in one place.
+          </p>
+        </div>
+
+        <a
+          routerLink="/client/browse-freelancers"
+          class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-4 py-3 text-sm font-medium text-white transition hover:bg-[#1d4ed8]"
+        >
+          <lucide-angular [img]="icons.UserRoundSearch" class="h-4 w-4"></lucide-angular>
+          Find Freelancers
+        </a>
+      </div>
+    </section>
+
+    <div
+      *ngIf="loadError"
+      class="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+    >
+      {{ loadError }}
+    </div>
+
+    <section class="mt-6">
+      <h2 class="text-xl font-semibold text-[#111827]">Client Overview</h2>
+
+      <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <a
+          routerLink="/client/my-orders"
+          class="rounded-2xl border border-[#e5e7eb] bg-white p-5 transition hover:border-[#bfdbfe] hover:shadow-sm"
+        >
+          <div class="flex items-start justify-between">
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#eff6ff]">
+              <lucide-angular [img]="icons.BriefcaseBusiness" class="h-5 w-5 text-[#2563eb]"></lucide-angular>
+            </div>
+            <span class="text-3xl font-semibold text-[#111827]">{{ activeOrdersCount }}</span>
+          </div>
+          <p class="mt-4 text-sm font-medium text-[#111827]">Active Orders</p>
+          <p class="mt-1 text-xs text-[#6b7280]">{{ activeOrdersCount }} Active Projects</p>
+        </a>
+
+        <a
+          routerLink="/client/my-orders"
+          class="rounded-2xl border border-[#e5e7eb] bg-white p-5 transition hover:border-[#e9d5ff] hover:shadow-sm"
+        >
+          <div class="flex items-start justify-between">
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#faf5ff]">
+              <lucide-angular [img]="icons.FileText" class="h-5 w-5 text-[#a855f7]"></lucide-angular>
+            </div>
+            <span class="text-3xl font-semibold text-[#111827]">{{ totalProjects }}</span>
+          </div>
+          <p class="mt-4 text-sm font-medium text-[#111827]">Total Projects</p>
+          <p class="mt-1 text-xs text-[#6b7280]">{{ totalProjects }} Projects Posted</p>
+        </a>
+
+        <a
+          routerLink="/client/dashboard/view-transaction"
+          class="rounded-2xl border border-[#e5e7eb] bg-white p-5 transition hover:border-[#fde68a] hover:shadow-sm"
+        >
+          <div class="flex items-start justify-between">
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#fffbeb]">
+              <lucide-angular [img]="icons.BadgeDollarSign" class="h-5 w-5 text-[#eab308]"></lucide-angular>
+            </div>
+            <span class="text-3xl font-semibold text-[#111827]">{{ formatAmount(pendingPayments) }}</span>
+          </div>
+          <p class="mt-4 text-sm font-medium text-[#111827]">Pending Payments</p>
+          <p class="mt-1 text-xs text-[#6b7280]">{{ formatAmount(pendingPayments) }} Pending</p>
+        </a>
+
+        <a
+          routerLink="/client/my-orders"
+          class="rounded-2xl border border-[#e5e7eb] bg-white p-5 transition hover:border-[#bbf7d0] hover:shadow-sm"
+        >
+          <div class="flex items-start justify-between">
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f0fdf4]">
+              <lucide-angular [img]="icons.CircleCheckBig" class="h-5 w-5 text-[#22c55e]"></lucide-angular>
+            </div>
+            <span class="text-3xl font-semibold text-[#111827]">{{ completedProjects }}</span>
+          </div>
+          <p class="mt-4 text-sm font-medium text-[#111827]">Completed Projects</p>
+          <p class="mt-1 text-xs text-[#6b7280]">{{ completedProjects }} Completed</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-12">
+      <div class="xl:col-span-8">
+        <div class="mb-4 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-[#eef2ff]">
+              <lucide-angular [img]="icons.BriefcaseBusiness" class="h-4 w-4 text-[#2563eb]"></lucide-angular>
+            </div>
+            <h2 class="text-[28px] font-semibold leading-none text-[#111827] md:text-[18px]">
+              Active Orders
+            </h2>
+          </div>
+
+          <a
+            routerLink="/client/my-orders"
+            class="inline-flex items-center gap-1 text-sm font-medium text-[#2563eb] transition hover:text-[#1d4ed8]"
+          >
+            View all
+            <lucide-angular [img]="icons.ChevronRight" class="h-4 w-4"></lucide-angular>
+          </a>
+        </div>
+
+        <div class="h-96 space-y-4 overflow-y-auto pr-2">
+          <div
+            *ngIf="isLoading"
+            class="rounded-2xl border border-[#e5e7eb] bg-white p-5 text-sm text-[#6b7280]"
+          >
+            Loading active orders...
+          </div>
+
+          <ng-container *ngIf="!isLoading">
+            <div
+              *ngFor="let order of activeOrders; trackBy: trackByOrderId"
+              class="rounded-2xl border border-[#e5e7eb] bg-white p-5 transition hover:shadow-sm"
+            >
+              <div class="flex items-start justify-between gap-4">
+                <div>
+                  <h3 class="text-lg font-semibold text-[#111827]">{{ order.title }}</h3>
+
+                  <div class="mt-2 flex flex-wrap items-center gap-3 text-xs text-[#6b7280]">
+                    <span class="inline-flex items-center gap-1">
+                      <lucide-angular [img]="icons.User" class="h-3.5 w-3.5"></lucide-angular>
+                      {{ order.freelancerName }}
+                    </span>
+                    <span class="inline-flex items-center gap-1">
+                      <lucide-angular [img]="icons.CalendarDays" class="h-3.5 w-3.5"></lucide-angular>
+                      Due {{ formatDate(order.dueDate) }}
+                    </span>
+                    <span class="inline-flex items-center gap-1">
+                      <lucide-angular [img]="icons.BadgeDollarSign" class="h-3.5 w-3.5"></lucide-angular>
+                      {{ formatAmount(order.price) }}
+                    </span>
+                  </div>
+                </div>
+
+                <span
+                  class="shrink-0 rounded-full px-3 py-1 text-xs font-medium"
+                  [ngClass]="getStatusClasses(order.status)"
+                >
+                  {{ getStatusLabel(order.status) }}
+                </span>
+              </div>
+
+              <div class="mt-5">
+                <div class="mb-2 flex items-center justify-between">
+                  <span class="text-xs font-medium text-[#6b7280]">Progress</span>
+                  <span class="text-xs font-semibold text-[#2563eb]">{{ order.progress }}%</span>
+                </div>
+
+                <div class="h-2 w-full overflow-hidden rounded-full bg-[#e5e7eb]">
+                  <div
+                    class="h-full rounded-full bg-[#2563eb]"
+                    [style.width.%]="order.progress"
+                  ></div>
+                </div>
+              </div>
+
+              <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+                <a
+                  [routerLink]="getOrderDetailLink(order)"
+                  class="inline-flex items-center justify-center rounded-xl bg-[#2563eb] px-4 py-3 text-sm font-medium text-white transition hover:bg-[#1d4ed8]"
+                >
+                  View Details
+                </a>
+
+                <a
+                  [routerLink]="getOrderChatLink(order)"
+                  class="inline-flex items-center justify-center gap-2 rounded-xl border border-[#e5e7eb] bg-white px-4 py-3 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+                >
+                  <lucide-angular [img]="icons.MessageCircle" class="h-4 w-4"></lucide-angular>
+                  Message
+                </a>
+              </div>
+            </div>
+
+            <div
+              *ngIf="!activeOrders.length"
+              class="rounded-2xl border border-dashed border-[#d1d5db] bg-white p-10 text-center"
+            >
+              <h3 class="text-lg font-semibold text-[#111827]">No active orders</h3>
+              <p class="mt-2 text-sm text-[#6b7280]">Accepted and in-progress projects will appear here.</p>
+            </div>
+          </ng-container>
+        </div>
+
+        <div class="mt-6">
+          <h2 class="text-xl font-semibold text-[#111827]">Quick Actions</h2>
+
+          <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <a
+              routerLink="/client/browse-freelancers"
+              class="rounded-2xl border border-[#e5e7eb] bg-white p-5 text-center transition hover:border-[#c7d2fe] hover:bg-[#f8fbff]"
+            >
+              <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#ecfdf3]">
+                <lucide-angular [img]="icons.UserRoundSearch" class="h-5 w-5 text-[#2563eb]"></lucide-angular>
+              </div>
+              <p class="mt-4 text-sm font-medium text-[#111827]">Find Freelancer</p>
+            </a>
+
+            <a
+              [routerLink]="firstChatLink"
+              class="rounded-2xl border border-[#e5e7eb] bg-white p-5 text-center transition hover:border-[#c7d2fe] hover:bg-[#f8fbff]"
+            >
+              <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#ecfdf3]">
+                <lucide-angular [img]="icons.MessageCircle" class="h-5 w-5 text-[#22c55e]"></lucide-angular>
+              </div>
+              <p class="mt-4 text-sm font-medium text-[#111827]">View Messages</p>
+            </a>
+
+            <a
+              routerLink="/client/browse-gigs"
+              class="rounded-2xl border border-[#e5e7eb] bg-white p-5 text-center transition hover:border-[#fed7aa] hover:bg-[#fff7ed]"
+            >
+              <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#fff7ed]">
+                <lucide-angular [img]="icons.BriefcaseBusiness" class="h-5 w-5 text-[#f97316]"></lucide-angular>
+              </div>
+              <p class="mt-4 text-sm font-medium text-[#111827]">Manage Orders</p>
+            </a>
+          </div>
+        </div>
+
+        <div class="mt-6">
+          <div class="mb-4 flex items-center justify-between">
+            <h2 class="text-xl font-semibold text-[#111827]">Freelancers For You</h2>
+            <a
+              routerLink="/client/browse-freelancers"
+              class="inline-flex items-center gap-1 text-sm font-medium text-[#2563eb] transition hover:text-[#1d4ed8]"
+            >
+              Browse all
+              <lucide-angular [img]="icons.ChevronRight" class="h-4 w-4"></lucide-angular>
+            </a>
+          </div>
+
+          <swiper-container
+            class="block min-h-[190px] pb-8"
+            [loop]="true"
+            [autoplay]="swiperAutoplay"
+            [pagination]="{ clickable: true }"
+            [breakpoints]="swiperBreakpoints"
+            [slidesPerView]="1"
+            [spaceBetween]="16"
+          >
+            <swiper-slide
+              *ngFor="let card of freelancerSlides; trackBy: trackByFreelancerSlideId"
+            >
+              <a
+                [routerLink]="card.link"
+                class="block h-full rounded-2xl border border-[#e5e7eb] bg-white p-4 transition hover:border-[#bfdbfe] hover:shadow-sm"
+              >
+                <div class="flex items-start gap-3">
+                  <div
+                    class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#e5e7eb] bg-[#eff6ff] text-sm font-semibold text-[#2563eb]"
+                  >
+                    <img
+                      *ngIf="card.avatar; else cardInitials"
+                      [src]="card.avatar"
+                      [alt]="card.name"
+                      class="h-full w-full object-cover"
+                    />
+                    <ng-template #cardInitials>
+                      {{ getInitials(card.name) }}
+                    </ng-template>
+                  </div>
+
+                  <div class="min-w-0">
+                    <h3 class="truncate text-sm font-semibold text-[#111827]">{{ card.name }}</h3>
+                    <p class="mt-1 truncate text-xs text-[#6b7280]">{{ card.job }}</p>
+                  </div>
+                </div>
+
+                <div class="mt-4 flex flex-wrap items-center gap-2 text-xs text-[#6b7280]">
+                  <span class="inline-flex items-center gap-1 text-[#f59e0b]">
+                    <lucide-angular [img]="icons.Star" class="h-3.5 w-3.5 fill-current"></lucide-angular>
+                    {{ card.rating }}
+                  </span>
+                  <span class="inline-flex min-w-0 items-center gap-1">
+                    <lucide-angular [img]="icons.MapPin" class="h-3.5 w-3.5"></lucide-angular>
+                    <span class="truncate">{{ card.location }}</span>
+                  </span>
+                </div>
+
+                <div class="mt-4 flex items-center justify-between gap-3">
+                  <span class="text-xs text-[#6b7280]">{{ card.experience }}</span>
+                  <span class="text-sm font-semibold text-[#2563eb]">{{ card.price }}</span>
+                </div>
+              </a>
+            </swiper-slide>
+          </swiper-container>
+        </div>
+      </div>
+
+      <div class="space-y-4 xl:col-span-4">
+        <div class="rounded-2xl border border-[#e5e7eb] bg-white p-5">
+          <div class="mb-5 flex items-center gap-2">
+            <lucide-angular [img]="icons.BadgeDollarSign" class="h-4 w-4 text-[#2563eb]"></lucide-angular>
+            <h2 class="text-lg font-semibold text-[#111827]">Spending Summary</h2>
+          </div>
+
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-3 xl:grid-cols-1">
+            <div class="rounded-xl bg-[#eef2ff] p-4">
+              <p class="text-[10px] font-medium uppercase tracking-wide text-[#2563eb]">Total Spent</p>
+              <p class="mt-3 text-lg font-semibold text-[#111827]">{{ formatAmount(totalSpent) }}</p>
+            </div>
+
+            <div class="rounded-xl bg-[#fff7ed] p-4">
+              <p class="text-[10px] font-medium uppercase tracking-wide text-[#f97316]">In Progress</p>
+              <p class="mt-3 text-lg font-semibold text-[#111827]">{{ formatAmount(inProgressSpend) }}</p>
+              <p class="mt-2 text-xs text-[#f97316]">{{ activeOrdersCount }} active orders</p>
+            </div>
+
+            <div class="rounded-xl bg-[#f0fdf4] p-4">
+              <p class="text-[10px] font-medium uppercase tracking-wide text-[#16a34a]">Completed</p>
+              <p class="mt-3 text-lg font-semibold text-[#111827]">{{ formatAmount(completedSpend) }}</p>
+              <p class="mt-2 text-xs text-[#16a34a]">{{ completedProjects }} orders</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-[#e5e7eb] bg-white p-5">
+          <div class="mb-5 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+              <lucide-angular [img]="icons.ReceiptText" class="h-4 w-4 text-[#6b7280]"></lucide-angular>
+              <h2 class="text-lg font-semibold text-[#111827]">Recent Transactions</h2>
+            </div>
+            <a
+              routerLink="/client/dashboard/view-transaction"
+              class="text-sm font-medium text-[#2563eb] transition hover:text-[#1d4ed8]"
+            >
+              View all
+            </a>
+          </div>
+
+          <div class="h-96 space-y-5 overflow-y-auto pr-2">
+            <div *ngIf="isLoading" class="text-sm text-[#6b7280]">Loading transactions...</div>
+
+            <ng-container *ngIf="!isLoading">
+              <div
+                *ngFor="let transaction of recentTransactions; trackBy: trackByTransactionId"
+                class="flex items-start justify-between gap-3"
+              >
+                <div class="flex min-w-0 gap-3">
+                  <div
+                    class="mt-1 flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#e5e7eb] bg-[#f9fafb] text-xs font-semibold text-[#374151]"
+                  >
+                    <img
+                      *ngIf="transaction.freelancerAvatar; else transactionInitials"
+                      [src]="transaction.freelancerAvatar"
+                      [alt]="transaction.freelancerName"
+                      class="h-full w-full object-cover"
+                    />
+                    <ng-template #transactionInitials>
+                      {{ getInitials(transaction.freelancerName) }}
+                    </ng-template>
+                  </div>
+                  <div class="min-w-0">
+                    <p class="truncate text-sm font-medium text-[#111827]">{{ transaction.title }}</p>
+                    <p class="mt-1 truncate text-xs text-[#6b7280]">by {{ transaction.freelancerName }}</p>
+                    <p class="text-xs text-[#6b7280]">{{ formatDate(transaction.date) }}</p>
+                  </div>
+                </div>
+
+                <div class="shrink-0 text-right">
+                  <p class="text-sm font-semibold text-[#111827]">-{{ formatAmount(transaction.amount) }}</p>
+                  <span
+                    class="mt-1 inline-flex rounded-full px-2 py-1 text-[10px] font-medium"
+                    [ngClass]="getTransactionStatusClasses(transaction.status)"
+                  >
+                    {{ transaction.status }}
+                  </span>
+                </div>
+              </div>
+
+              <div *ngIf="!recentTransactions.length" class="py-10 text-center">
+                <h3 class="text-sm font-semibold text-[#111827]">No transactions yet</h3>
+                <p class="mt-2 text-xs text-[#6b7280]">Your payments will appear here after checkout.</p>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
