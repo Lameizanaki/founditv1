@@ -35,6 +35,7 @@ type StructuredKind =
   | "price_proposal"
   | "price_agreement"
   | "price_rejected"
+  | "project_requirement_proposal"
   | "project_delivery"
   | "project_revision_request"
   | "status_update";
@@ -71,12 +72,104 @@ interface WorkflowProject {
   status: string;
 }
 
+interface AccountReportResponse {
+  id: number;
+}
+
+function ProjectRequirementsEditor({
+  disabled,
+  initialDeadline,
+  initialPrice,
+  initialRequirements,
+  initialTitle,
+  onSubmit,
+}: {
+  disabled: boolean;
+  initialDeadline: string;
+  initialPrice: string;
+  initialRequirements: string;
+  initialTitle: string;
+  onSubmit: (values: {
+    deadline: string;
+    file: File | null;
+    price: string;
+    requirements: string;
+    startDate: string;
+    title: string;
+  }) => Promise<void>;
+}) {
+  const [title, setTitle] = useState(initialTitle);
+  const [requirements, setRequirements] = useState(initialRequirements);
+  const [price, setPrice] = useState(initialPrice);
+  const [startDate, setStartDate] = useState("");
+  const [deadline, setDeadline] = useState(initialDeadline);
+  const [file, setFile] = useState<File | null>(null);
+
+  return (
+    <div className="mt-4 space-y-2 rounded-2xl border border-[#e5e7eb] bg-[#f8fafc] p-3">
+      <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6b7280]">
+        Actual Requirements
+      </p>
+      <input
+        className="w-full rounded-xl border border-[#d1d5db] px-3 py-2 text-sm text-[#111827] outline-none transition focus:border-[#2563eb]"
+        onChange={(event) => setTitle(event.target.value)}
+        placeholder="Project title"
+        value={title}
+      />
+      <textarea
+        className="min-h-[90px] w-full rounded-xl border border-[#d1d5db] px-3 py-2 text-sm text-[#111827] outline-none transition focus:border-[#2563eb]"
+        onChange={(event) => setRequirements(event.target.value)}
+        placeholder="Share the exact scope, assets, or instructions"
+        value={requirements}
+      />
+      <input
+        className="w-full rounded-xl border border-[#d1d5db] px-3 py-2 text-sm text-[#111827] outline-none transition focus:border-[#2563eb]"
+        onChange={(event) => setPrice(event.target.value)}
+        placeholder="Agreed price"
+        type="number"
+        value={price}
+      />
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <input
+          className="w-full rounded-xl border border-[#d1d5db] px-3 py-2 text-sm text-[#111827] outline-none transition focus:border-[#2563eb]"
+          onChange={(event) => setStartDate(event.target.value)}
+          type="date"
+          value={startDate}
+        />
+        <input
+          className="w-full rounded-xl border border-[#d1d5db] px-3 py-2 text-sm text-[#111827] outline-none transition focus:border-[#2563eb]"
+          onChange={(event) => setDeadline(event.target.value)}
+          type="date"
+          value={deadline}
+        />
+      </div>
+      <label className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]">
+        {file ? file.name : "Attach requirement file"}
+        <input
+          className="hidden"
+          onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+          type="file"
+        />
+      </label>
+      <button
+        className="w-full rounded-xl bg-[#2563eb] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#1d4ed8] disabled:opacity-60"
+        disabled={disabled}
+        onClick={() => void onSubmit({ deadline, file, price, requirements, startDate, title })}
+        type="button"
+      >
+        Send Requirements Update
+      </button>
+    </div>
+  );
+}
+
 interface StructuredMessageMeta {
   kind: StructuredKind;
   status: string;
   text: string;
   requestId: number | null;
   projectId: number | null;
+  proposalId: number | null;
   gigId: number | null;
   title: string | null;
   amount: number | null;
@@ -112,6 +205,7 @@ const messageTypeLabel: Record<StructuredKind, string> = {
   price_proposal: "Price Proposal",
   price_agreement: "Price Accepted",
   price_rejected: "Price Rejected",
+  project_requirement_proposal: "Requirements",
   project_delivery: "Delivery",
   project_revision_request: "Revision",
   status_update: "Update",
@@ -140,6 +234,8 @@ const parseStructuredMessage = (message: ChatMessageResponse): StructuredMessage
       kind = "price_agreement";
     } else if (type === "price_rejected") {
       kind = "price_rejected";
+    } else if (type === "project_requirement_proposal") {
+      kind = "project_requirement_proposal";
     } else if (type === "project_delivery") {
       kind = "project_delivery";
     } else if (type === "project_revision_request" || type === "revision_request") {
@@ -150,6 +246,7 @@ const parseStructuredMessage = (message: ChatMessageResponse): StructuredMessage
       amount: toNumber(parsed.pricePending ?? parsed.agreedPrice, 0) || null,
       gigId: toNumber(parsed.gigId, 0) || null,
       kind,
+      proposalId: toNumber(parsed.proposalId, 0) || null,
       projectId: toNumber(parsed.projectId, 0) || null,
       requestId: toNumber(parsed.requestId ?? parsed.hireRequestId, 0) || null,
       revisionMessage: toText(parsed.revisionMessage, "") || null,
@@ -249,6 +346,12 @@ export function ChatWorkspaceClient({
   const [isLoadingWorkflow, setIsLoadingWorkflow] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [isWorkflowBusy, setIsWorkflowBusy] = useState(false);
+  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
+  const [isSubmittingReport, setIsSubmittingReport] = useState(false);
+  const [reportSubject, setReportSubject] = useState("");
+  const [reportMessage, setReportMessage] = useState("");
+  const [reportError, setReportError] = useState<string | null>(null);
+  const [reportSuccess, setReportSuccess] = useState<string | null>(null);
 
   const workflowBase = scope === "client" ? "/client" : "/freelancer";
   const workflowEndpoints =
@@ -448,6 +551,33 @@ export function ChatWorkspaceClient({
     return `/client/browse-gigs/gig/${targetGigId}/confirm-order${params.size ? `?${params.toString()}` : ""}`;
   }, [matchedHireRequest, matchedProject, scope, selectedConversation]);
 
+  const reportDefaults = useMemo(() => {
+    const scopeLabel = scope === "client" ? "Client" : "Freelancer";
+    const projectLabel =
+      selectedConversation?.projectTitle ||
+      matchedProject?.projectTitle ||
+      matchedHireRequest?.gigTitle ||
+      "this project";
+
+    return {
+      message: [
+        `Please review a dispute reported by the ${scopeLabel.toLowerCase()}.`,
+        selectedConversation?.roomId ? `Chat room: ${selectedConversation.roomId}` : null,
+        selectedConversation?.otherUsername ? `Other user: ${selectedConversation.otherUsername}` : null,
+        selectedConversation?.hireRequestId ? `Hire request: ${selectedConversation.hireRequestId}` : null,
+        (selectedConversation?.projectId || matchedProject?.id)
+          ? `Project: ${selectedConversation?.projectId ?? matchedProject?.id}`
+          : null,
+        `Context: ${projectLabel}`,
+        "",
+        "Issue details:",
+      ]
+        .filter(Boolean)
+        .join("\n"),
+      subject: `${scopeLabel} report: ${projectLabel}`,
+    };
+  }, [matchedHireRequest?.gigTitle, matchedProject?.id, matchedProject?.projectTitle, scope, selectedConversation]);
+
   const latestPendingIncomingPriceProposal = (() => {
     for (let index = messages.length - 1; index >= 0; index -= 1) {
       const message = messages[index];
@@ -470,6 +600,113 @@ export function ChatWorkspaceClient({
 
     return null;
   })();
+
+  const latestPendingPriceProposal = (() => {
+    for (let index = messages.length - 1; index >= 0; index -= 1) {
+      const message = messages[index];
+      const meta = parseStructuredMessage(message);
+      if (!meta || meta.kind !== "price_proposal") {
+        continue;
+      }
+
+      if (normalizeWorkflowState(meta.status) !== "pending") {
+        continue;
+      }
+
+      const isCurrentUser =
+        !!currentEmail &&
+        !!message.senderEmail &&
+        currentEmail.toLowerCase() === message.senderEmail.toLowerCase();
+
+      return { isCurrentUser, message, meta };
+    }
+
+    return null;
+  })();
+
+  const latestPendingIncomingRequirementProposal = (() => {
+    for (let index = messages.length - 1; index >= 0; index -= 1) {
+      const message = messages[index];
+      const meta = parseStructuredMessage(message);
+      if (!meta || meta.kind !== "project_requirement_proposal") {
+        continue;
+      }
+
+      const isCurrentUser =
+        !!currentEmail &&
+        !!message.senderEmail &&
+        currentEmail.toLowerCase() === message.senderEmail.toLowerCase();
+
+      if (isCurrentUser || normalizeWorkflowState(meta.status) !== "pending") {
+        continue;
+      }
+
+      return { message, meta };
+    }
+
+    return null;
+  })();
+
+  const latestPendingRequirementProposal = (() => {
+    for (let index = messages.length - 1; index >= 0; index -= 1) {
+      const message = messages[index];
+      const meta = parseStructuredMessage(message);
+      if (!meta || meta.kind !== "project_requirement_proposal") {
+        continue;
+      }
+
+      if (normalizeWorkflowState(meta.status) !== "pending") {
+        continue;
+      }
+
+      const isCurrentUser =
+        !!currentEmail &&
+        !!message.senderEmail &&
+        currentEmail.toLowerCase() === message.senderEmail.toLowerCase();
+
+      return { isCurrentUser, message, meta };
+    }
+
+    return null;
+  })();
+
+  const hireRequestStatus = normalizeWorkflowState(matchedHireRequest?.status);
+  const projectStatus = normalizeWorkflowState(matchedProject?.status);
+  const hasPendingPriceProposal = !!latestPendingPriceProposal;
+  const hasPendingRequirementProposal = !!latestPendingRequirementProposal;
+  const canFreelancerRespondToHireRequest = scope === "freelancer" && hireRequestStatus === "pending";
+  const canClientCancelRequest =
+    scope === "client" &&
+    ["pending", "accepted"].includes(hireRequestStatus) &&
+    !matchedProject &&
+    !hasPendingPriceProposal &&
+    !hasPendingRequirementProposal;
+  const canProposePrice =
+    ["accepted", "pending"].includes(hireRequestStatus) &&
+    !hasPendingPriceProposal &&
+    !["completed", "cancelled", "delivered"].includes(projectStatus);
+  const canClientSubmitRequirements =
+    scope === "client" &&
+    !!matchedProject &&
+    !hasPendingRequirementProposal &&
+    !["completed", "cancelled", "delivered"].includes(projectStatus);
+  const canFreelancerAcceptRequirements =
+    scope === "freelancer" &&
+    !!latestPendingIncomingRequirementProposal &&
+    !["completed", "cancelled"].includes(projectStatus);
+  const canFreelancerDeliverProject =
+    scope === "freelancer" &&
+    !!matchedProject &&
+    ["in_progress", "revision_requested"].includes(projectStatus) &&
+    !hasPendingRequirementProposal;
+  const canClientReviewDelivery =
+    scope === "client" &&
+    !!matchedProject &&
+    projectStatus === "delivered";
+  const canFreelancerAcceptRevision =
+    scope === "freelancer" &&
+    !!matchedProject &&
+    projectStatus.includes("revision");
 
   const upsertConversationSummary = useCallback(
     (message: ChatMessageResponse) => {
@@ -550,6 +787,48 @@ export function ChatWorkspaceClient({
     setSelectedRoomId(roomId);
     setWorkflowError(null);
     router.replace(`/${scope}/${roomId}/chat`);
+  };
+
+  const openReportDialog = () => {
+    setReportSubject(reportDefaults.subject);
+    setReportMessage(reportDefaults.message);
+    setReportError(null);
+    setReportSuccess(null);
+    setIsReportDialogOpen(true);
+  };
+
+  const handleSubmitReport = async () => {
+    if (!token || isSubmittingReport) {
+      return;
+    }
+
+    const subject = reportSubject.trim() || reportDefaults.subject;
+    const message = reportMessage.trim();
+
+    if (!message) {
+      setReportError("Please describe the issue before submitting the report.");
+      return;
+    }
+
+    setIsSubmittingReport(true);
+    setReportError(null);
+
+    try {
+      const response = await apiRequest<AccountReportResponse>("/account/reports", {
+        body: {
+          message,
+          subject,
+        },
+        method: "POST",
+        token,
+      });
+      setIsReportDialogOpen(false);
+      setReportSuccess(`Report #${response.id} was sent to admin for review.`);
+    } catch (error) {
+      setReportError(toErrorMessage(error));
+    } finally {
+      setIsSubmittingReport(false);
+    }
   };
 
   const handleSendMessage = async () => {
@@ -648,6 +927,81 @@ export function ChatWorkspaceClient({
       setWorkflowError(toErrorMessage(error));
     }
   };
+
+  const handleSubmitProjectRequirements = (values: {
+    deadline: string;
+    file: File | null;
+    price: string;
+    requirements: string;
+    startDate: string;
+    title: string;
+  }) =>
+    runWorkflowAction(async () => {
+      if (scope !== "client") {
+        return;
+      }
+
+      const projectId = matchedProject?.id ?? matchedHireRequest?.projectId ?? null;
+      if (!projectId) {
+        throw new Error("Project is not ready yet. Accept the hire request or price first.");
+      }
+
+      if (!values.title.trim() && !values.requirements.trim() && !values.file) {
+        throw new Error("Add a project title, requirements, or requirement file before saving.");
+      }
+
+      if (hasPendingRequirementProposal) {
+        throw new Error("Wait for the current requirement proposal to be reviewed before sending another.");
+      }
+
+      const payload = new FormData();
+      if (values.title.trim()) {
+        payload.append("projectTitle", values.title.trim());
+      }
+      if (values.requirements.trim()) {
+        payload.append("requirements", values.requirements.trim());
+      }
+      if (values.price.trim()) {
+        payload.append("agreedPrice", values.price.trim());
+      }
+      if (values.startDate) {
+        payload.append("startDate", values.startDate);
+      }
+      if (values.deadline) {
+        payload.append("deadline", values.deadline);
+      }
+      if (values.file) {
+        payload.append("requirementFile", values.file, values.file.name);
+      }
+
+      await apiRequest<Record<string, unknown>>(
+        `/client/project/${projectId}/requirements`,
+        {
+          body: payload,
+          method: "PUT",
+          token,
+        },
+      );
+    });
+
+  const handleAcceptRequirementProposal = () =>
+    runWorkflowAction(async () => {
+      if (scope !== "freelancer" || !latestPendingIncomingRequirementProposal?.meta.proposalId) {
+        throw new Error("This requirement update is missing its proposal reference.");
+      }
+
+      if (!canFreelancerAcceptRequirements) {
+        throw new Error("This requirement update is no longer waiting for freelancer approval.");
+      }
+
+      await apiRequest<Record<string, unknown>>(
+        `/freelancer/project-requirements/${latestPendingIncomingRequirementProposal.meta.proposalId}/accept`,
+        {
+          method: "POST",
+          token,
+        },
+      );
+    });
 
   const handleDeliveryDownload = async () => {
     if (!token || !matchedProject?.id) {
@@ -748,6 +1102,10 @@ export function ChatWorkspaceClient({
         return;
       }
 
+      if (hasPendingPriceProposal) {
+        throw new Error("Resolve the current pending price proposal before sending a new one.");
+      }
+
       const price = Number(priceDraft);
       if (!Number.isFinite(price) || price <= 0) {
         throw new Error("Enter a valid price proposal before sending.");
@@ -833,6 +1191,10 @@ export function ChatWorkspaceClient({
         return;
       }
 
+      if (!canFreelancerDeliverProject) {
+        throw new Error("Delivery is only available while the project is actively in progress.");
+      }
+
       const message = deliveryText.trim();
       const deliverPath = message
         ? `${workflowBase}/project/${matchedProject.id}/deliver?deliveryMessage=${encodeURIComponent(message)}`
@@ -878,6 +1240,10 @@ export function ChatWorkspaceClient({
         return;
       }
 
+      if (!canClientReviewDelivery) {
+        throw new Error("Only delivered projects can be approved.");
+      }
+
       await apiRequest<Record<string, unknown>>(
         `${workflowBase}/project/${matchedProject.id}/approve-delivery`,
         {
@@ -895,12 +1261,20 @@ export function ChatWorkspaceClient({
         text: `Delivery approved. "${matchedProject.projectTitle}" is now complete.`,
         type: "project_delivery",
       });
+
+      if (confirmOrderHref) {
+        router.push(confirmOrderHref);
+      }
     });
 
   const handleRequestRevision = () =>
     runWorkflowAction(async () => {
       if (!matchedProject) {
         return;
+      }
+
+      if (!canClientReviewDelivery) {
+        throw new Error("Only delivered projects can be sent back for revision.");
       }
 
       const message = revisionText.trim();
@@ -934,6 +1308,10 @@ export function ChatWorkspaceClient({
     runWorkflowAction(async () => {
       if (!matchedProject) {
         return;
+      }
+
+      if (!canFreelancerAcceptRevision) {
+        throw new Error("There is no active revision request to accept.");
       }
 
       await apiRequest<Record<string, unknown>>(
@@ -996,9 +1374,95 @@ export function ChatWorkspaceClient({
             >
               Refresh
             </button>
+            <button
+              className="rounded-xl border border-[#fecaca] bg-white px-4 py-2.5 text-sm font-semibold text-[#dc2626] transition hover:bg-[#fef2f2]"
+              onClick={openReportDialog}
+              type="button"
+            >
+              Report to Admin
+            </button>
           </div>
         </div>
       </section>
+
+      {reportSuccess ? (
+        <div className="mt-4 rounded-2xl border border-[#bbf7d0] bg-[#f0fdf4] px-5 py-4 text-sm text-[#166534]">
+          {reportSuccess}
+        </div>
+      ) : null}
+
+      {isReportDialogOpen ? (
+        <section className="mt-4 rounded-2xl border border-[#fecaca] bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <h2 className="text-[18px] font-semibold text-[#111827]">Report This Situation</h2>
+              <p className="mt-1 text-sm text-[#6b7280]">
+                Send the current dispute or suspicious behavior to the admin team for review.
+              </p>
+            </div>
+            <button
+              className="rounded-xl border border-[#d1d5db] bg-white px-4 py-2 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+              onClick={() => {
+                setIsReportDialogOpen(false);
+                setReportError(null);
+              }}
+              type="button"
+            >
+              Close
+            </button>
+          </div>
+
+          {reportError ? (
+            <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {reportError}
+            </div>
+          ) : null}
+
+          <div className="mt-4 grid gap-4">
+            <input
+              className="w-full rounded-xl border border-[#d1d5db] px-4 py-3 text-sm text-[#111827] outline-none transition focus:border-[#dc2626]"
+              onChange={(event) => setReportSubject(event.target.value)}
+              placeholder="Report subject"
+              value={reportSubject}
+            />
+            <textarea
+              className="min-h-[180px] w-full rounded-xl border border-[#d1d5db] px-4 py-3 text-sm text-[#111827] outline-none transition focus:border-[#dc2626]"
+              onChange={(event) => setReportMessage(event.target.value)}
+              placeholder="Describe what happened, what you need reviewed, and any important timestamps or behavior."
+              value={reportMessage}
+            />
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-3 text-xs text-[#6b7280]">
+            {selectedConversation?.roomId ? <span>Room #{selectedConversation.roomId}</span> : null}
+            {selectedConversation?.otherUsername ? <span>User: {selectedConversation.otherUsername}</span> : null}
+            {selectedConversation?.projectId ? <span>Project #{selectedConversation.projectId}</span> : null}
+            {selectedConversation?.hireRequestId ? <span>Request #{selectedConversation.hireRequestId}</span> : null}
+          </div>
+
+          <div className="mt-5 flex flex-wrap justify-end gap-3">
+            <button
+              className="rounded-xl border border-[#d1d5db] bg-white px-4 py-2.5 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+              onClick={() => {
+                setReportSubject(reportDefaults.subject);
+                setReportMessage(reportDefaults.message);
+                setReportError(null);
+              }}
+              type="button"
+            >
+              Reset
+            </button>
+            <button
+              className="rounded-xl bg-[#dc2626] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#b91c1c] disabled:opacity-60"
+              disabled={isSubmittingReport}
+              onClick={() => void handleSubmitReport()}
+              type="button"
+            >
+              {isSubmittingReport ? "Sending..." : "Send Report"}
+            </button>
+          </div>
+        </section>
+      ) : null}
 
       <section className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
         <aside className="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white">
@@ -1110,6 +1574,7 @@ export function ChatWorkspaceClient({
                           !!meta &&
                           meta.kind === "price_proposal" &&
                           normalizeWorkflowState(meta.status) === "pending" &&
+                          latestPendingIncomingPriceProposal?.message.id === message.id &&
                           !isCurrentUser &&
                           !isWorkflowBusy;
 
@@ -1330,7 +1795,7 @@ export function ChatWorkspaceClient({
                             </Link>
                           ) : null}
 
-                          {scope === "freelancer" && normalizeWorkflowState(matchedHireRequest.status) === "pending" ? (
+                          {canFreelancerRespondToHireRequest ? (
                             <div className="flex gap-2">
                               <button
                                 className="flex-1 rounded-xl bg-[#16a34a] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#15803d] disabled:opacity-60"
@@ -1351,8 +1816,7 @@ export function ChatWorkspaceClient({
                             </div>
                           ) : null}
 
-                          {scope === "client" &&
-                          ["pending", "accepted"].includes(normalizeWorkflowState(matchedHireRequest.status)) ? (
+                          {canClientCancelRequest ? (
                             <button
                               className="w-full rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-sm font-semibold text-[#374151] transition hover:bg-[#f9fafb] disabled:opacity-60"
                               disabled={isWorkflowBusy}
@@ -1363,7 +1827,7 @@ export function ChatWorkspaceClient({
                             </button>
                           ) : null}
 
-                          {["accepted", "pending"].includes(normalizeWorkflowState(matchedHireRequest.status)) ? (
+                          {canProposePrice ? (
                             <div className="space-y-2">
                               <input
                                 className="w-full rounded-xl border border-[#d1d5db] px-3 py-2 text-sm text-[#111827] outline-none transition focus:border-[#2563eb]"
@@ -1373,7 +1837,7 @@ export function ChatWorkspaceClient({
                               />
                               <button
                                 className="w-full rounded-xl bg-[#2563eb] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#1d4ed8] disabled:opacity-60"
-                                disabled={isWorkflowBusy || !priceDraft.trim()}
+                                disabled={isWorkflowBusy || !priceDraft.trim() || hasPendingPriceProposal}
                                 onClick={() => void handleProposePrice()}
                                 type="button"
                               >
@@ -1420,6 +1884,41 @@ export function ChatWorkspaceClient({
                                   Reject
                                 </button>
                               </div>
+                            </div>
+                          ) : null}
+
+                          {canFreelancerAcceptRequirements && latestPendingIncomingRequirementProposal ? (
+                            <div className="rounded-xl border border-[#dcfce7] bg-[#f0fdf4] p-3">
+                              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#15803d]">
+                                Requirement Update
+                              </p>
+                              <p className="mt-1 text-sm font-semibold text-[#14532d]">
+                                {latestPendingIncomingRequirementProposal.meta.title || "Project requirements"}
+                              </p>
+                              <p className="mt-1 text-sm text-[#166534]">
+                                {latestPendingIncomingRequirementProposal.meta.text}
+                              </p>
+                              {latestPendingIncomingRequirementProposal.message.attachmentName ? (
+                                <button
+                                  className="mt-3 text-sm font-medium text-[#166534] underline underline-offset-2"
+                                  onClick={() =>
+                                    void handleAttachmentDownload(
+                                      latestPendingIncomingRequirementProposal.message,
+                                    )
+                                  }
+                                  type="button"
+                                >
+                                  Download attached requirements
+                                </button>
+                              ) : null}
+                              <button
+                                className="mt-3 w-full rounded-xl bg-[#16a34a] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#15803d] disabled:opacity-60"
+                                disabled={isWorkflowBusy || !canFreelancerAcceptRequirements}
+                                onClick={() => void handleAcceptRequirementProposal()}
+                                type="button"
+                              >
+                                Accept Requirements
+                              </button>
                             </div>
                           ) : null}
                         </div>
@@ -1473,8 +1972,7 @@ export function ChatWorkspaceClient({
                           ) : null}
                         </div>
 
-                        {scope === "freelancer" &&
-                        !["completed", "delivered"].includes(normalizeWorkflowState(matchedProject.status)) ? (
+                        {canFreelancerDeliverProject ? (
                           <div className="mt-4 space-y-2">
                             <textarea
                               className="min-h-[90px] w-full rounded-xl border border-[#d1d5db] px-3 py-2 text-sm text-[#111827] outline-none transition focus:border-[#2563eb]"
@@ -1492,7 +1990,7 @@ export function ChatWorkspaceClient({
                             </label>
                             <button
                               className="w-full rounded-xl bg-[#16a34a] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#15803d] disabled:opacity-60"
-                              disabled={isWorkflowBusy}
+                              disabled={isWorkflowBusy || !canFreelancerDeliverProject}
                               onClick={() => void handleDeliverProject()}
                               type="button"
                             >
@@ -1501,7 +1999,7 @@ export function ChatWorkspaceClient({
                           </div>
                         ) : null}
 
-                        {scope === "client" && normalizeWorkflowState(matchedProject.status) === "delivered" ? (
+                        {canClientReviewDelivery ? (
                           <div className="mt-4 space-y-2">
                             {confirmOrderHref ? (
                               <Link
@@ -1521,7 +2019,7 @@ export function ChatWorkspaceClient({
                             <div className="flex gap-2">
                               <button
                                 className="flex-1 rounded-xl bg-[#16a34a] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#15803d] disabled:opacity-60"
-                                disabled={isWorkflowBusy}
+                                disabled={isWorkflowBusy || !canClientReviewDelivery}
                                 onClick={() => void handleApproveDelivery()}
                                 type="button"
                               >
@@ -1529,7 +2027,7 @@ export function ChatWorkspaceClient({
                               </button>
                               <button
                                 className="flex-1 rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-sm font-semibold text-[#374151] transition hover:bg-[#f9fafb] disabled:opacity-60"
-                                disabled={isWorkflowBusy || !revisionText.trim()}
+                                disabled={isWorkflowBusy || !revisionText.trim() || !canClientReviewDelivery}
                                 onClick={() => void handleRequestRevision()}
                                 type="button"
                               >
@@ -1539,16 +2037,35 @@ export function ChatWorkspaceClient({
                           </div>
                         ) : null}
 
-                        {scope === "freelancer" &&
-                        normalizeWorkflowState(matchedProject.status).includes("revision") ? (
+                        {canFreelancerAcceptRevision ? (
                           <button
                             className="mt-4 w-full rounded-xl bg-[#2563eb] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#1d4ed8] disabled:opacity-60"
-                            disabled={isWorkflowBusy}
+                            disabled={isWorkflowBusy || !canFreelancerAcceptRevision}
                             onClick={() => void handleAcceptRevision()}
                             type="button"
                           >
                             Accept Revision
                           </button>
+                        ) : null}
+
+                        {canClientSubmitRequirements ? (
+                          <ProjectRequirementsEditor
+                            key={`${selectedConversation?.roomId ?? "room"}:${matchedProject.id}`}
+                            disabled={isWorkflowBusy || !canClientSubmitRequirements}
+                            initialDeadline={matchedProject.deadline ?? matchedHireRequest?.deadline ?? ""}
+                            initialPrice={
+                              matchedProject.agreedPrice
+                                ? String(matchedProject.agreedPrice)
+                                : matchedHireRequest?.projectAgreedPrice
+                                  ? String(matchedHireRequest.projectAgreedPrice)
+                                  : matchedHireRequest?.agreedPrice
+                                    ? String(matchedHireRequest.agreedPrice)
+                                    : ""
+                            }
+                            initialRequirements={matchedProject.requirements ?? matchedHireRequest?.requirements ?? ""}
+                            initialTitle={matchedProject.projectTitle ?? matchedHireRequest?.gigTitle ?? ""}
+                            onSubmit={handleSubmitProjectRequirements}
+                          />
                         ) : null}
                       </>
                     ) : (

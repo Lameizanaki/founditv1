@@ -9,6 +9,8 @@ export function ClientPaymentSuccessClient() {
   const mode = searchParams.get("mode") === "pay" ? "pay" : "request";
   const orderId = searchParams.get("orderId") ?? "";
   const roomId = searchParams.get("roomId");
+  const projectId = searchParams.get("projectId");
+  const orderDetailHref = projectId ? `/client/my-orders/${projectId}` : "/client/my-orders";
 
   return (
     <div className="mx-auto max-w-[640px] px-4 py-10 md:px-6">
@@ -46,10 +48,10 @@ export function ClientPaymentSuccessClient() {
         <div className="mt-7 space-y-3">
           <button
             className="inline-flex h-[54px] w-full items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-4 text-[16px] font-semibold text-white transition hover:bg-[#1d4ed8]"
-            onClick={() => router.push("/client/my-orders")}
+            onClick={() => router.push(orderDetailHref)}
             type="button"
           >
-            Track My Orders
+            {projectId ? "Track This Order" : "Track My Orders"}
           </button>
 
           <button

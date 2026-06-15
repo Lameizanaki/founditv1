@@ -230,6 +230,15 @@ export function ClientOrdersClient() {
                 </div>
 
                 <div className="flex shrink-0 flex-col gap-3 xl:w-[190px]">
+                  {order.projectId ? (
+                    <Link
+                      className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#d1d5db] bg-white px-4 py-2.5 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+                      href={`/client/my-orders/${order.projectId}`}
+                    >
+                      View Details
+                    </Link>
+                  ) : null}
+
                   {order.gigId && order.projectId && order.status.includes("complete") ? (
                     <Link
                       className={
