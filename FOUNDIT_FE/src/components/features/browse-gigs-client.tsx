@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useApiQuery } from "@/hooks/use-api-query";
-import { asRecord, buildImageSource, toNumber, toText } from "@/lib/data-utils";
+import { asRecord, buildImageSource, getInitials, toNumber, toText } from "@/lib/data-utils";
 import { PublicFooter } from "@/components/shell/public-footer";
 import { PublicHeader } from "@/components/shell/public-header";
 
@@ -57,9 +57,10 @@ export function BrowseGigsClient({ mode, basePath }: BrowseGigsClientProps) {
       delivery: deliveryDays > 0 ? `${deliveryDays} days` : "Flexible delivery",
       price: toNumber(record.price, 0),
       sellerAvatar: buildImageSource({
-        data: record.profilePictureData,
-        contentType: record.profilePictureType,
-        url: record.profilePictureUrl,
+        data: record.freelancerProfilePictureData ?? record.profilePictureData,
+        contentType: record.freelancerProfilePictureType ?? record.profilePictureType,
+        url: record.freelancerProfilePictureUrl ?? record.profilePictureUrl,
+        fallback: "",
       }),
     } satisfies GigCard;
   });
@@ -155,14 +156,20 @@ export function BrowseGigsClient({ mode, basePath }: BrowseGigsClientProps) {
 
             <div className="p-4">
               <div className="mb-3 flex items-center gap-2">
-                <div className="h-7 w-7 overflow-hidden rounded-full border border-[#e5e7eb] bg-gray-100">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    alt={gig.seller}
-                    className="h-full w-full object-cover"
-                    src={gig.sellerAvatar}
-                  />
-                </div>
+                {gig.sellerAvatar ? (
+                  <div className="h-7 w-7 overflow-hidden rounded-full border border-[#e5e7eb] bg-gray-100">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      alt={gig.seller}
+                      className="h-full w-full object-cover"
+                      src={gig.sellerAvatar}
+                    />
+                  </div>
+                ) : (
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#eef2ff] text-[11px] font-semibold text-[#2563eb]">
+                    {getInitials(gig.seller)}
+                  </div>
+                )}
                 <span className="text-[12px] text-[#4b5563]">{gig.seller}</span>
               </div>
 

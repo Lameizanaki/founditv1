@@ -222,9 +222,13 @@ export function ClientOrdersClient() {
                         <span className="text-[#6b7280]">Updated {order.paymentSubmittedAt}</span>
                       ) : null}
                     </div>
+                  ) : order.status.includes("deliver") ? (
+                    <div className="mt-3 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-800">
+                      The freelancer has delivered the work. Review it in chat, then approve delivery to continue to payment.
+                    </div>
                   ) : order.status.includes("complete") ? (
                     <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
-                      Work is completed. Submit your manual payment proof to move this order to paid.
+                      Delivery approved. Submit your payment proof now to finish the order.
                     </div>
                   ) : null}
                 </div>

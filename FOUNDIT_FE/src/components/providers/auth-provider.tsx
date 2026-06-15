@@ -59,6 +59,8 @@ const subscribeToTokenStore = (listener: () => void) => {
   };
 };
 
+const subscribeToHydration = () => () => undefined;
+
 const getValidSession = (token: string | null) => {
   if (!token) {
     return null;
@@ -73,13 +75,23 @@ const getValidSession = (token: string | null) => {
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const isHydrated = useSyncExternalStore(
+    subscribeToHydration,
+    () => true,
+    () => false,
+  );
   const token = useSyncExternalStore(
     subscribeToTokenStore,
     readStoredToken,
     () => null,
   );
+
   const session = getValidSession(token);
-  const status: AuthStatus = session ? "authenticated" : "unauthenticated";
+  const status: AuthStatus = !isHydrated
+    ? "loading"
+    : session
+      ? "authenticated"
+      : "unauthenticated";
 
   const signIn = async (payload: SignInPayload) => {
     const response = await apiRequest<LoginResponse>("/auth/login", {

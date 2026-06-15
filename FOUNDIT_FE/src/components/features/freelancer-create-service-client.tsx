@@ -5,8 +5,6 @@ import { useState } from "react";
 import { apiRequest, toErrorMessage } from "@/lib/api";
 import { useAuth } from "@/components/providers/auth-provider";
 
-type PackageType = "basic" | "standard" | "premium";
-
 type PricingPackage = {
   price: number;
   delivery: number;
@@ -14,10 +12,11 @@ type PricingPackage = {
   description: string;
 };
 
-const createDefaultPackages = () => ({
-  basic: { price: 100, delivery: 7, revisions: 2, description: "Basic package" },
-  standard: { price: 200, delivery: 5, revisions: 4, description: "Standard package" },
-  premium: { price: 300, delivery: 3, revisions: 6, description: "Premium package" },
+const createDefaultPackage = (): PricingPackage => ({
+  price: 200,
+  delivery: 5,
+  revisions: 4,
+  description: "Standard package",
 });
 
 export function FreelancerCreateServiceClient() {
@@ -28,16 +27,14 @@ export function FreelancerCreateServiceClient() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [selectedPackage, setSelectedPackage] = useState<PackageType>("standard");
   const [overview, setOverview] = useState({
     title: "",
     category: "",
     description: "",
     tags: "",
   });
-  const [packages, setPackages] = useState<Record<PackageType, PricingPackage>>(createDefaultPackages());
+  const [pricing, setPricing] = useState<PricingPackage>(createDefaultPackage());
   const [mainImage, setMainImage] = useState<File | null>(null);
-  const [coverImages, setCoverImages] = useState<File[]>([]);
 
   const submitOverview = async () => {
     if (!token) return;
@@ -84,7 +81,6 @@ export function FreelancerCreateServiceClient() {
 
   const submitPricing = async () => {
     if (!token || !gigId) return;
-    const selected = packages[selectedPackage];
     setIsLoading(true);
     setError(null);
 
@@ -100,20 +96,20 @@ export function FreelancerCreateServiceClient() {
             .split(",")
             .map((tag) => tag.trim())
             .filter(Boolean),
-          paymentChoice: selectedPackage,
-          price: String(selected.price),
-          deliveryDate: String(selected.delivery),
-          rivision: String(selected.revisions),
-          packageDescription: selected.description,
+          paymentChoice: "standard",
+          price: String(pricing.price),
+          deliveryDate: String(pricing.delivery),
+          rivision: String(pricing.revisions),
+          packageDescription: pricing.description,
           pricingPackagesJson: JSON.stringify(
-            Object.entries(packages).map(([type, pkg]) => ({
-              type,
-              label: type,
-              price: pkg.price,
-              deliveryDate: pkg.delivery,
-              rivision: pkg.revisions,
-              packageDescription: pkg.description,
-            })),
+            [{
+              type: "standard",
+              label: "standard",
+              price: pricing.price,
+              deliveryDate: pricing.delivery,
+              rivision: pricing.revisions,
+              packageDescription: pricing.description,
+            }],
           ),
         },
       });
@@ -137,7 +133,6 @@ export function FreelancerCreateServiceClient() {
     try {
       const formData = new FormData();
       formData.append("main", mainImage);
-      coverImages.forEach((file) => formData.append("cover", file));
 
       await apiRequest(`/freelancer/${gigId}/publish-service`, {
         method: "PUT",
@@ -148,10 +143,8 @@ export function FreelancerCreateServiceClient() {
       setCurrentStep(1);
       setGigId(null);
       setOverview({ title: "", category: "", description: "", tags: "" });
-      setPackages(createDefaultPackages());
-      setSelectedPackage("standard");
+      setPricing(createDefaultPackage());
       setMainImage(null);
-      setCoverImages([]);
     } catch (nextError) {
       setError(toErrorMessage(nextError));
     } finally {
@@ -280,55 +273,45 @@ export function FreelancerCreateServiceClient() {
 
           {currentStep === 2 ? (
             <>
-              <h2 className="text-[24px] font-semibold text-[#111827]">Pricing & Packages</h2>
+              <h2 className="text-[24px] font-semibold text-[#111827]">Standard Package</h2>
               <div className="mt-6 space-y-4">
-                {(["basic", "standard", "premium"] as PackageType[]).map((packageType) => (
-                  <div
-                    key={packageType}
-                    className={
-                      selectedPackage === packageType
-                        ? "rounded-2xl border border-[#16a34a] bg-[#f0fdf4] p-5 shadow-[inset_0_0_0_1px_rgba(22,163,74,0.2)]"
-                        : "rounded-2xl border border-[#e5e7eb] p-5"
-                    }
-                  >
-                    <button
-                      className="mb-4 text-left text-xl font-semibold text-[#111827]"
-                      onClick={() => setSelectedPackage(packageType)}
-                      type="button"
-                    >
-                      {packageType[0].toUpperCase() + packageType.slice(1)}
-                    </button>
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                      {[
-                        ["price", "Price ($)"],
-                        ["delivery", "Delivery (days)"],
-                        ["revisions", "Revisions"],
-                        ["description", "Package Description"],
-                      ].map(([field, label]) => (
-                        <div key={field}>
-                          <label className="mb-2 block text-sm font-medium text-[#374151]">{label}</label>
-                          <input
-                            className="h-11 w-full rounded-xl border border-[#d1d5db] px-4 text-sm outline-none focus:border-[#16a34a]"
-                            onChange={(event) =>
-                              setPackages((current) => ({
-                                ...current,
-                                [packageType]: {
-                                  ...current[packageType],
-                                  [field]:
-                                    field === "description"
-                                      ? event.target.value
-                                      : Number(event.target.value),
-                                },
-                              }))
-                            }
-                            type={field === "description" ? "text" : "number"}
-                            value={String(packages[packageType][field as keyof PricingPackage])}
-                          />
-                        </div>
-                      ))}
-                    </div>
+                <div className="rounded-2xl border border-[#16a34a] bg-[#f0fdf4] p-5 shadow-[inset_0_0_0_1px_rgba(22,163,74,0.2)]">
+                  <div className="mb-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#16a34a]">
+                      Single Package
+                    </p>
+                    <h3 className="mt-2 text-xl font-semibold text-[#111827]">Standard</h3>
+                    <p className="mt-1 text-sm text-[#6b7280]">
+                      Keep one clear package so clients see one straightforward offer.
+                    </p>
                   </div>
-                ))}
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    {[
+                      ["price", "Price ($)"],
+                      ["delivery", "Delivery (days)"],
+                      ["revisions", "Revisions"],
+                      ["description", "Package Description"],
+                    ].map(([field, label]) => (
+                      <div key={field}>
+                        <label className="mb-2 block text-sm font-medium text-[#374151]">{label}</label>
+                        <input
+                          className="h-11 w-full rounded-xl border border-[#d1d5db] px-4 text-sm outline-none focus:border-[#16a34a]"
+                          onChange={(event) =>
+                            setPricing((current) => ({
+                              ...current,
+                              [field]:
+                                field === "description"
+                                  ? event.target.value
+                                  : Number(event.target.value),
+                            }))
+                          }
+                          type={field === "description" ? "text" : "number"}
+                          value={String(pricing[field as keyof PricingPackage])}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               <div className="mt-8 flex items-center justify-between">
@@ -364,20 +347,10 @@ export function FreelancerCreateServiceClient() {
                     type="file"
                   />
                 </div>
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-[#374151]">Gallery Images</label>
-                  <input
-                    accept="image/*"
-                    className="block rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-sm text-[#374151] file:mr-3 file:rounded-lg file:border-0 file:bg-[#16a34a] file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white"
-                    multiple
-                    onChange={(event) => setCoverImages(Array.from(event.target.files ?? []).slice(0, 3))}
-                    type="file"
-                  />
-                </div>
                 <div className="rounded-2xl border border-[#86efac] bg-[#ecfdf3] px-5 py-4">
                   <p className="text-base font-semibold text-[#111827]">Ready to Publish?</p>
                   <p className="mt-1 text-sm text-[#6b7280]">
-                    Your service listing will be reviewed and go live after publishing.
+                    One strong cover image is enough for this version of your listing.
                   </p>
                 </div>
               </div>

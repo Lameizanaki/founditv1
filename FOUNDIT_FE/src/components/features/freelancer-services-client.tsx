@@ -29,8 +29,6 @@ export function FreelancerServicesClient() {
       activeOrders: toNumber(record.orders, 0),
       status: toText(record.status, "Active"),
       price: toNumber(record.price, 0),
-      impressions: toNumber(record.views ?? record.viewCount, 0),
-      clicks: toNumber(record.clicks, 0),
     };
   });
 
@@ -66,12 +64,12 @@ export function FreelancerServicesClient() {
       ) : null}
 
       <div className="mt-5 overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-sm">
-        <div className="grid grid-cols-12 gap-4 border-b border-[#e5e7eb] bg-[#f9fafb] px-5 py-4 text-sm font-semibold text-[#4b5563]">
+          <div className="grid grid-cols-12 gap-4 border-b border-[#e5e7eb] bg-[#f9fafb] px-5 py-4 text-sm font-semibold text-[#4b5563]">
           <div className="col-span-5">Service Detail</div>
           <div className="col-span-2">Status</div>
           <div className="col-span-1">Price</div>
           <div className="col-span-2">Performance</div>
-          <div className="col-span-2 text-right">Actions</div>
+          <div className="col-span-2 text-right">Edit</div>
         </div>
 
         {services.isLoading ? (
@@ -109,24 +107,18 @@ export function FreelancerServicesClient() {
 
               <div className="col-span-2 flex items-center gap-8">
                 <div>
-                  <p className="text-sm font-semibold text-[#111827]">{service.impressions}</p>
-                  <p className="text-xs text-[#9ca3af]">Impressions</p>
+                  <p className="text-sm font-semibold text-[#111827]">{service.activeOrders}</p>
+                  <p className="text-xs text-[#9ca3af]">Orders</p>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-[#111827]">{service.clicks}</p>
-                  <p className="text-xs text-[#9ca3af]">Clicks</p>
+                  <p className="text-sm font-semibold text-[#111827]">{service.rating.toFixed(1)}</p>
+                  <p className="text-xs text-[#9ca3af]">Rating</p>
                 </div>
               </div>
 
               <div className="col-span-2 flex items-center justify-end gap-4 text-sm">
                 <Link
-                  className="font-medium text-[#6b7280] transition hover:text-[#111827]"
-                  href={`/freelancer/my-services/${service.id}`}
-                >
-                  View
-                </Link>
-                <Link
-                  className="font-medium text-[#16a34a] transition hover:text-[#15803d]"
+                  className="inline-flex rounded-xl bg-[#111827] px-4 py-2 text-sm font-semibold text-white transition visited:text-white hover:bg-[#0b1220]"
                   href={`/freelancer/my-services/${service.id}/edit`}
                 >
                   Edit

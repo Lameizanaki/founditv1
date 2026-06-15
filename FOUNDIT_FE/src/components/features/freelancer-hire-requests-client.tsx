@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useApiQuery } from "@/hooks/use-api-query";
 import {
   asRecord,
@@ -12,6 +13,9 @@ import {
 
 const badgeClass = (status: string) => {
   const normalized = normalizeStatus(status);
+  if (normalized.includes("complete")) {
+    return "bg-[#dcfce7] text-[#16a34a]";
+  }
   if (normalized.includes("accept") || normalized.includes("progress")) {
     return "bg-[#dcfce7] text-[#16a34a]";
   }
@@ -37,6 +41,9 @@ export function FreelancerHireRequestsClient() {
       deadline: formatDate(record.deadline, "No deadline"),
       status: toText(record.projectStatus ?? record.status, "Pending"),
       createdAt: formatDate(record.createdAt, "Unknown"),
+      requirements: toText(record.requirements, "No requirement message yet."),
+      requirementFileName: toText(record.requirementFileName, ""),
+      projectId: toNumber(record.projectId, 0) || null,
     };
   });
 
@@ -77,23 +84,26 @@ export function FreelancerHireRequestsClient() {
                     <span>Due {item.deadline}</span>
                     <span>Requested {item.createdAt}</span>
                   </div>
+                  <div className="mt-4 rounded-xl border border-[#eef2f7] bg-[#f8fafc] p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6b7280]">
+                      Requirements
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[#374151]">{item.requirements}</p>
+                    {item.requirementFileName ? (
+                      <p className="mt-2 text-xs font-medium text-[#2563eb]">
+                        Attachment included: {item.requirementFileName}
+                      </p>
+                    ) : null}
+                  </div>
                 </div>
 
                 <div className="flex gap-3">
-                  <button
-                    className="rounded-xl bg-[#16a34a] px-4 py-2.5 text-sm font-semibold text-white opacity-70"
-                    disabled
-                    type="button"
+                  <Link
+                    className="rounded-xl border border-[#d1d5db] bg-white px-4 py-2.5 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+                    href={item.projectId ? "/freelancer/chat" : "/freelancer/chat"}
                   >
-                    Accept
-                  </button>
-                  <button
-                    className="rounded-xl border border-[#d1d5db] bg-white px-4 py-2.5 text-sm font-medium text-[#374151] opacity-70"
-                    disabled
-                    type="button"
-                  >
-                    Review
-                  </button>
+                    Review in Chat
+                  </Link>
                 </div>
               </div>
             </div>

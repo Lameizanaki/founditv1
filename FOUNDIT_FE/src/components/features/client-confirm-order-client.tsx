@@ -80,7 +80,6 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
 
   const [requestMessage, setRequestMessage] = useState("");
   const [projectRequirements, setProjectRequirements] = useState("");
-  const [deadline, setDeadline] = useState("");
   const [paymentReference, setPaymentReference] = useState("");
   const [selectedProofFile, setSelectedProofFile] = useState<File | null>(null);
   const [sellerQrImageUrl, setSellerQrImageUrl] = useState("");
@@ -301,11 +300,6 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
       return;
     }
 
-    if (!deadline) {
-      setSubmitError("Please set a project deadline before sending the request.");
-      return;
-    }
-
     setIsSubmitting(true);
     setSubmitError("");
 
@@ -316,7 +310,6 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
       payload.append("message", requestMessage.trim());
       payload.append("requestMessage", requestMessage.trim());
       payload.append("requirements", projectRequirements.trim());
-      payload.append("deadline", deadline);
       if (gigPrice > 0) {
         payload.append("agreedPrice", String(gigPrice));
       }
@@ -449,15 +442,6 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
               value={projectRequirements}
             />
 
-            <div className="mt-4">
-              <label className="text-sm font-semibold text-[#111827]">Project Deadline</label>
-              <input
-                className="mt-2 h-11 w-full rounded-xl border border-[#e5e7eb] bg-white px-4 text-sm text-[#111827] outline-none focus:border-[#2563eb]"
-                onChange={(event) => setDeadline(event.target.value)}
-                type="date"
-                value={deadline}
-              />
-            </div>
           </section>
 
           <section className="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-sm">

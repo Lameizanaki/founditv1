@@ -17,7 +17,6 @@ import {
   upsertConversationFromMessage,
 } from "@/lib/chat";
 import {
-  formatDate,
   formatMoney,
   getInitials,
   normalizeStatus,
@@ -78,19 +77,16 @@ interface AccountReportResponse {
 
 function ProjectRequirementsEditor({
   disabled,
-  initialDeadline,
   initialPrice,
   initialRequirements,
   initialTitle,
   onSubmit,
 }: {
   disabled: boolean;
-  initialDeadline: string;
   initialPrice: string;
   initialRequirements: string;
   initialTitle: string;
   onSubmit: (values: {
-    deadline: string;
     file: File | null;
     price: string;
     requirements: string;
@@ -102,7 +98,6 @@ function ProjectRequirementsEditor({
   const [requirements, setRequirements] = useState(initialRequirements);
   const [price, setPrice] = useState(initialPrice);
   const [startDate, setStartDate] = useState("");
-  const [deadline, setDeadline] = useState(initialDeadline);
   const [file, setFile] = useState<File | null>(null);
 
   return (
@@ -129,18 +124,12 @@ function ProjectRequirementsEditor({
         type="number"
         value={price}
       />
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-2">
         <input
           className="w-full rounded-xl border border-[#d1d5db] px-3 py-2 text-sm text-[#111827] outline-none transition focus:border-[#2563eb]"
           onChange={(event) => setStartDate(event.target.value)}
           type="date"
           value={startDate}
-        />
-        <input
-          className="w-full rounded-xl border border-[#d1d5db] px-3 py-2 text-sm text-[#111827] outline-none transition focus:border-[#2563eb]"
-          onChange={(event) => setDeadline(event.target.value)}
-          type="date"
-          value={deadline}
         />
       </div>
       <label className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]">
@@ -154,7 +143,7 @@ function ProjectRequirementsEditor({
       <button
         className="w-full rounded-xl bg-[#2563eb] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#1d4ed8] disabled:opacity-60"
         disabled={disabled}
-        onClick={() => void onSubmit({ deadline, file, price, requirements, startDate, title })}
+        onClick={() => void onSubmit({ file, price, requirements, startDate, title })}
         type="button"
       >
         Send Requirements Update
@@ -557,17 +546,12 @@ export function ChatWorkspaceClient({
       selectedConversation?.projectTitle ||
       matchedProject?.projectTitle ||
       matchedHireRequest?.gigTitle ||
-      "this project";
+      "this conversation";
 
     return {
       message: [
         `Please review a dispute reported by the ${scopeLabel.toLowerCase()}.`,
-        selectedConversation?.roomId ? `Chat room: ${selectedConversation.roomId}` : null,
-        selectedConversation?.otherUsername ? `Other user: ${selectedConversation.otherUsername}` : null,
-        selectedConversation?.hireRequestId ? `Hire request: ${selectedConversation.hireRequestId}` : null,
-        (selectedConversation?.projectId || matchedProject?.id)
-          ? `Project: ${selectedConversation?.projectId ?? matchedProject?.id}`
-          : null,
+        selectedConversation?.otherUsername ? `Reported user: ${selectedConversation.otherUsername}` : null,
         `Context: ${projectLabel}`,
         "",
         "Issue details:",
@@ -576,7 +560,7 @@ export function ChatWorkspaceClient({
         .join("\n"),
       subject: `${scopeLabel} report: ${projectLabel}`,
     };
-  }, [matchedHireRequest?.gigTitle, matchedProject?.id, matchedProject?.projectTitle, scope, selectedConversation]);
+  }, [matchedHireRequest?.gigTitle, matchedProject?.projectTitle, scope, selectedConversation]);
 
   const latestPendingIncomingPriceProposal = (() => {
     for (let index = messages.length - 1; index >= 0; index -= 1) {
@@ -682,6 +666,7 @@ export function ChatWorkspaceClient({
     !hasPendingPriceProposal &&
     !hasPendingRequirementProposal;
   const canProposePrice =
+    scope === "freelancer" &&
     ["accepted", "pending"].includes(hireRequestStatus) &&
     !hasPendingPriceProposal &&
     !["completed", "cancelled", "delivered"].includes(projectStatus);
@@ -929,7 +914,6 @@ export function ChatWorkspaceClient({
   };
 
   const handleSubmitProjectRequirements = (values: {
-    deadline: string;
     file: File | null;
     price: string;
     requirements: string;
@@ -966,9 +950,6 @@ export function ChatWorkspaceClient({
       }
       if (values.startDate) {
         payload.append("startDate", values.startDate);
-      }
-      if (values.deadline) {
-        payload.append("deadline", values.deadline);
       }
       if (values.file) {
         payload.append("requirementFile", values.file, values.file.name);
@@ -1433,13 +1414,6 @@ export function ChatWorkspaceClient({
             />
           </div>
 
-          <div className="mt-4 flex flex-wrap gap-3 text-xs text-[#6b7280]">
-            {selectedConversation?.roomId ? <span>Room #{selectedConversation.roomId}</span> : null}
-            {selectedConversation?.otherUsername ? <span>User: {selectedConversation.otherUsername}</span> : null}
-            {selectedConversation?.projectId ? <span>Project #{selectedConversation.projectId}</span> : null}
-            {selectedConversation?.hireRequestId ? <span>Request #{selectedConversation.hireRequestId}</span> : null}
-          </div>
-
           <div className="mt-5 flex flex-wrap justify-end gap-3">
             <button
               className="rounded-xl border border-[#d1d5db] bg-white px-4 py-2.5 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
@@ -1694,10 +1668,10 @@ export function ChatWorkspaceClient({
 
                 <div className="border-t border-[#eef2f7] bg-white p-5">
                   {selectedFile ? (
-                    <div className="mb-4 flex items-center justify-between rounded-xl border border-[#dbeafe] bg-[#eff6ff] px-4 py-3 text-sm text-[#1d4ed8]">
-                      <span className="truncate">{selectedFile.name}</span>
+                    <div className="mb-4 flex items-center justify-between rounded-2xl border border-[#dbeafe] bg-[#eff6ff] px-4 py-3 text-sm text-[#1d4ed8]">
+                      <span className="truncate font-medium">{selectedFile.name}</span>
                       <button
-                        className="font-medium text-[#1d4ed8] transition hover:opacity-80"
+                        className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-[#1d4ed8] transition hover:bg-[#dbeafe]"
                         onClick={() => setSelectedFile(null)}
                         type="button"
                       >
@@ -1712,7 +1686,7 @@ export function ChatWorkspaceClient({
                         Message
                       </label>
                       <textarea
-                        className="min-h-[120px] w-full rounded-2xl border border-[#d1d5db] bg-white px-4 py-3 text-sm text-[#111827] outline-none transition focus:border-[#2563eb]"
+                        className="min-h-[120px] w-full rounded-2xl border border-[#d1d5db] bg-[#fcfcfd] px-4 py-3 text-sm text-[#111827] outline-none transition focus:border-[#2563eb]"
                         onChange={(event) => setComposerText(event.target.value)}
                         placeholder="Write a message, share next steps, or send an update..."
                         value={composerText}
@@ -1720,8 +1694,8 @@ export function ChatWorkspaceClient({
                     </div>
 
                     <div className="flex shrink-0 flex-col gap-3 lg:w-[220px]">
-                      <label className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-[#d1d5db] bg-white px-4 py-3 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]">
-                        Attach file
+                      <label className="inline-flex cursor-pointer items-center justify-center rounded-2xl border border-dashed border-[#93c5fd] bg-gradient-to-br from-[#eff6ff] to-[#dbeafe] px-4 py-3 text-sm font-semibold text-[#1d4ed8] transition hover:from-[#dbeafe] hover:to-[#bfdbfe]">
+                        {selectedFile ? "Change attachment" : "Attach file"}
                         <input
                           accept="image/*,.pdf,.doc,.docx,.zip,.rar,.txt"
                           className="hidden"
@@ -1730,12 +1704,12 @@ export function ChatWorkspaceClient({
                         />
                       </label>
                       <button
-                        className="inline-flex items-center justify-center rounded-xl bg-[#16a34a] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#15803d] disabled:cursor-not-allowed disabled:opacity-60"
+                        className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-[#111827] to-[#1f2937] px-4 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(17,24,39,0.18)] transition hover:from-[#0b1220] hover:to-[#111827] disabled:cursor-not-allowed disabled:opacity-60"
                         disabled={isSending || (!composerText.trim() && !selectedFile)}
                         onClick={() => void handleSendMessage()}
                         type="button"
                       >
-                        {isSending ? "Sending..." : "Send message"}
+                        {isSending ? "Sending..." : "Send Message"}
                       </button>
                     </div>
                   </div>
@@ -1781,8 +1755,12 @@ export function ChatWorkspaceClient({
                     {matchedHireRequest ? (
                       <>
                         <div className="mt-3 space-y-2 text-sm text-[#6b7280]">
-                          <p>Deadline: {formatDate(matchedHireRequest.deadline, "No deadline")}</p>
-                          <p>Agreed price: {formatMoney(matchedHireRequest.projectAgreedPrice || matchedHireRequest.agreedPrice)}</p>
+                          <p>
+                            Agreed price:{" "}
+                            {formatMoney(
+                              matchedHireRequest.projectAgreedPrice || matchedHireRequest.agreedPrice,
+                            )}
+                          </p>
                         </div>
 
                         <div className="mt-4 space-y-3">
@@ -1829,10 +1807,13 @@ export function ChatWorkspaceClient({
 
                           {canProposePrice ? (
                             <div className="space-y-2">
+                              <p className="text-xs text-[#6b7280]">
+                                Send a counteroffer only if the requested scope needs a different price.
+                              </p>
                               <input
                                 className="w-full rounded-xl border border-[#d1d5db] px-3 py-2 text-sm text-[#111827] outline-none transition focus:border-[#2563eb]"
                                 onChange={(event) => setPriceDraft(event.target.value)}
-                                placeholder="Propose a price"
+                                placeholder="Send a counteroffer"
                                 value={priceDraft}
                               />
                               <button
@@ -1841,7 +1822,7 @@ export function ChatWorkspaceClient({
                                 onClick={() => void handleProposePrice()}
                                 type="button"
                               >
-                                Send Price Proposal
+                                Send Counteroffer
                               </button>
                             </div>
                           ) : null}
@@ -1950,7 +1931,6 @@ export function ChatWorkspaceClient({
                     {matchedProject ? (
                       <>
                         <div className="mt-3 space-y-2 text-sm text-[#6b7280]">
-                          <p>Due: {formatDate(matchedProject.deadline, "No deadline")}</p>
                           <p>Budget: {formatMoney(matchedProject.agreedPrice)}</p>
                           {matchedProject.requirementFileName ? (
                             <button
@@ -2001,12 +1981,16 @@ export function ChatWorkspaceClient({
 
                         {canClientReviewDelivery ? (
                           <div className="mt-4 space-y-2">
+                            <div className="rounded-xl border border-[#dbeafe] bg-[#eff6ff] p-3 text-sm text-[#1d4ed8]">
+                              Review the delivered work first. Once you approve it, the next step is
+                              payment confirmation.
+                            </div>
                             {confirmOrderHref ? (
                               <Link
                                 className="inline-flex w-full items-center justify-center rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-sm font-semibold text-[#2563eb] transition hover:bg-[#eff6ff]"
                                 href={confirmOrderHref}
                               >
-                                Open Payment Page
+                                Open Payment Step
                               </Link>
                             ) : null}
 
@@ -2023,7 +2007,7 @@ export function ChatWorkspaceClient({
                                 onClick={() => void handleApproveDelivery()}
                                 type="button"
                               >
-                                Approve Delivery
+                                Approve & Continue to Payment
                               </button>
                               <button
                                 className="flex-1 rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-sm font-semibold text-[#374151] transition hover:bg-[#f9fafb] disabled:opacity-60"
@@ -2052,7 +2036,6 @@ export function ChatWorkspaceClient({
                           <ProjectRequirementsEditor
                             key={`${selectedConversation?.roomId ?? "room"}:${matchedProject.id}`}
                             disabled={isWorkflowBusy || !canClientSubmitRequirements}
-                            initialDeadline={matchedProject.deadline ?? matchedHireRequest?.deadline ?? ""}
                             initialPrice={
                               matchedProject.agreedPrice
                                 ? String(matchedProject.agreedPrice)
