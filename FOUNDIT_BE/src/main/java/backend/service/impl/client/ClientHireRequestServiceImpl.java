@@ -621,6 +621,8 @@ public class ClientHireRequestServiceImpl implements ClientHireRequestService {
         payload.put("requirements", hireRequest.getRequirements());
         payload.put("agreedPrice", hireRequest.getAgreedPrice());
         payload.put("status", hireRequest.getStatus() != null ? hireRequest.getStatus().name().toLowerCase() : null);
+        payload.put("text", "New hire request from " + hireRequest.getClient().getUsername()
+                + " for " + hireRequest.getGig().getServiceTitle() + ".");
 
         try {
             return objectMapper.writeValueAsString(payload);

@@ -1,14 +1,64 @@
 import { getInitials } from "@/lib/data-utils";
 import type { ChatMessageResponse, ConversationResponse } from "@/types/chat";
 
-const parseStructuredText = (value: string | null | undefined) => {
+const toText = (value: unknown) => (typeof value === "string" ? value.trim() : "");
+
+const buildStructuredFallbackText = (parsed: Record<string, unknown>) => {
+  const type = toText(parsed.messageType ?? parsed.type).toLowerCase();
+  const gigTitle = toText(parsed.gigTitle) || toText(parsed.projectTitle) || "this project";
+  const clientName = toText(parsed.clientName) || "Client";
+  const revisionMessage = toText(parsed.revisionMessage);
+
+  if (type === "hire_request") {
+    return `${clientName} sent a hire request for ${gigTitle}.`;
+  }
+
+  if (type === "hire_request_cancelled") {
+    return `${clientName} cancelled the hire request for ${gigTitle}.`;
+  }
+
+  if (type === "price_proposal") {
+    return `A new price proposal is waiting for review.`;
+  }
+
+  if (type === "price_agreement" || type === "price_notice") {
+    return `The proposed price was accepted.`;
+  }
+
+  if (type === "price_rejected") {
+    return `The proposed price was rejected.`;
+  }
+
+  if (type === "project_delivery") {
+    return `Project delivery was submitted for review.`;
+  }
+
+  if (type === "project_revision_request" || type === "revision_request") {
+    return revisionMessage
+      ? `Revision requested: ${revisionMessage}`
+      : "A revision was requested for this delivery.";
+  }
+
+  if (type === "project_requirement_proposal") {
+    return "Actual requirement submitted. Please review and accept it.";
+  }
+
+  return null;
+};
+
+export const extractStructuredChatText = (value: string | null | undefined) => {
   if (!value) {
     return null;
   }
 
   try {
     const parsed = JSON.parse(value) as Record<string, unknown>;
-    return typeof parsed.text === "string" && parsed.text.trim() ? parsed.text : null;
+    const explicitText = toText(parsed.text);
+    if (explicitText) {
+      return explicitText;
+    }
+
+    return buildStructuredFallbackText(parsed);
   } catch {
     return null;
   }
@@ -41,7 +91,7 @@ export const formatChatTimestamp = (value: string | null | undefined) => {
 };
 
 export const buildConversationPreview = (conversation: ConversationResponse) => {
-  const structuredPreview = parseStructuredText(conversation.lastMessage);
+  const structuredPreview = extractStructuredChatText(conversation.lastMessage);
   if (structuredPreview) {
     return structuredPreview;
   }
@@ -58,7 +108,7 @@ export const buildConversationPreview = (conversation: ConversationResponse) => 
 };
 
 export const buildMessagePreview = (message: ChatMessageResponse) => {
-  const structuredPreview = parseStructuredText(message.content);
+  const structuredPreview = extractStructuredChatText(message.content);
   if (structuredPreview) {
     return structuredPreview;
   }

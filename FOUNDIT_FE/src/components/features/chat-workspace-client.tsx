@@ -9,6 +9,7 @@ import { useChatRealtime } from "@/hooks/use-chat-realtime";
 import { apiFileRequest, apiRequest, toErrorMessage } from "@/lib/api";
 import {
   buildConversationPreview,
+  extractStructuredChatText,
   formatChatTimestamp,
   getConversationHeadline,
   getConversationInitials,
@@ -153,7 +154,7 @@ const parseStructuredMessage = (message: ChatMessageResponse): StructuredMessage
       requestId: toNumber(parsed.requestId ?? parsed.hireRequestId, 0) || null,
       revisionMessage: toText(parsed.revisionMessage, "") || null,
       status: toText(parsed.status, "pending"),
-      text: toText(parsed.text, message.content),
+      text: extractStructuredChatText(message.content) ?? toText(parsed.text, message.content),
       title: toText(parsed.projectTitle ?? parsed.gigTitle, "") || null,
     };
   } catch {
