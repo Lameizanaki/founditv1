@@ -514,18 +514,29 @@ public class ClientHireRequestServiceImpl implements ClientHireRequestService {
             throw new RuntimeException("Unable to open chat for this hire request");
         }
 
-        String roomKey = generateProjectRoomKey(sender.getId(), receiver.getId(), hireRequest.getGig().getId(), hireRequest.getId());
+        String roomKey = generateRoomKey(sender.getId(), receiver.getId());
 
         ChatRoom room = chatRoomRepository.findByRoomKey(roomKey)
-                .orElseGet(() -> chatRoomRepository.save(ChatRoom.builder()
-                        .roomKey(roomKey)
-                        .userOne(sender.getId() < receiver.getId() ? sender : receiver)
-                        .userTwo(sender.getId() < receiver.getId() ? receiver : sender)
-                        .hireRequestId(hireRequest.getId())
-                        .gigId(hireRequest.getGig().getId())
-                        .projectTitle(hireRequest.getGig().getServiceTitle())
-                        .createdAt(LocalDateTime.now())
-                        .build()));
+                .orElseGet(() -> chatRoomRepository.findByUserOne_IdOrUserTwo_Id(sender.getId(), sender.getId())
+                        .stream()
+                        .filter(existingRoom -> isParticipant(existingRoom, sender) && isParticipant(existingRoom, receiver))
+                        .findFirst()
+                        .map(existingRoom -> {
+                            existingRoom.setRoomKey(roomKey);
+                            return chatRoomRepository.save(existingRoom);
+                        })
+                        .orElseGet(() -> chatRoomRepository.save(ChatRoom.builder()
+                                .roomKey(roomKey)
+                                .userOne(sender.getId() < receiver.getId() ? sender : receiver)
+                                .userTwo(sender.getId() < receiver.getId() ? receiver : sender)
+                                .createdAt(LocalDateTime.now())
+                                .build())));
+
+        room.setHireRequestId(hireRequest.getId());
+        room.setProjectId(null);
+        room.setGigId(hireRequest.getGig().getId());
+        room.setProjectTitle(hireRequest.getGig().getServiceTitle());
+        room = chatRoomRepository.save(room);
 
         String content = buildHireRequestPayload(hireRequest);
 
@@ -676,6 +687,11 @@ public class ClientHireRequestServiceImpl implements ClientHireRequestService {
 
     private String generateProjectRoomKey(Long userId1, Long userId2, Long gigId, Long hireRequestId) {
         return generateRoomKey(userId1, userId2) + "_gig_" + gigId + "_request_" + hireRequestId;
+    }
+
+    private boolean isParticipant(ChatRoom room, Register user) {
+        return room.getUserOne().getId().equals(user.getId()) ||
+                room.getUserTwo().getId().equals(user.getId());
     }
 
     private void requireVerifiedEkyc(Client client, String message) {

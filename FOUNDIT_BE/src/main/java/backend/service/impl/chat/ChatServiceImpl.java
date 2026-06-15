@@ -69,22 +69,7 @@ public class ChatServiceImpl implements ChatService {
             throw new RuntimeException("You cannot message yourself");
         }
 
-        String roomKey = generateRoomKey(sender.getId(), receiver.getId());
-
-        ChatRoom room = chatRoomRepository.findByRoomKey(roomKey)
-                .orElseGet(() -> {
-                    Register userOne = sender.getId() < receiver.getId() ? sender : receiver;
-                    Register userTwo = sender.getId() < receiver.getId() ? receiver : sender;
-
-                    ChatRoom newRoom = ChatRoom.builder()
-                            .roomKey(roomKey)
-                            .userOne(userOne)
-                            .userTwo(userTwo)
-                            .createdAt(LocalDateTime.now())
-                            .build();
-
-                    return chatRoomRepository.save(newRoom);
-                });
+        ChatRoom room = findOrCreateCanonicalRoom(sender, receiver, null, null, null, null);
 
         return saveMessage(room, sender, receiver, request.getContent().trim(), null);
     }
@@ -308,7 +293,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    @Transactional(Transactional.TxType.SUPPORTS)
+    @Transactional
     public List<ConversationResponse> getMyConversations(Authentication auth) {
         if (auth == null) {
             throw new RuntimeException("Unauthorized");
@@ -320,6 +305,15 @@ public class ChatServiceImpl implements ChatService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         List<ChatRoom> rooms = chatRoomRepository.findByUserOne_IdOrUserTwo_Id(
+                currentUser.getId(), currentUser.getId(), PageRequest.of(0, 100)
+        );
+
+        rooms.stream()
+                .map(room -> room.getUserOne().getId().equals(currentUser.getId()) ? room.getUserTwo() : room.getUserOne())
+                .distinct()
+                .forEach(otherUser -> findOrCreateCanonicalRoom(currentUser, otherUser, null, null, null, null));
+
+        rooms = chatRoomRepository.findByUserOne_IdOrUserTwo_Id(
                 currentUser.getId(), currentUser.getId(), PageRequest.of(0, 100)
         );
 
@@ -348,28 +342,96 @@ public class ChatServiceImpl implements ChatService {
             throw new RuntimeException("You cannot message yourself");
         }
 
-        String roomKey = generateRoomKey(sender.getId(), receiver.getId());
-
-        ChatRoom room = chatRoomRepository.findByRoomKey(roomKey)
-                .orElseGet(() -> {
-                    Register userOne = sender.getId() < receiver.getId() ? sender : receiver;
-                    Register userTwo = sender.getId() < receiver.getId() ? receiver : sender;
-
-                    return chatRoomRepository.save(ChatRoom.builder()
-                            .roomKey(roomKey)
-                            .userOne(userOne)
-                            .userTwo(userTwo)
-                            .gigId(request.getGigId())
-                            .createdAt(LocalDateTime.now())
-                            .build());
-                });
-
-        if (room.getGigId() == null && request.getGigId() != null) {
-            room.setGigId(request.getGigId());
-            room = chatRoomRepository.save(room);
-        }
+        ChatRoom room = findOrCreateCanonicalRoom(sender, receiver, request.getGigId(), null, null, null);
 
         return mapConversation(room, sender);
+    }
+
+    private ChatRoom findOrCreateCanonicalRoom(
+            Register firstUser,
+            Register secondUser,
+            Long gigId,
+            Long hireRequestId,
+            Long projectId,
+            String projectTitle
+    ) {
+        String roomKey = generateRoomKey(firstUser.getId(), secondUser.getId());
+        List<ChatRoom> pairRooms = chatRoomRepository.findByUserOne_IdOrUserTwo_Id(firstUser.getId(), firstUser.getId())
+                .stream()
+                .filter(room -> isParticipant(room, firstUser) && isParticipant(room, secondUser))
+                .toList();
+
+        ChatRoom canonicalRoom = pairRooms.stream()
+                .filter(room -> roomKey.equals(room.getRoomKey()))
+                .findFirst()
+                .orElseGet(() -> pairRooms.stream()
+                        .min((left, right) -> left.getCreatedAt().compareTo(right.getCreatedAt()))
+                        .orElseGet(() -> {
+                            Register userOne = firstUser.getId() < secondUser.getId() ? firstUser : secondUser;
+                            Register userTwo = firstUser.getId() < secondUser.getId() ? secondUser : firstUser;
+
+                            return chatRoomRepository.save(ChatRoom.builder()
+                                    .roomKey(roomKey)
+                                    .userOne(userOne)
+                                    .userTwo(userTwo)
+                                    .createdAt(LocalDateTime.now())
+                                    .build());
+                        }));
+
+        boolean changed = false;
+        if (!roomKey.equals(canonicalRoom.getRoomKey())) {
+            canonicalRoom.setRoomKey(roomKey);
+            changed = true;
+        }
+        if (canonicalRoom.getGigId() == null && gigId != null) {
+            canonicalRoom.setGigId(gigId);
+            changed = true;
+        }
+        if (canonicalRoom.getHireRequestId() == null && hireRequestId != null) {
+            canonicalRoom.setHireRequestId(hireRequestId);
+            changed = true;
+        }
+        if (canonicalRoom.getProjectId() == null && projectId != null) {
+            canonicalRoom.setProjectId(projectId);
+            changed = true;
+        }
+        if ((canonicalRoom.getProjectTitle() == null || canonicalRoom.getProjectTitle().isBlank()) && projectTitle != null && !projectTitle.isBlank()) {
+            canonicalRoom.setProjectTitle(projectTitle);
+            changed = true;
+        }
+
+        for (ChatRoom room : pairRooms) {
+            if (room.getId().equals(canonicalRoom.getId())) {
+                continue;
+            }
+
+            if (canonicalRoom.getGigId() == null && room.getGigId() != null) {
+                canonicalRoom.setGigId(room.getGigId());
+                changed = true;
+            }
+            if (canonicalRoom.getHireRequestId() == null && room.getHireRequestId() != null) {
+                canonicalRoom.setHireRequestId(room.getHireRequestId());
+                changed = true;
+            }
+            if (canonicalRoom.getProjectId() == null && room.getProjectId() != null) {
+                canonicalRoom.setProjectId(room.getProjectId());
+                changed = true;
+            }
+            if ((canonicalRoom.getProjectTitle() == null || canonicalRoom.getProjectTitle().isBlank())
+                    && room.getProjectTitle() != null && !room.getProjectTitle().isBlank()) {
+                canonicalRoom.setProjectTitle(room.getProjectTitle());
+                changed = true;
+            }
+
+            List<ChatMessage> messages = chatMessageRepository.findByChatRoom_IdOrderBySentAtAsc(room.getId());
+            if (!messages.isEmpty()) {
+                messages.forEach(message -> message.setChatRoom(canonicalRoom));
+                chatMessageRepository.saveAll(messages);
+            }
+            chatRoomRepository.delete(room);
+        }
+
+        return changed ? chatRoomRepository.save(canonicalRoom) : canonicalRoom;
     }
 
     private Register resolveConversationReceiver(OpenConversationRequest request) {
@@ -483,13 +545,16 @@ public class ChatServiceImpl implements ChatService {
     }
 
     private void validateRoomParticipant(Register user, ChatRoom room) {
-        boolean isParticipant =
-                room.getUserOne().getId().equals(user.getId()) ||
-                room.getUserTwo().getId().equals(user.getId());
+        boolean isParticipant = isParticipant(room, user);
 
         if (!isParticipant) {
             throw new RuntimeException("Unauthorized access to this room");
         }
+    }
+
+    private boolean isParticipant(ChatRoom room, Register user) {
+        return room.getUserOne().getId().equals(user.getId()) ||
+                room.getUserTwo().getId().equals(user.getId());
     }
 
     private String generateRoomKey(Long userId1, Long userId2) {
