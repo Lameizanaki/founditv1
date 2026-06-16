@@ -57,6 +57,64 @@ const initialDashboard: DashboardData = {
   pendingReviewItems: [],
 };
 
+const toFlag = (value: unknown) => {
+  if (typeof value === "boolean") {
+    return value;
+  }
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === "true") return true;
+    if (normalized === "false") return false;
+  }
+  return null;
+};
+
+const summarizeFailureReason = (value: string | null) => {
+  const text = toText(value, "").trim();
+  if (!text) {
+    return "Waiting for admin review";
+  }
+
+  try {
+    const parsed = JSON.parse(text) as Record<string, unknown>;
+    const liveFace = (parsed.live_face ?? {}) as Record<string, unknown>;
+    const ocr = (parsed.ocr ?? parsed.document ?? {}) as Record<string, unknown>;
+    const notes: string[] = [];
+
+    if (toText(parsed.status, "").toLowerCase() === "failed") {
+      notes.push("Automated verification needs manual review.");
+    }
+
+    const livenessPassed = toFlag(liveFace.liveness_passed);
+    const livenessConfidence = toNumber(liveFace.liveness_confidence, 0);
+    if (toFlag(liveFace.captured)) {
+      notes.push(
+        livenessPassed === false
+          ? `Live face was captured but the liveness check did not pass${livenessConfidence ? ` (${livenessConfidence.toFixed(2)} confidence)` : ""}.`
+          : livenessPassed === true
+            ? `Live face capture passed${livenessConfidence ? ` (${livenessConfidence.toFixed(2)} confidence)` : ""}.`
+            : "Live face was captured for manual review.",
+      );
+    }
+
+    const ocrMatched = toFlag(ocr.matched ?? ocr.ocr_verified);
+    if (ocrMatched === false) {
+      notes.push("ID document details did not fully match the submitted profile.");
+    } else if (ocrMatched === true) {
+      notes.push("ID document details were extracted successfully.");
+    }
+
+    const message = toText(parsed.message, "");
+    if (message) {
+      notes.push(message);
+    }
+
+    return notes.join(" ") || "Automated verification details are available for admin review.";
+  } catch {
+    return text;
+  }
+};
+
 export function AdminDashboardClient() {
   const { session } = useAuth();
   const token = session?.token ?? null;
@@ -275,7 +333,7 @@ export function AdminDashboardClient() {
                   <td className="px-5 py-4 text-[#374151]">{toText(review.phoneNumber, "No phone")}</td>
                   <td className="max-w-md px-5 py-4">
                     <p className="line-clamp-2 text-[#6b7280]">
-                      {toText(review.failureReason, "Waiting for admin review")}
+                      {summarizeFailureReason(review.failureReason)}
                     </p>
                   </td>
                   <td className="px-5 py-4">
@@ -377,7 +435,7 @@ export function AdminDashboardClient() {
                     </span>
                   </div>
                   <p className="mt-3 max-h-32 overflow-auto rounded-md bg-[#f9fafb] p-3 text-xs text-[#6b7280]">
-                    {toText(selectedReview.failureReason, "No failure reason recorded.")}
+                    {summarizeFailureReason(selectedReview.failureReason)}
                   </p>
                 </div>
               </div>

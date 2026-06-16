@@ -28,6 +28,7 @@ import type {
   ChatScope,
   ConversationResponse,
 } from "@/types/chat";
+import type { PaymentTransactionResponse } from "@/types/payment";
 
 type StructuredKind =
   | "formal_notice"
@@ -77,27 +78,21 @@ interface AccountReportResponse {
 
 function ProjectRequirementsEditor({
   disabled,
-  initialPrice,
   initialRequirements,
   initialTitle,
   onSubmit,
 }: {
   disabled: boolean;
-  initialPrice: string;
   initialRequirements: string;
   initialTitle: string;
   onSubmit: (values: {
     file: File | null;
-    price: string;
     requirements: string;
-    startDate: string;
     title: string;
   }) => Promise<void>;
 }) {
   const [title, setTitle] = useState(initialTitle);
   const [requirements, setRequirements] = useState(initialRequirements);
-  const [price, setPrice] = useState(initialPrice);
-  const [startDate, setStartDate] = useState("");
   const [file, setFile] = useState<File | null>(null);
 
   return (
@@ -117,21 +112,6 @@ function ProjectRequirementsEditor({
         placeholder="Share the exact scope, assets, or instructions"
         value={requirements}
       />
-      <input
-        className="w-full rounded-xl border border-[#d1d5db] px-3 py-2 text-sm text-[#111827] outline-none transition focus:border-[#2563eb]"
-        onChange={(event) => setPrice(event.target.value)}
-        placeholder="Agreed price"
-        type="number"
-        value={price}
-      />
-      <div className="grid grid-cols-1 gap-2">
-        <input
-          className="w-full rounded-xl border border-[#d1d5db] px-3 py-2 text-sm text-[#111827] outline-none transition focus:border-[#2563eb]"
-          onChange={(event) => setStartDate(event.target.value)}
-          type="date"
-          value={startDate}
-        />
-      </div>
       <label className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]">
         {file ? file.name : "Attach requirement file"}
         <input
@@ -143,7 +123,7 @@ function ProjectRequirementsEditor({
       <button
         className="w-full rounded-xl bg-[#2563eb] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#1d4ed8] disabled:opacity-60"
         disabled={disabled}
-        onClick={() => void onSubmit({ file, price, requirements, startDate, title })}
+        onClick={() => void onSubmit({ file, requirements, title })}
         type="button"
       >
         Send Requirements Update
@@ -320,6 +300,7 @@ export function ChatWorkspaceClient({
   const [messages, setMessages] = useState<ChatMessageResponse[]>([]);
   const [hireRequests, setHireRequests] = useState<WorkflowHireRequest[]>([]);
   const [projects, setProjects] = useState<WorkflowProject[]>([]);
+  const [paymentTransactions, setPaymentTransactions] = useState<PaymentTransactionResponse[]>([]);
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(initialRoomId ?? null);
   const [composerText, setComposerText] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -341,12 +322,21 @@ export function ChatWorkspaceClient({
   const [reportMessage, setReportMessage] = useState("");
   const [reportError, setReportError] = useState<string | null>(null);
   const [reportSuccess, setReportSuccess] = useState<string | null>(null);
+  const [paymentActionId, setPaymentActionId] = useState<string | null>(null);
 
   const workflowBase = scope === "client" ? "/client" : "/freelancer";
   const workflowEndpoints =
     scope === "client"
-      ? { projects: "/client/projects", requests: "/client/hire-requests" }
-      : { projects: "/freelancer/view-project", requests: "/freelancer/view-hire-request" };
+      ? {
+          payments: "/payment/my-transactions",
+          projects: "/client/projects",
+          requests: "/client/hire-requests",
+        }
+      : {
+          payments: "/payment/freelancer/my-transactions",
+          projects: "/freelancer/view-project",
+          requests: "/freelancer/view-hire-request",
+        };
 
   const loadConversations = useCallback(async (preserveSelection = true) => {
     if (!token) {
@@ -420,19 +410,21 @@ export function ChatWorkspaceClient({
     setWorkflowError(null);
 
     try {
-      const [requestData, projectData] = await Promise.all([
+      const [requestData, projectData, paymentData] = await Promise.all([
         apiRequest<unknown[]>(workflowEndpoints.requests, { token }),
         apiRequest<unknown[]>(workflowEndpoints.projects, { token }),
+        apiRequest<PaymentTransactionResponse[]>(workflowEndpoints.payments, { token }),
       ]);
 
       setHireRequests(requestData.map(mapHireRequest));
       setProjects(projectData.map(mapProject));
+      setPaymentTransactions(paymentData);
     } catch (error) {
       setWorkflowError(toErrorMessage(error));
     } finally {
       setIsLoadingWorkflow(false);
     }
-  }, [token, workflowEndpoints.projects, workflowEndpoints.requests]);
+  }, [token, workflowEndpoints.payments, workflowEndpoints.projects, workflowEndpoints.requests]);
 
   useEffect(() => {
     if (!token) {
@@ -539,6 +531,27 @@ export function ChatWorkspaceClient({
 
     return `/client/browse-gigs/gig/${targetGigId}/confirm-order${params.size ? `?${params.toString()}` : ""}`;
   }, [matchedHireRequest, matchedProject, scope, selectedConversation]);
+
+  const relatedPaymentTransactions = useMemo(() => {
+    if (!matchedProject?.id) {
+      return [];
+    }
+
+    return [...paymentTransactions]
+      .filter((payment) => payment.projectId === matchedProject.id)
+      .sort((left, right) => {
+        const leftTime = new Date(left.createdAt ?? left.submittedAt ?? left.paidAt ?? 0).getTime();
+        const rightTime = new Date(right.createdAt ?? right.submittedAt ?? right.paidAt ?? 0).getTime();
+        return rightTime - leftTime;
+      });
+  }, [matchedProject, paymentTransactions]);
+
+  const submittedPayment =
+    relatedPaymentTransactions.find(
+      (payment) => String(payment.status ?? "").toUpperCase() === "PAYMENT_SUBMITTED",
+    ) ?? null;
+  const paidPayment =
+    relatedPaymentTransactions.find((payment) => String(payment.status ?? "").toUpperCase() === "PAID") ?? null;
 
   const reportDefaults = useMemo(() => {
     const scopeLabel = scope === "client" ? "Client" : "Freelancer";
@@ -950,9 +963,7 @@ export function ChatWorkspaceClient({
 
   const handleSubmitProjectRequirements = (values: {
     file: File | null;
-    price: string;
     requirements: string;
-    startDate: string;
     title: string;
   }) =>
     runWorkflowAction(async () => {
@@ -979,12 +990,6 @@ export function ChatWorkspaceClient({
       }
       if (values.requirements.trim()) {
         payload.append("requirements", values.requirements.trim());
-      }
-      if (values.price.trim()) {
-        payload.append("agreedPrice", values.price.trim());
-      }
-      if (values.startDate) {
-        payload.append("startDate", values.startDate);
       }
       if (values.file) {
         payload.append("requirementFile", values.file, values.file.name);
@@ -1041,6 +1046,49 @@ export function ChatWorkspaceClient({
       setWorkflowError(toErrorMessage(error));
     }
   };
+
+  const handlePaymentProofDownload = async (tranId: string, fileName?: string | null) => {
+    if (!token || !tranId || scope !== "freelancer") {
+      return;
+    }
+
+    setPaymentActionId(`proof:${tranId}`);
+
+    try {
+      const blob = await apiFileRequest(`/payment/freelancer/${encodeURIComponent(tranId)}/proof`, {
+        token,
+      });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = fileName || `${tranId}-payment-proof`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (error) {
+      setWorkflowError(toErrorMessage(error));
+    } finally {
+      setPaymentActionId(null);
+    }
+  };
+
+  const handleConfirmPaymentReceived = (tranId: string) =>
+    runWorkflowAction(async () => {
+      if (!token || !tranId || scope !== "freelancer") {
+        return;
+      }
+
+      setPaymentActionId(`confirm:${tranId}`);
+      try {
+        await apiRequest(`/payment/freelancer/${encodeURIComponent(tranId)}/confirm`, {
+          method: "POST",
+          token,
+        });
+      } finally {
+        setPaymentActionId(null);
+      }
+    });
 
   const handleAcceptHireRequest = () =>
     runWorkflowAction(async () => {
@@ -1967,6 +2015,16 @@ export function ChatWorkspaceClient({
                       <>
                         <div className="mt-3 space-y-2 text-sm text-[#6b7280]">
                           <p>Budget: {formatMoney(matchedProject.agreedPrice)}</p>
+                          {matchedProject.requirements ? (
+                            <div className="rounded-xl border border-[#e5e7eb] bg-[#f8fafc] p-3 text-[#374151]">
+                              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6b7280]">
+                                Current Requirements
+                              </p>
+                              <p className="mt-2 whitespace-pre-wrap text-sm leading-6">
+                                {matchedProject.requirements}
+                              </p>
+                            </div>
+                          ) : null}
                           {matchedProject.requirementFileName ? (
                             <button
                               className="text-left font-medium text-[#2563eb] transition hover:text-[#1d4ed8]"
@@ -1989,6 +2047,14 @@ export function ChatWorkspaceClient({
 
                         {canFreelancerDeliverProject ? (
                           <div className="mt-4 space-y-2">
+                            {matchedProject?.id ? (
+                              <Link
+                                className="inline-flex w-full items-center justify-center rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-sm font-semibold text-[#2563eb] transition hover:bg-[#eff6ff]"
+                                href="/freelancer/active-work"
+                              >
+                                Open Delivery Workspace
+                              </Link>
+                            ) : null}
                             <textarea
                               className="min-h-[90px] w-full rounded-xl border border-[#d1d5db] px-3 py-2 text-sm text-[#111827] outline-none transition focus:border-[#2563eb]"
                               onChange={(event) => setDeliveryText(event.target.value)}
@@ -2009,7 +2075,7 @@ export function ChatWorkspaceClient({
                               onClick={() => void handleDeliverProject()}
                               type="button"
                             >
-                              Deliver Project
+                              Mark as Delivered
                             </button>
                           </div>
                         ) : null}
@@ -2063,6 +2129,87 @@ export function ChatWorkspaceClient({
                           </div>
                         ) : null}
 
+                        {(submittedPayment || paidPayment) ? (
+                          <div className="mt-4 rounded-xl border border-[#e5e7eb] bg-[#f8fafc] p-3">
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+                                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6b7280]">
+                                  Payment
+                                </p>
+                                <p className="mt-1 text-sm font-semibold text-[#111827]">
+                                  {submittedPayment
+                                    ? "Payment proof submitted"
+                                    : "Payment confirmed"}
+                                </p>
+                              </div>
+                              <span
+                                className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+                                  submittedPayment
+                                    ? "bg-[#fef3c7] text-[#d97706]"
+                                    : "bg-[#dcfce7] text-[#16a34a]"
+                                }`}
+                              >
+                                {submittedPayment ? "Awaiting seller review" : "Paid"}
+                              </span>
+                            </div>
+
+                            <div className="mt-3 space-y-1 text-sm text-[#6b7280]">
+                              <p>
+                                Amount:{" "}
+                                {formatMoney(
+                                  toNumber(
+                                    submittedPayment?.amount ?? paidPayment?.amount,
+                                    matchedProject.agreedPrice,
+                                  ),
+                                )}
+                              </p>
+                              {(submittedPayment?.proofReference ?? paidPayment?.proofReference) ? (
+                                <p>
+                                  Reference:{" "}
+                                  {toText(
+                                    submittedPayment?.proofReference ?? paidPayment?.proofReference,
+                                    "Not provided",
+                                  )}
+                                </p>
+                              ) : null}
+                            </div>
+
+                            {scope === "freelancer" && submittedPayment ? (
+                              <div className="mt-3 flex flex-wrap gap-2">
+                                {submittedPayment.hasProofFile ? (
+                                  <button
+                                    className="inline-flex items-center justify-center rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb] disabled:opacity-60"
+                                    disabled={paymentActionId === `proof:${submittedPayment.tranId ?? ""}`}
+                                    onClick={() =>
+                                      void handlePaymentProofDownload(
+                                        submittedPayment.tranId ?? "",
+                                        submittedPayment.proofFileName,
+                                      )
+                                    }
+                                    type="button"
+                                  >
+                                    {paymentActionId === `proof:${submittedPayment.tranId ?? ""}`
+                                      ? "Opening..."
+                                      : "View Payment Proof"}
+                                  </button>
+                                ) : null}
+                                <button
+                                  className="inline-flex items-center justify-center rounded-xl bg-[#16a34a] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#15803d] disabled:opacity-60"
+                                  disabled={paymentActionId === `confirm:${submittedPayment.tranId ?? ""}`}
+                                  onClick={() =>
+                                    void handleConfirmPaymentReceived(submittedPayment.tranId ?? "")
+                                  }
+                                  type="button"
+                                >
+                                  {paymentActionId === `confirm:${submittedPayment.tranId ?? ""}`
+                                    ? "Confirming..."
+                                    : "Payment Received"}
+                                </button>
+                              </div>
+                            ) : null}
+                          </div>
+                        ) : null}
+
                         {canFreelancerAcceptRevision ? (
                           <button
                             className="mt-4 w-full rounded-xl bg-[#2563eb] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#1d4ed8] disabled:opacity-60"
@@ -2078,15 +2225,6 @@ export function ChatWorkspaceClient({
                           <ProjectRequirementsEditor
                             key={`${selectedConversation?.roomId ?? "room"}:${matchedProject.id}`}
                             disabled={isWorkflowBusy || !canClientSubmitRequirements}
-                            initialPrice={
-                              matchedProject.agreedPrice
-                                ? String(matchedProject.agreedPrice)
-                                : matchedHireRequest?.projectAgreedPrice
-                                  ? String(matchedHireRequest.projectAgreedPrice)
-                                  : matchedHireRequest?.agreedPrice
-                                    ? String(matchedHireRequest.agreedPrice)
-                                    : ""
-                            }
                             initialRequirements={matchedProject.requirements ?? matchedHireRequest?.requirements ?? ""}
                             initialTitle={matchedProject.projectTitle ?? matchedHireRequest?.gigTitle ?? ""}
                             onSubmit={handleSubmitProjectRequirements}

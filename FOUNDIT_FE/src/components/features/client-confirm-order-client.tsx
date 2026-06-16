@@ -79,7 +79,6 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
   });
 
   const [requestMessage, setRequestMessage] = useState("");
-  const [projectRequirements, setProjectRequirements] = useState("");
   const [paymentReference, setPaymentReference] = useState("");
   const [selectedProofFile, setSelectedProofFile] = useState<File | null>(null);
   const [sellerQrImageUrl, setSellerQrImageUrl] = useState("");
@@ -106,24 +105,51 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
   const freelancerId = toNumber(gigRecord.freelancerId, 0) || null;
 
   const matchedRequest = useMemo(() => {
-    return hireRequests.data
-      .map((entry) => asRecord(entry))
-      .find((record) => {
-        const requestId = toNumber(record.id, 0);
-        const projectId = toNumber(record.projectId, 0);
-        const recordGigId = toNumber(record.gigId, 0);
+    const records = hireRequests.data.map((entry) => asRecord(entry));
 
-        if (requestIdParam && requestId === requestIdParam) {
+    if (requestIdParam) {
+      return records.find((record) => toNumber(record.id, 0) === requestIdParam) ?? null;
+    }
+
+    if (projectIdParam) {
+      return records.find((record) => toNumber(record.projectId, 0) === projectIdParam) ?? null;
+    }
+
+    const relatedRecords = records.filter((record) => toNumber(record.gigId, 0) === Number(gigId));
+
+    return (
+      relatedRecords.find((record) => {
+        const requestStatus = normalizeStatus(record.status);
+        const projectStatus = normalizeStatus(record.projectStatus);
+        const projectId = toNumber(record.projectId, 0) || null;
+        const isPaid = projectId
+          ? transactions.data.some(
+              (transaction) =>
+                transaction.projectId === projectId &&
+                String(transaction.status ?? "").toUpperCase() === "PAID",
+            )
+          : false;
+
+        if (projectId) {
+          if (["in_progress", "revision_requested", "delivered"].includes(projectStatus)) {
+            return true;
+          }
+
+          if (projectStatus === "completed" && !isPaid) {
+            return true;
+          }
+
+          return false;
+        }
+
+        if (["pending", "accepted"].includes(requestStatus)) {
           return true;
         }
 
-        if (projectIdParam && projectId === projectIdParam) {
-          return true;
-        }
-
-        return recordGigId === Number(gigId);
-      }) ?? null;
-  }, [gigId, hireRequests.data, projectIdParam, requestIdParam]);
+        return false;
+      }) ?? null
+    );
+  }, [gigId, hireRequests.data, projectIdParam, requestIdParam, transactions.data]);
 
   const resolvedProjectId = projectIdParam || toNumber(matchedRequest?.projectId, 0) || null;
   const resolvedRequestId = requestIdParam || toNumber(matchedRequest?.id, 0) || null;
@@ -304,7 +330,6 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
       payload.append("freelancerId", String(freelancerId));
       payload.append("message", requestMessage.trim());
       payload.append("requestMessage", requestMessage.trim());
-      payload.append("requirements", projectRequirements.trim());
       if (gigPrice > 0) {
         payload.append("agreedPrice", String(gigPrice));
       }
@@ -372,6 +397,28 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
       const tranId = response.tranId ?? response.tran_id ?? "";
       setLocalPaymentTranId(tranId);
       setLocalPaymentStatus(tranId ? "submitted" : "idle");
+
+      if (roomIdParam && freelancerId) {
+        try {
+          await apiRequest(`/api/chat/rooms/${roomIdParam}/messages`, {
+            body: {
+              content: JSON.stringify({
+                messageType: "formal_notice",
+                projectId: resolvedProjectId,
+                status: "PAYMENT_SUBMITTED",
+                text: "Payment proof was submitted. Please review it and confirm once you receive the transfer.",
+                tranId,
+                type: "formal_notice",
+              }),
+              receiverId: freelancerId,
+            },
+            method: "POST",
+            token,
+          });
+        } catch {
+          // Payment proof was already submitted successfully; do not fail the flow on chat notice issues.
+        }
+      }
     } catch (error) {
       setSubmitError(toErrorMessage(error));
     } finally {
@@ -425,21 +472,6 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
           </section>
 
           <section className="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-sm">
-            <h2 className="text-[18px] font-semibold text-[#111827]">Project Requirements</h2>
-            <p className="mt-1 text-xs text-[#6b7280]">
-              Share any specific requirements or details with the freelancer.
-            </p>
-
-            <textarea
-              className="mt-4 min-h-[140px] w-full rounded-xl border border-[#e5e7eb] bg-white px-4 py-3 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#2563eb]"
-              onChange={(event) => setProjectRequirements(event.target.value)}
-              placeholder="Describe your project requirements, preferences, or special instructions..."
-              value={projectRequirements}
-            />
-
-          </section>
-
-          <section className="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-sm">
             <h2 className="text-[18px] font-semibold text-[#111827]">Payment Method</h2>
 
             <div className="mt-4 rounded-2xl border border-[#dbeafe] bg-[#eff6ff] p-4 text-sm text-[#1e40af]">
@@ -453,6 +485,20 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
             {isLoadingSellerQr ? (
               <div className="mt-4 rounded-xl border border-[#dbeafe] bg-[#eff6ff] p-4 text-sm text-[#1e40af]">
                 Loading seller bank QR...
+              </div>
+            ) : null}
+
+            {effectiveMode === "pay" && sellerQrImageUrl ? (
+              <div className="mt-4 rounded-2xl border border-[#e5e7eb] bg-[#f8fafc] p-4">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  alt="Seller bank QR"
+                  className="mx-auto max-h-72 w-full max-w-sm rounded-xl object-contain"
+                  src={sellerQrImageUrl}
+                />
+                <p className="mt-3 text-center text-xs text-[#6b7280]">
+                  Scan this QR with your banking app, then submit the payment proof below.
+                </p>
               </div>
             ) : null}
 
