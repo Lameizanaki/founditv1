@@ -27,11 +27,6 @@ const navItems = [
     note: "Messages",
   },
   {
-    href: "/freelancer/ekyc",
-    label: "eKYC",
-    note: "Verification",
-  },
-  {
     href: "/freelancer/setting",
     label: "Settings",
     note: "Account",

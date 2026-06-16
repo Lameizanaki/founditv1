@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { apiRequest, toErrorMessage } from "@/lib/api";
 import { useAuth } from "@/components/providers/auth-provider";
@@ -146,6 +147,34 @@ export function ClientSettingClient() {
                 <span>{label}</span>
               </button>
             ))}
+
+            <Link
+              className="mt-3 flex w-full items-center gap-3 rounded-xl border border-[#dbeafe] bg-[#eff6ff] px-4 py-3 text-left text-sm font-medium text-[#2563eb] transition hover:bg-[#dbeafe]"
+              href="/client/ekyc"
+            >
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white text-[#2563eb]">
+                <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
+                  <path
+                    d="M12 3 5 6v5c0 5.25 3.44 10.16 7 11 3.56-.84 7-5.75 7-11V6l-7-3Z"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.8"
+                  />
+                  <path
+                    d="m9.5 12 1.7 1.7L14.8 10"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.8"
+                  />
+                </svg>
+              </span>
+              <span>
+                <span className="block">Identity Verification</span>
+                <span className="block text-xs font-normal text-[#5b7fd6]">Open your eKYC flow</span>
+              </span>
+            </Link>
           </aside>
 
           <section className="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-[0_2px_8px_rgba(15,23,42,0.04)] md:p-6">

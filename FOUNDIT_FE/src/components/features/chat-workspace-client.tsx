@@ -1817,7 +1817,7 @@ export function ChatWorkspaceClient({
                     </div>
                   ) : null}
 
-                  <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_240px] lg:items-end">
+                  <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_186px] lg:items-end">
                     <div className="flex-1">
                       <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.08em] text-[#6b7280]">
                         Message
@@ -1831,8 +1831,26 @@ export function ChatWorkspaceClient({
                     </div>
 
                     <div className="flex shrink-0 flex-col gap-3">
-                      <label className="inline-flex min-h-[56px] cursor-pointer items-center justify-center rounded-2xl border border-dashed border-[#93c5fd] bg-gradient-to-br from-[#eff6ff] to-[#dbeafe] px-4 py-3 text-center text-sm font-semibold text-[#1d4ed8] transition hover:from-[#dbeafe] hover:to-[#bfdbfe]">
-                        {selectedFile ? "Change attachment" : "Attach file"}
+                      <label
+                        className="inline-flex min-h-[56px] cursor-pointer items-center justify-center rounded-2xl border border-dashed border-[#93c5fd] bg-gradient-to-br from-[#eff6ff] to-[#dbeafe] px-4 py-3 text-center text-sm font-semibold text-[#1d4ed8] transition hover:from-[#dbeafe] hover:to-[#bfdbfe]"
+                        title={selectedFile ? `Change attachment: ${selectedFile.name}` : "Attach file"}
+                      >
+                        <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/80 shadow-sm">
+                          <svg
+                            aria-hidden="true"
+                            className="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              d="m15.5 6.5-6.8 6.8a2.5 2.5 0 1 0 3.54 3.53l7.07-7.07a4 4 0 0 0-5.66-5.66L6.25 11.9a5.5 5.5 0 0 0 7.78 7.78l6.01-6.01"
+                              stroke="currentColor"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="1.8"
+                            />
+                          </svg>
+                        </span>
                         <input
                           accept="image/*,.pdf,.doc,.docx,.zip,.rar,.txt"
                           className="hidden"

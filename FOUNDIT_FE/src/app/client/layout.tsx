@@ -27,11 +27,6 @@ const navItems = [
     note: "Messages",
   },
   {
-    href: "/client/ekyc",
-    label: "eKYC",
-    note: "Verification",
-  },
-  {
     href: "/client/setting",
     label: "Settings",
     note: "Preferences",
