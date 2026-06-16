@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { apiRequest, toErrorMessage } from "@/lib/api";
 import { useAuth } from "@/components/providers/auth-provider";
 import { useApiQuery } from "@/hooks/use-api-query";
-import { asRecord, buildImageSource, toText } from "@/lib/data-utils";
+import { asRecord, buildImageSource, getInitials, toText } from "@/lib/data-utils";
 
 type SettingsTab = "personal" | "notifications" | "security" | "payments";
 
@@ -30,20 +30,38 @@ export function FreelancerSettingClient() {
     newPassword: "",
     confirmPassword: "",
   });
+  const avatarPreview = useMemo(
+    () => (avatarFile ? URL.createObjectURL(avatarFile) : null),
+    [avatarFile],
+  );
+  const bankQrPreview = useMemo(
+    () => (bankQrFile ? URL.createObjectURL(bankQrFile) : null),
+    [bankQrFile],
+  );
 
   const settingRecord = asRecord(setting.data);
   const profileRecord = asRecord(profile.data);
-  const avatar = buildImageSource({
+  const avatar = avatarPreview ?? buildImageSource({
     data: profileRecord.profilePictureData,
     contentType: profileRecord.profilePictureType,
     url: profileRecord.profilePictureUrl,
   });
-  const bankQr = buildImageSource({
+  const bankQr = bankQrPreview ?? buildImageSource({
     data: settingRecord.bankQrData,
     contentType: settingRecord.bankQrType,
     url: undefined,
     fallback: "",
   });
+
+  useEffect(() => {
+    if (!avatarPreview) return;
+    return () => URL.revokeObjectURL(avatarPreview);
+  }, [avatarPreview]);
+
+  useEffect(() => {
+    if (!bankQrPreview) return;
+    return () => URL.revokeObjectURL(bankQrPreview);
+  }, [bankQrPreview]);
 
   const uploadAvatar = async () => {
     if (!token || !avatarFile) return;
@@ -59,6 +77,7 @@ export function FreelancerSettingClient() {
         body: formData,
       });
       setAvatarFile(null);
+      await profile.refresh();
       setMessage("Profile picture updated.");
     } catch (nextError) {
       setError(toErrorMessage(nextError));
@@ -81,6 +100,7 @@ export function FreelancerSettingClient() {
         body: formData,
       });
       setBankQrFile(null);
+      await setting.refresh();
       setMessage("Seller bank QR uploaded.");
     } catch (nextError) {
       setError(toErrorMessage(nextError));
@@ -168,8 +188,14 @@ export function FreelancerSettingClient() {
                 <h2 className="text-[18px] font-semibold text-[#111827]">Personal Information</h2>
                 <div className="mt-5 flex flex-col gap-4 border-b border-[#e5e7eb] pb-6 md:flex-row md:items-center">
                   <div className="relative h-16 w-16 overflow-hidden rounded-full ring-4 ring-[#f3f4f6]">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img alt="Profile" className="h-full w-full object-cover" src={avatar} />
+                    {avatar ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img alt="Profile" className="h-full w-full object-cover" src={avatar} />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-[#eef2ff] text-lg font-semibold text-[#2563eb]">
+                        {getInitials(toText(profileRecord.freelancerName, "Freelancer"))}
+                      </div>
+                    )}
                   </div>
                   <div className="flex-1">
                     <h3 className="text-xl font-semibold text-[#111827]">
@@ -209,7 +235,7 @@ export function FreelancerSettingClient() {
                           // eslint-disable-next-line @next/next/no-img-element
                           <img alt="Seller bank QR" className="h-full w-full object-contain" src={bankQr} />
                         ) : (
-                          <span className="text-sm text-[#6b7280]">No QR</span>
+                          <span className="px-3 text-center text-sm text-[#6b7280]">No QR uploaded</span>
                         )}
                       </div>
                       <div>

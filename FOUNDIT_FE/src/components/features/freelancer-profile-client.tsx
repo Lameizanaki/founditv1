@@ -9,6 +9,7 @@ import {
   asRecord,
   buildImageSource,
   formatMoney,
+  getInitials,
   toNumber,
   toText,
 } from "@/lib/data-utils";
@@ -83,6 +84,7 @@ export function FreelancerProfileClient() {
             .filter(Boolean),
         },
       });
+      await Promise.all([profile.refresh(), sidebar.refresh()]);
       setMessage("Freelancer profile updated.");
     } catch (nextError) {
       setError(toErrorMessage(nextError));
@@ -116,8 +118,12 @@ export function FreelancerProfileClient() {
         <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex flex-col gap-6 md:flex-row">
             <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border border-[#e5e7eb] bg-[#eef2ff] text-2xl font-semibold text-[#2563eb]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img alt={effective.freelancerName} className="h-full w-full object-cover" src={avatar} />
+              {avatar ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img alt={effective.freelancerName} className="h-full w-full object-cover" src={avatar} />
+              ) : (
+                <span>{getInitials(effective.freelancerName)}</span>
+              )}
             </div>
             <div className="flex-1">
               <div className="grid gap-4 md:grid-cols-2">

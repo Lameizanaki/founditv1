@@ -145,6 +145,9 @@ interface StructuredMessageMeta {
   revisionMessage: string | null;
 }
 
+const isPriceProposalResolution = (kind: StructuredKind) =>
+  kind === "price_agreement" || kind === "price_rejected";
+
 const dedupeMessages = (messages: ChatMessageResponse[]) => {
   const seen = new Set<string>();
   const next: ChatMessageResponse[] = [];
@@ -576,10 +579,21 @@ export function ChatWorkspaceClient({
   }, [matchedHireRequest?.gigTitle, matchedProject?.projectTitle, scope, selectedConversation]);
 
   const latestPendingIncomingPriceProposal = (() => {
+    const resolvedRequestIds = new Set<number>();
+
     for (let index = messages.length - 1; index >= 0; index -= 1) {
       const message = messages[index];
       const meta = parseStructuredMessage(message);
-      if (!meta || meta.kind !== "price_proposal") {
+      if (!meta) {
+        continue;
+      }
+
+      if (isPriceProposalResolution(meta.kind) && meta.requestId) {
+        resolvedRequestIds.add(meta.requestId);
+        continue;
+      }
+
+      if (meta.kind !== "price_proposal") {
         continue;
       }
 
@@ -588,7 +602,11 @@ export function ChatWorkspaceClient({
         !!message.senderEmail &&
         currentEmail.toLowerCase() === message.senderEmail.toLowerCase();
 
-      if (isCurrentUser || normalizeWorkflowState(meta.status) !== "pending") {
+      if (
+        isCurrentUser ||
+        normalizeWorkflowState(meta.status) !== "pending" ||
+        (meta.requestId ? resolvedRequestIds.has(meta.requestId) : false)
+      ) {
         continue;
       }
 
@@ -599,14 +617,28 @@ export function ChatWorkspaceClient({
   })();
 
   const latestPendingPriceProposal = (() => {
+    const resolvedRequestIds = new Set<number>();
+
     for (let index = messages.length - 1; index >= 0; index -= 1) {
       const message = messages[index];
       const meta = parseStructuredMessage(message);
-      if (!meta || meta.kind !== "price_proposal") {
+      if (!meta) {
         continue;
       }
 
-      if (normalizeWorkflowState(meta.status) !== "pending") {
+      if (isPriceProposalResolution(meta.kind) && meta.requestId) {
+        resolvedRequestIds.add(meta.requestId);
+        continue;
+      }
+
+      if (meta.kind !== "price_proposal") {
+        continue;
+      }
+
+      if (
+        normalizeWorkflowState(meta.status) !== "pending" ||
+        (meta.requestId ? resolvedRequestIds.has(meta.requestId) : false)
+      ) {
         continue;
       }
 
@@ -622,10 +654,25 @@ export function ChatWorkspaceClient({
   })();
 
   const latestPendingIncomingRequirementProposal = (() => {
+    const resolvedProposalIds = new Set<number>();
+
     for (let index = messages.length - 1; index >= 0; index -= 1) {
       const message = messages[index];
       const meta = parseStructuredMessage(message);
-      if (!meta || meta.kind !== "project_requirement_proposal") {
+      if (!meta) {
+        continue;
+      }
+
+      if (
+        meta.kind === "project_requirement_proposal" &&
+        meta.proposalId &&
+        normalizeWorkflowState(meta.status) === "accepted"
+      ) {
+        resolvedProposalIds.add(meta.proposalId);
+        continue;
+      }
+
+      if (meta.kind !== "project_requirement_proposal") {
         continue;
       }
 
@@ -634,7 +681,11 @@ export function ChatWorkspaceClient({
         !!message.senderEmail &&
         currentEmail.toLowerCase() === message.senderEmail.toLowerCase();
 
-      if (isCurrentUser || normalizeWorkflowState(meta.status) !== "pending") {
+      if (
+        isCurrentUser ||
+        normalizeWorkflowState(meta.status) !== "pending" ||
+        (meta.proposalId ? resolvedProposalIds.has(meta.proposalId) : false)
+      ) {
         continue;
       }
 
@@ -645,14 +696,32 @@ export function ChatWorkspaceClient({
   })();
 
   const latestPendingRequirementProposal = (() => {
+    const resolvedProposalIds = new Set<number>();
+
     for (let index = messages.length - 1; index >= 0; index -= 1) {
       const message = messages[index];
       const meta = parseStructuredMessage(message);
-      if (!meta || meta.kind !== "project_requirement_proposal") {
+      if (!meta) {
         continue;
       }
 
-      if (normalizeWorkflowState(meta.status) !== "pending") {
+      if (
+        meta.kind === "project_requirement_proposal" &&
+        meta.proposalId &&
+        normalizeWorkflowState(meta.status) === "accepted"
+      ) {
+        resolvedProposalIds.add(meta.proposalId);
+        continue;
+      }
+
+      if (meta.kind !== "project_requirement_proposal") {
+        continue;
+      }
+
+      if (
+        normalizeWorkflowState(meta.status) !== "pending" ||
+        (meta.proposalId ? resolvedProposalIds.has(meta.proposalId) : false)
+      ) {
         continue;
       }
 
@@ -1022,6 +1091,24 @@ export function ChatWorkspaceClient({
           token,
         },
       );
+
+      await sendSystemMessage({
+        gigId:
+          matchedProject?.gigId ??
+          matchedHireRequest?.gigId ??
+          latestPendingIncomingRequirementProposal.meta.gigId,
+        messageType: "project_requirement_proposal",
+        projectId: matchedProject?.id ?? latestPendingIncomingRequirementProposal.meta.projectId,
+        proposalId: latestPendingIncomingRequirementProposal.meta.proposalId,
+        requestId: latestPendingIncomingRequirementProposal.meta.requestId,
+        status: "accepted",
+        text: `Requirements accepted for "${latestPendingIncomingRequirementProposal.meta.title || matchedProject?.projectTitle || "this project"}".`,
+        title:
+          latestPendingIncomingRequirementProposal.meta.title ??
+          matchedProject?.projectTitle ??
+          null,
+        type: "project_requirement_proposal",
+      });
     });
 
   const handleDeliveryDownload = async () => {
@@ -1296,39 +1383,6 @@ export function ChatWorkspaceClient({
           : `Project "${matchedProject.projectTitle}" was delivered for review.`,
         type: "project_delivery",
       });
-    });
-
-  const handleApproveDelivery = () =>
-    runWorkflowAction(async () => {
-      if (!matchedProject) {
-        return;
-      }
-
-      if (!canClientReviewDelivery) {
-        throw new Error("Only delivered projects can be approved.");
-      }
-
-      await apiRequest<Record<string, unknown>>(
-        `${workflowBase}/project/${matchedProject.id}/approve-delivery`,
-        {
-          method: "PUT",
-          token,
-        },
-      );
-
-      await sendSystemMessage({
-        gigId: matchedProject.gigId,
-        messageType: "project_delivery",
-        projectId: matchedProject.id,
-        projectTitle: matchedProject.projectTitle,
-        status: "COMPLETED",
-        text: `Delivery approved. "${matchedProject.projectTitle}" is now complete.`,
-        type: "project_delivery",
-      });
-
-      if (confirmOrderHref) {
-        router.push(confirmOrderHref);
-      }
     });
 
   const handleRequestRevision = () =>
@@ -1763,7 +1817,7 @@ export function ChatWorkspaceClient({
                     </div>
                   ) : null}
 
-                  <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
+                  <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_240px] lg:items-end">
                     <div className="flex-1">
                       <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.08em] text-[#6b7280]">
                         Message
@@ -1776,8 +1830,8 @@ export function ChatWorkspaceClient({
                       />
                     </div>
 
-                    <div className="flex shrink-0 flex-col gap-3 lg:w-[220px]">
-                      <label className="inline-flex cursor-pointer items-center justify-center rounded-2xl border border-dashed border-[#93c5fd] bg-gradient-to-br from-[#eff6ff] to-[#dbeafe] px-4 py-3 text-sm font-semibold text-[#1d4ed8] transition hover:from-[#dbeafe] hover:to-[#bfdbfe]">
+                    <div className="flex shrink-0 flex-col gap-3">
+                      <label className="inline-flex min-h-[56px] cursor-pointer items-center justify-center rounded-2xl border border-dashed border-[#93c5fd] bg-gradient-to-br from-[#eff6ff] to-[#dbeafe] px-4 py-3 text-center text-sm font-semibold text-[#1d4ed8] transition hover:from-[#dbeafe] hover:to-[#bfdbfe]">
                         {selectedFile ? "Change attachment" : "Attach file"}
                         <input
                           accept="image/*,.pdf,.doc,.docx,.zip,.rar,.txt"
@@ -1787,7 +1841,7 @@ export function ChatWorkspaceClient({
                         />
                       </label>
                       <button
-                        className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-[#111827] to-[#1f2937] px-4 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(17,24,39,0.18)] transition hover:from-[#0b1220] hover:to-[#111827] disabled:cursor-not-allowed disabled:opacity-60"
+                        className="inline-flex min-h-[56px] items-center justify-center rounded-2xl bg-gradient-to-r from-[#111827] to-[#1f2937] px-4 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(17,24,39,0.18)] transition hover:from-[#0b1220] hover:to-[#111827] disabled:cursor-not-allowed disabled:opacity-60"
                         disabled={isSending || (!composerText.trim() && !selectedFile)}
                         onClick={() => void handleSendMessage()}
                         type="button"
@@ -1976,7 +2030,11 @@ export function ChatWorkspaceClient({
                                 </button>
                               ) : null}
                               <button
-                                className="mt-3 w-full rounded-xl bg-[#16a34a] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#15803d] disabled:opacity-60"
+                                className={`mt-3 w-full rounded-xl px-3 py-2 text-sm font-semibold transition ${
+                                  canFreelancerAcceptRequirements
+                                    ? "bg-[#16a34a] text-white hover:bg-[#15803d]"
+                                    : "cursor-not-allowed bg-[#d1fae5] text-[#166534]"
+                                } disabled:opacity-100`}
                                 disabled={isWorkflowBusy || !canFreelancerAcceptRequirements}
                                 onClick={() => void handleAcceptRequirementProposal()}
                                 type="button"
@@ -2108,24 +2166,14 @@ export function ChatWorkspaceClient({
                               placeholder="Add revision notes if changes are needed"
                               value={revisionText}
                             />
-                            <div className="flex gap-2">
-                              <button
-                                className="flex-1 rounded-xl bg-[#16a34a] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#15803d] disabled:opacity-60"
-                                disabled={isWorkflowBusy || !canClientReviewDelivery}
-                                onClick={() => void handleApproveDelivery()}
-                                type="button"
-                              >
-                                Approve & Continue to Payment
-                              </button>
-                              <button
-                                className="flex-1 rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-sm font-semibold text-[#374151] transition hover:bg-[#f9fafb] disabled:opacity-60"
-                                disabled={isWorkflowBusy || !revisionText.trim() || !canClientReviewDelivery}
-                                onClick={() => void handleRequestRevision()}
-                                type="button"
-                              >
-                                Request Revision
-                              </button>
-                            </div>
+                            <button
+                              className="w-full rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-sm font-semibold text-[#374151] transition hover:bg-[#f9fafb] disabled:opacity-60"
+                              disabled={isWorkflowBusy || !revisionText.trim() || !canClientReviewDelivery}
+                              onClick={() => void handleRequestRevision()}
+                              type="button"
+                            >
+                              Request Revision
+                            </button>
                           </div>
                         ) : null}
 

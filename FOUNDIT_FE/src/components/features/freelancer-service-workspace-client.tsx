@@ -39,6 +39,7 @@ export function FreelancerServiceWorkspaceClient({
     description: "",
     tags: "",
   });
+  const [mainImageFile, setMainImageFile] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -50,6 +51,7 @@ export function FreelancerServiceWorkspaceClient({
     (Array.isArray(record.tags)
       ? record.tags.map((tag) => toText(tag, "")).filter(Boolean).join(", ")
       : toText(record.tags, ""));
+  const previewImage = mainImageFile ? URL.createObjectURL(mainImageFile) : image;
 
   const saveOverview = async () => {
     if (!token) {
@@ -76,6 +78,33 @@ export function FreelancerServiceWorkspaceClient({
       });
       await gig.refresh();
       setMessage("Service overview updated.");
+    } catch (nextError) {
+      setError(toErrorMessage(nextError));
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const updateMainImage = async () => {
+    if (!token || !mainImageFile) {
+      return;
+    }
+
+    setIsSaving(true);
+    setError(null);
+    setMessage(null);
+
+    try {
+      const payload = new FormData();
+      payload.append("main", mainImageFile, mainImageFile.name);
+      await apiRequest(`/freelancer/${gigId}/publish-service`, {
+        method: "PUT",
+        token,
+        body: payload,
+      });
+      setMainImageFile(null);
+      await gig.refresh();
+      setMessage("Service image updated.");
     } catch (nextError) {
       setError(toErrorMessage(nextError));
     } finally {
@@ -145,7 +174,7 @@ export function FreelancerServiceWorkspaceClient({
                 {effectiveTitle || toText(record.serviceTitle, "Untitled service")}
               </h1>
               <p className="mt-2 text-sm text-[#6b7280]">
-                Use this workspace to review your listing, update the overview, and control visibility.
+                Use this workspace to review your listing, update the overview and image, and control visibility.
               </p>
             </div>
 
@@ -156,8 +185,38 @@ export function FreelancerServiceWorkspaceClient({
 
           <div className="overflow-hidden rounded-3xl border border-[#e5e7eb] bg-[#f8fafc]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img alt={toText(record.serviceTitle, "Service image")} className="h-[280px] w-full object-cover" src={image} />
+            <img alt={toText(record.serviceTitle, "Service image")} className="h-[280px] w-full object-cover" src={previewImage} />
           </div>
+
+          {mode === "edit" ? (
+            <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-[#e5e7eb] bg-[#f8fafc] p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-semibold text-[#111827]">Update service image</p>
+                <p className="mt-1 text-xs text-[#6b7280]">
+                  Replace the main image shown on your listing card and detail page.
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 sm:items-end">
+                <label className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-[#d1d5db] bg-white px-4 py-2 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]">
+                  {mainImageFile ? mainImageFile.name : "Choose image"}
+                  <input
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(event) => setMainImageFile(event.target.files?.[0] ?? null)}
+                    type="file"
+                  />
+                </label>
+                <button
+                  className="rounded-xl bg-[#111827] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0b1220] disabled:opacity-60"
+                  disabled={isSaving || !mainImageFile}
+                  onClick={() => void updateMainImage()}
+                  type="button"
+                >
+                  {isSaving ? "Updating..." : "Update Image"}
+                </button>
+              </div>
+            </div>
+          ) : null}
 
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <div>
