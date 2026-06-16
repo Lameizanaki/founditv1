@@ -12,6 +12,7 @@ import {
   toText,
 } from "@/lib/data-utils";
 import { normalizeBackendEkycStatus } from "@/lib/ekyc";
+import type { PaymentTransactionResponse } from "@/types/payment";
 
 const orderStatusClass = (status: string) => {
   const normalized = normalizeStatus(status);
@@ -38,6 +39,10 @@ export function ClientDashboardClient() {
   });
   const history = useApiQuery<unknown[]>({
     endpoint: "/client/project-history",
+    initialData: [],
+  });
+  const transactions = useApiQuery<PaymentTransactionResponse[]>({
+    endpoint: "/payment/my-transactions",
     initialData: [],
   });
   const freelancers = useApiQuery<unknown[]>({
@@ -87,17 +92,15 @@ export function ClientDashboardClient() {
   const completedProjects = history.data.filter((entry) =>
     normalizeStatus(asRecord(entry).status).includes("complete"),
   ).length;
-  const totalSpent = history.data.reduce<number>(
-    (sum, entry) =>
-      sum + toNumber(asRecord(entry).projectAgreedPrice ?? asRecord(entry).agreedPrice, 0),
-    0,
-  );
+  const totalSpent = transactions.data
+    .filter((transaction) => normalizeStatus(transaction.status).includes("paid"))
+    .reduce<number>((sum, transaction) => sum + toNumber(transaction.amount, 0), 0);
   const profileRecord = asRecord(profile.data);
   const ekycStatus = normalizeBackendEkycStatus(asRecord(ekyc.data).status);
   const isVerified = ekycStatus === "verified";
-  const loadError = profile.error || orders.error || history.error || freelancers.error;
+  const loadError = profile.error || orders.error || history.error || freelancers.error || transactions.error;
   const isLoading =
-    profile.isLoading || orders.isLoading || history.isLoading || freelancers.isLoading;
+    profile.isLoading || orders.isLoading || history.isLoading || freelancers.isLoading || transactions.isLoading;
 
   return (
     <div className="mx-auto w-full max-w-[1600px] px-4 pb-8 md:px-6 lg:px-10">

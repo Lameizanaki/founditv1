@@ -32,11 +32,6 @@ const navItems = [
     note: "Verification",
   },
   {
-    href: "/client/my-profile",
-    label: "My Profile",
-    note: "Account",
-  },
-  {
     href: "/client/setting",
     label: "Settings",
     note: "Preferences",

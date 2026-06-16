@@ -163,6 +163,11 @@ public class PaymentServiceImpl implements PaymentService {
 		tx.setManualStatusMessage("Seller confirmed payment after checking bank app.");
 		tx.setConfirmedReference(tx.getProofReference());
 
+		if (project.getStatus() != ProjectStatusEnum.COMPLETED) {
+			project.setStatus(ProjectStatusEnum.COMPLETED);
+			projectRepository.save(project);
+		}
+
 		PaymentTransaction saved = paymentTransactionRepository.save(tx);
 		notificationEventPublisher.publishPaymentReceived(saved);
 		return saved;

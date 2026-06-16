@@ -32,11 +32,6 @@ const navItems = [
     note: "Verification",
   },
   {
-    href: "/freelancer/profile",
-    label: "Profile",
-    note: "Portfolio",
-  },
-  {
     href: "/freelancer/setting",
     label: "Settings",
     note: "Account",

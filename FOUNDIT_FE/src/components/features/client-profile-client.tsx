@@ -1,7 +1,8 @@
 "use client";
 
 import { useApiQuery } from "@/hooks/use-api-query";
-import { asRecord, formatDate, formatMoney, toNumber, toText } from "@/lib/data-utils";
+import { asRecord, formatDate, formatMoney, normalizeStatus, toNumber, toText } from "@/lib/data-utils";
+import type { PaymentTransactionResponse } from "@/types/payment";
 
 export function ClientProfileClient() {
   const profile = useApiQuery<unknown>({ endpoint: "/client/me", initialData: {} });
@@ -9,14 +10,16 @@ export function ClientProfileClient() {
     endpoint: "/client/project-history",
     initialData: [],
   });
+  const transactions = useApiQuery<PaymentTransactionResponse[]>({
+    endpoint: "/payment/my-transactions",
+    initialData: [],
+  });
 
   const record = asRecord(profile.data);
   const stats = {
-    spent: history.data.reduce<number>(
-      (sum, item) =>
-        sum + toNumber(asRecord(item).projectAgreedPrice ?? asRecord(item).agreedPrice, 0),
-      0,
-    ),
+    spent: transactions.data
+      .filter((transaction) => normalizeStatus(transaction.status).includes("paid"))
+      .reduce<number>((sum, transaction) => sum + toNumber(transaction.amount, 0), 0),
     active: history.data.filter((item) =>
       toText(asRecord(item).status).toLowerCase().includes("progress"),
     ).length,
@@ -34,9 +37,9 @@ export function ClientProfileClient() {
         </p>
       </div>
 
-      {profile.error || history.error ? (
+      {profile.error || history.error || transactions.error ? (
         <div className="mb-6 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-          {profile.error || history.error}
+          {profile.error || history.error || transactions.error}
         </div>
       ) : null}
 

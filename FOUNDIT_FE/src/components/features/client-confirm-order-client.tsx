@@ -105,7 +105,13 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
   const freelancerId = toNumber(gigRecord.freelancerId, 0) || null;
 
   const matchedRequest = useMemo(() => {
-    const records = hireRequests.data.map((entry) => asRecord(entry));
+    const records = hireRequests.data
+      .map((entry) => asRecord(entry))
+      .sort((left, right) => {
+        const leftId = toNumber(left.projectId ?? left.id, 0);
+        const rightId = toNumber(right.projectId ?? right.id, 0);
+        return rightId - leftId;
+      });
 
     if (requestIdParam) {
       return records.find((record) => toNumber(record.id, 0) === requestIdParam) ?? null;
@@ -131,6 +137,10 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
           : false;
 
         if (projectId) {
+          if (isPaid) {
+            return false;
+          }
+
           if (["in_progress", "revision_requested", "delivered"].includes(projectStatus)) {
             return true;
           }
