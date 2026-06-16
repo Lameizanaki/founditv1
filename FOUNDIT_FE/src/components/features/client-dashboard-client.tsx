@@ -11,6 +11,7 @@ import {
   toNumber,
   toText,
 } from "@/lib/data-utils";
+import { normalizeBackendEkycStatus } from "@/lib/ekyc";
 
 const orderStatusClass = (status: string) => {
   const normalized = normalizeStatus(status);
@@ -42,6 +43,10 @@ export function ClientDashboardClient() {
   const freelancers = useApiQuery<unknown[]>({
     endpoint: "/freelancer/active",
     initialData: [],
+  });
+  const ekyc = useApiQuery<unknown | null>({
+    endpoint: "/ekyc/current",
+    initialData: null,
   });
 
   const activeOrders = orders.data
@@ -88,6 +93,8 @@ export function ClientDashboardClient() {
     0,
   );
   const profileRecord = asRecord(profile.data);
+  const ekycStatus = normalizeBackendEkycStatus(asRecord(ekyc.data).status);
+  const isVerified = ekycStatus === "verified";
   const loadError = profile.error || orders.error || history.error || freelancers.error;
   const isLoading =
     profile.isLoading || orders.isLoading || history.isLoading || freelancers.isLoading;
@@ -106,12 +113,18 @@ export function ClientDashboardClient() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <Link
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#d1d5db] bg-white px-4 py-3 text-sm font-medium text-[#2563eb] transition hover:bg-[#f9fafb]"
-              href="/client/ekyc"
-            >
-              Verify Identity
-            </Link>
+            {isVerified ? (
+              <span className="inline-flex items-center justify-center gap-2 rounded-full bg-[#dcfce7] px-4 py-3 text-sm font-semibold text-[#166534]">
+                Verified
+              </span>
+            ) : (
+              <Link
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#d1d5db] bg-white px-4 py-3 text-sm font-medium text-[#2563eb] transition hover:bg-[#f9fafb]"
+                href="/client/ekyc"
+              >
+                Verify Identity
+              </Link>
+            )}
             <Link
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-4 py-3 text-sm font-medium text-white transition hover:bg-[#1d4ed8]"
               href="/client/browse-freelancers"

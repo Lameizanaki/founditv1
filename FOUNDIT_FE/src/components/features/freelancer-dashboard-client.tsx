@@ -11,6 +11,7 @@ import {
   toNumber,
   toText,
 } from "@/lib/data-utils";
+import { normalizeBackendEkycStatus } from "@/lib/ekyc";
 import type { PaymentTransactionResponse } from "@/types/payment";
 
 const serviceStatusClass = (value: string) => {
@@ -52,6 +53,10 @@ export function FreelancerDashboardClient() {
   const payments = useApiQuery<PaymentTransactionResponse[]>({
     endpoint: "/payment/freelancer/my-transactions",
     initialData: [],
+  });
+  const ekyc = useApiQuery<unknown | null>({
+    endpoint: "/ekyc/current",
+    initialData: null,
   });
 
   const sidebarRecord = asRecord(sidebar.data);
@@ -105,6 +110,8 @@ export function FreelancerDashboardClient() {
   );
   const totalServiceRating = serviceCards.reduce((sum, service) => sum + service.rating, 0);
   const averageRating = serviceCards.length ? totalServiceRating / serviceCards.length : 0;
+  const ekycStatus = normalizeBackendEkycStatus(asRecord(ekyc.data).status);
+  const isVerified = ekycStatus === "verified";
 
   const isLoading =
     sidebar.isLoading || projects.isLoading || services.isLoading || requests.isLoading || payments.isLoading;
@@ -124,12 +131,18 @@ export function FreelancerDashboardClient() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <Link
-              className="inline-flex items-center gap-2 rounded-xl border border-[#d1d5db] bg-white px-4 py-2.5 text-sm font-semibold text-[#2563eb] transition hover:bg-[#f9fafb]"
-              href="/freelancer/ekyc"
-            >
-              Verify Identity
-            </Link>
+            {isVerified ? (
+              <span className="inline-flex items-center gap-2 rounded-full bg-[#dcfce7] px-4 py-2.5 text-sm font-semibold text-[#166534]">
+                Verified
+              </span>
+            ) : (
+              <Link
+                className="inline-flex items-center gap-2 rounded-xl border border-[#d1d5db] bg-white px-4 py-2.5 text-sm font-semibold text-[#2563eb] transition hover:bg-[#f9fafb]"
+                href="/freelancer/ekyc"
+              >
+                Verify Identity
+              </Link>
+            )}
             <Link
               className="inline-flex items-center gap-2 rounded-xl bg-[#16a34a] px-4 py-2.5 text-sm font-semibold !text-white shadow-sm transition visited:!text-white hover:!text-white hover:bg-[#15803d] focus:!text-white"
               href="/freelancer/create-new-service"

@@ -98,7 +98,11 @@ export function FreelancerServiceWorkspaceClient({
         token,
       });
       await gig.refresh();
-      setMessage(`Service ${action}d successfully.`);
+      setMessage(
+        action === "disable"
+          ? "Service removed from the marketplace."
+          : `Service ${action}d successfully.`,
+      );
     } catch (nextError) {
       setError(toErrorMessage(nextError));
     } finally {
@@ -232,7 +236,7 @@ export function FreelancerServiceWorkspaceClient({
           <div className="rounded-3xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
             <h2 className="text-xl font-semibold text-[#111827]">Listing Controls</h2>
             <p className="mt-2 text-sm text-[#6b7280]">
-              Pause, resume, or disable the service without deleting it.
+              Pause, resume, or remove the service from client browsing while keeping your past order records.
             </p>
 
             <div className="mt-5 flex flex-wrap gap-3">
@@ -258,7 +262,7 @@ export function FreelancerServiceWorkspaceClient({
                 onClick={() => void updateStatus("disable")}
                 type="button"
               >
-                Disable
+                Delete
               </button>
             </div>
 

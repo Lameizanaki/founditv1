@@ -231,22 +231,18 @@ export function BrowseFreelancersClient({
 
             <div className="mb-3 text-sm text-gray-500">{card.location}</div>
 
-            <div className="mb-4 flex flex-wrap gap-2">
-              {card.skills.length ? (
-                card.skills.map((skill) => (
+            {card.skills.length ? (
+              <div className="mb-4 flex flex-wrap gap-2">
+                {card.skills.map((skill) => (
                   <span
                     key={`${card.id}-${skill}`}
                     className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600"
                   >
                     {skill}
                   </span>
-                ))
-              ) : (
-                <span className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600">
-                  General
-                </span>
-              )}
-            </div>
+                ))}
+              </div>
+            ) : null}
 
             <p className="line-clamp-2 text-sm text-[#6b7280]">{card.about}</p>
 
