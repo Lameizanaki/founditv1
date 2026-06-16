@@ -183,6 +183,34 @@ export function FreelancerSettingClient() {
             ))}
 
             <Link
+              className="mt-3 flex w-full items-center gap-3 rounded-xl border border-[#e5e7eb] bg-[#f8fafc] px-4 py-3 text-left text-sm font-medium text-[#111827] transition hover:border-[#bfdbfe] hover:bg-[#eff6ff]"
+              href="/freelancer/profile"
+            >
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white text-[#2563eb]">
+                <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
+                  <path
+                    d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.8"
+                  />
+                  <path
+                    d="M4.5 20a7.5 7.5 0 0 1 15 0"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.8"
+                  />
+                </svg>
+              </span>
+              <span>
+                <span className="block">Portfolio Profile</span>
+                <span className="block text-xs font-normal text-[#6b7280]">Open and update your public profile</span>
+              </span>
+            </Link>
+
+            <Link
               className="mt-3 flex w-full items-center gap-3 rounded-xl border border-[#dcfce7] bg-[#f0fdf4] px-4 py-3 text-left text-sm font-medium text-[#15803d] transition hover:bg-[#dcfce7]"
               href="/freelancer/ekyc"
             >

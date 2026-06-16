@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useAuth } from "@/components/providers/auth-provider";
 import { getDefaultRouteForRole } from "@/lib/auth";
 import { toErrorMessage } from "@/lib/api";
@@ -14,22 +14,33 @@ export function SignInClient({ nextPath }: { nextPath: string | null }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
-  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
+    setIsSubmitting(true);
 
-    startTransition(() => {
-      void (async () => {
-        try {
-          const session = await signIn({ email, password });
-          router.push(nextPath || getDefaultRouteForRole(session.user.role));
-        } catch (submitError) {
-          setError(toErrorMessage(submitError));
-        }
-      })();
-    });
+    try {
+      const session = await signIn({ email, password });
+      router.push(nextPath || getDefaultRouteForRole(session.user.role));
+    } catch (submitError) {
+      setError(toErrorMessage(submitError));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleGoogleContinue = async () => {
+    setError(null);
+    setIsGoogleLoading(true);
+    try {
+      await continueWithGoogle();
+    } catch (submitError) {
+      setError(toErrorMessage(submitError));
+      setIsGoogleLoading(false);
+    }
   };
 
   return (
@@ -59,13 +70,14 @@ export function SignInClient({ nextPath }: { nextPath: string | null }) {
               <div className="space-y-3">
                 <button
                   className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 transition hover:bg-gray-50"
-                  onClick={continueWithGoogle}
+                  disabled={isSubmitting || isGoogleLoading}
+                  onClick={() => void handleGoogleContinue()}
                   type="button"
                 >
                   <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-gray-300 text-[11px] font-bold text-[#4285F4]">
                     G
                   </span>
-                  <span>Continue with Google</span>
+                  <span>{isGoogleLoading ? "Redirecting..." : "Continue with Google"}</span>
                 </button>
               </div>
 
@@ -94,6 +106,7 @@ export function SignInClient({ nextPath }: { nextPath: string | null }) {
                     required
                     type="email"
                     value={email}
+                    disabled={isSubmitting || isGoogleLoading}
                   />
                 </div>
 
@@ -109,6 +122,7 @@ export function SignInClient({ nextPath }: { nextPath: string | null }) {
                     required
                     type="password"
                     value={password}
+                    disabled={isSubmitting || isGoogleLoading}
                   />
                 </div>
 
@@ -118,6 +132,7 @@ export function SignInClient({ nextPath }: { nextPath: string | null }) {
                     id="rememberMe"
                     name="rememberMe"
                     type="checkbox"
+                    disabled={isSubmitting || isGoogleLoading}
                   />
                   <label className="text-sm text-gray-700" htmlFor="rememberMe">
                     Remember me
@@ -127,10 +142,10 @@ export function SignInClient({ nextPath }: { nextPath: string | null }) {
                 <div className="pt-2">
                   <button
                     className="h-12 w-full rounded-xl bg-[#08b239] text-sm font-semibold text-white transition hover:bg-[#069d32] disabled:cursor-not-allowed disabled:opacity-70"
-                    disabled={isPending}
+                    disabled={isSubmitting || isGoogleLoading}
                     type="submit"
                   >
-                    {isPending ? "Signing in..." : "Sign in"}
+                    {isSubmitting ? "Signing in..." : "Sign in"}
                   </button>
                 </div>
 

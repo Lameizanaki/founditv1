@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useAuth } from "@/components/providers/auth-provider";
 import { toErrorMessage } from "@/lib/api";
 import type { AppRole } from "@/types/auth";
@@ -21,7 +21,8 @@ export default function SignUpPage() {
   });
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const updateField = (key: keyof typeof form, value: string) => {
     setForm((current) => ({
@@ -30,22 +31,33 @@ export default function SignUpPage() {
     }));
   };
 
-  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
     setSuccess(null);
 
-    startTransition(() => {
-      void (async () => {
-        try {
-          await signUp(form);
-          setSuccess("Account created. You can sign in with the new credentials now.");
-          router.push("/auth/sign-in");
-        } catch (submitError) {
-          setError(toErrorMessage(submitError));
-        }
-      })();
-    });
+    setIsSubmitting(true);
+    try {
+      await signUp(form);
+      setSuccess("Account created. You can sign in with the new credentials now.");
+      router.push("/auth/sign-in");
+    } catch (submitError) {
+      setError(toErrorMessage(submitError));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleGoogleContinue = async () => {
+    setError(null);
+    setSuccess(null);
+    setIsGoogleLoading(true);
+    try {
+      await continueWithGoogle();
+    } catch (submitError) {
+      setError(toErrorMessage(submitError));
+      setIsGoogleLoading(false);
+    }
   };
 
   return (
@@ -75,13 +87,14 @@ export default function SignUpPage() {
               <div className="mt-8 space-y-3">
                 <button
                   className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-[#e3e3e3] bg-white text-[14px] font-medium text-[#222] transition hover:bg-gray-50"
-                  onClick={continueWithGoogle}
+                  disabled={isSubmitting || isGoogleLoading}
+                  onClick={() => void handleGoogleContinue()}
                   type="button"
                 >
                   <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-gray-300 text-[11px] font-bold text-[#4285F4]">
                     G
                   </span>
-                  <span>Continue with Google</span>
+                  <span>{isGoogleLoading ? "Redirecting..." : "Continue with Google"}</span>
                 </button>
               </div>
 
@@ -116,6 +129,7 @@ export default function SignUpPage() {
                     required
                     type="text"
                     value={form.username}
+                    disabled={isSubmitting || isGoogleLoading}
                   />
                 </div>
 
@@ -131,6 +145,7 @@ export default function SignUpPage() {
                     required
                     type="email"
                     value={form.email}
+                    disabled={isSubmitting || isGoogleLoading}
                   />
                 </div>
 
@@ -143,6 +158,7 @@ export default function SignUpPage() {
                     id="role"
                     onChange={(event) => updateField("role", event.target.value)}
                     value={form.role}
+                    disabled={isSubmitting || isGoogleLoading}
                   >
                     {roles.map((role) => (
                       <option key={role} value={role}>
@@ -164,16 +180,17 @@ export default function SignUpPage() {
                     required
                     type="password"
                     value={form.password}
+                    disabled={isSubmitting || isGoogleLoading}
                   />
                 </div>
 
                 <div className="pt-2">
                   <button
                     className="mx-auto block h-12 w-full rounded-xl bg-[#08b239] text-[15px] font-semibold text-white transition hover:bg-[#069d32] disabled:cursor-not-allowed disabled:opacity-60"
-                    disabled={isPending}
+                    disabled={isSubmitting || isGoogleLoading}
                     type="submit"
                   >
-                    {isPending ? "Signing up..." : "Sign up"}
+                    {isSubmitting ? "Signing up..." : "Sign up"}
                   </button>
                 </div>
 
