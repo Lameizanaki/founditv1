@@ -264,7 +264,7 @@ export function FreelancerServiceWorkspaceClient({
 
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
-                className="inline-flex rounded-xl bg-[#111827] px-4 py-2 text-sm font-semibold text-white transition visited:text-white hover:bg-[#0b1220]"
+                className="inline-flex rounded-xl bg-[#111827] px-4 py-2 text-sm font-semibold !text-white transition visited:!text-white hover:!text-white hover:bg-[#0b1220] focus:!text-white"
                 href={`/freelancer/my-services/${gigId}/edit`}
               >
                 Edit Service

@@ -49,7 +49,7 @@ export function FreelancerServicesClient() {
             View Profile
           </Link>
           <Link
-            className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#111827] px-3 text-sm font-medium text-white shadow-sm transition visited:text-white hover:bg-[#0b1220]"
+            className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#111827] px-3 text-sm font-medium !text-white shadow-sm transition visited:!text-white hover:!text-white hover:bg-[#0b1220] focus:!text-white"
             href="/freelancer/create-new-service"
           >
             Add New Service
@@ -118,7 +118,7 @@ export function FreelancerServicesClient() {
 
               <div className="col-span-2 flex items-center justify-end gap-4 text-sm">
                 <Link
-                  className="inline-flex rounded-xl bg-[#111827] px-4 py-2 text-sm font-semibold text-white transition visited:text-white hover:bg-[#0b1220]"
+                  className="inline-flex rounded-xl bg-[#111827] px-4 py-2 text-sm font-semibold !text-white transition visited:!text-white hover:!text-white hover:bg-[#0b1220] focus:!text-white"
                   href={`/freelancer/my-services/${service.id}/edit`}
                 >
                   Edit

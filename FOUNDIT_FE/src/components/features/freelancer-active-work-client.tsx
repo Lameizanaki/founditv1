@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
+import { useAuth } from "@/components/providers/auth-provider";
 import { useApiQuery } from "@/hooks/use-api-query";
+import { apiRequest, toErrorMessage } from "@/lib/api";
 import {
   asRecord,
   formatDate,
@@ -15,13 +18,19 @@ const filterCount = (items: unknown[], target: string) =>
   items.filter((entry) => normalizeStatus(asRecord(entry).status).includes(target)).length;
 
 export function FreelancerActiveWorkClient() {
+  const { session } = useAuth();
+  const token = session?.token ?? null;
   const projects = useApiQuery<unknown[]>({
     endpoint: "/freelancer/view-project",
     initialData: [],
   });
+  const [busyProjectId, setBusyProjectId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const cards = projects.data.map((entry, index) => {
     const record = asRecord(entry);
+    const status = toText(record.status, "In Progress");
+    const normalizedStatus = normalizeStatus(status);
     return {
       id: toText(record.id ?? index + 1),
       roomId: toText(record.roomId),
@@ -32,9 +41,31 @@ export function FreelancerActiveWorkClient() {
       location: toText(record.clientLocation, "Remote"),
       dueDate: formatDate(record.deadline, "No deadline"),
       amount: toNumber(record.agreedPrice, 0),
-      status: toText(record.status, "In Progress"),
+      status,
+      canMarkDelivered: ["in_progress", "revision_requested"].includes(normalizedStatus),
     };
   });
+
+  const handleMarkDelivered = async (projectId: string) => {
+    if (!token || !projectId || busyProjectId) {
+      return;
+    }
+
+    setBusyProjectId(projectId);
+    setActionError(null);
+
+    try {
+      await apiRequest(`/freelancer/project/${projectId}/deliver`, {
+        method: "POST",
+        token,
+      });
+      projects.refresh();
+    } catch (error) {
+      setActionError(toErrorMessage(error));
+    } finally {
+      setBusyProjectId(null);
+    }
+  };
 
   return (
     <div className="mx-auto max-w-[1600px] px-4 py-6 md:px-6">
@@ -77,6 +108,12 @@ export function FreelancerActiveWorkClient() {
         </div>
       ) : null}
 
+      {actionError ? (
+        <div className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {actionError}
+        </div>
+      ) : null}
+
       {projects.isLoading ? (
         <div className="mt-5 rounded-2xl border border-[#e5e7eb] bg-white px-5 py-10 text-center text-sm text-[#6b7280]">
           Loading your work...
@@ -114,7 +151,17 @@ export function FreelancerActiveWorkClient() {
                 </div>
               </div>
 
-              <div className="flex shrink-0 gap-3">
+              <div className="flex shrink-0 flex-wrap gap-3">
+                {item.canMarkDelivered ? (
+                  <button
+                    className="inline-flex h-11 items-center justify-center rounded-xl bg-[#111827] px-4 text-sm font-semibold text-white transition hover:bg-[#0b1220] disabled:cursor-not-allowed disabled:opacity-60"
+                    disabled={busyProjectId === item.id}
+                    onClick={() => void handleMarkDelivered(item.id)}
+                    type="button"
+                  >
+                    {busyProjectId === item.id ? "Marking..." : "Mark as Delivered"}
+                  </button>
+                ) : null}
                 {item.roomId ? (
                   <Link
                     className="inline-flex h-11 items-center justify-center rounded-xl bg-[#16a34a] px-4 text-sm font-semibold text-white transition hover:bg-[#15803d]"

@@ -218,7 +218,7 @@ export function FreelancerDashboardClient() {
               Verify Identity
             </Link>
             <Link
-              className="inline-flex items-center gap-2 rounded-xl bg-[#16a34a] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition visited:text-white hover:bg-[#15803d]"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#16a34a] px-4 py-2.5 text-sm font-semibold !text-white shadow-sm transition visited:!text-white hover:!text-white hover:bg-[#15803d] focus:!text-white"
               href="/freelancer/create-new-service"
             >
               Post a Gig

@@ -654,10 +654,35 @@ export function ChatWorkspaceClient({
     return null;
   })();
 
+  const latestProjectDeliveryUpdate = (() => {
+    for (let index = messages.length - 1; index >= 0; index -= 1) {
+      const message = messages[index];
+      const meta = parseStructuredMessage(message);
+      if (!meta || meta.kind !== "project_delivery") {
+        continue;
+      }
+
+      const isCurrentUser =
+        !!currentEmail &&
+        !!message.senderEmail &&
+        currentEmail.toLowerCase() === message.senderEmail.toLowerCase();
+
+      return { isCurrentUser, message, meta };
+    }
+
+    return null;
+  })();
+
   const hireRequestStatus = normalizeWorkflowState(matchedHireRequest?.status);
   const projectStatus = normalizeWorkflowState(matchedProject?.status);
   const hasPendingPriceProposal = !!latestPendingPriceProposal;
   const hasPendingRequirementProposal = !!latestPendingRequirementProposal;
+  const hasDeliveryReadyForReview =
+    !!matchedProject &&
+    (projectStatus === "delivered" ||
+      !!matchedProject.deliveryFileName ||
+      !!matchedProject.deliveryMessage?.trim() ||
+      normalizeWorkflowState(latestProjectDeliveryUpdate?.meta.status) === "delivered");
   const canFreelancerRespondToHireRequest = scope === "freelancer" && hireRequestStatus === "pending";
   const canClientCancelRequest =
     scope === "client" &&
@@ -687,7 +712,7 @@ export function ChatWorkspaceClient({
   const canClientReviewDelivery =
     scope === "client" &&
     !!matchedProject &&
-    projectStatus === "delivered";
+    hasDeliveryReadyForReview;
   const canFreelancerAcceptRevision =
     scope === "freelancer" &&
     !!matchedProject &&
@@ -764,6 +789,16 @@ export function ChatWorkspaceClient({
 
       if (message.roomId === selectedRoomId) {
         setMessages((current) => dedupeMessages([...current, message]));
+
+        const meta = parseStructuredMessage(message);
+        if (
+          meta &&
+          ["formal_notice", "project_delivery", "project_requirement_proposal", "project_revision_request"].includes(
+            meta.kind,
+          )
+        ) {
+          void refreshWorkflowAndRooms();
+        }
       }
     },
   });
@@ -1979,18 +2014,25 @@ export function ChatWorkspaceClient({
                           </div>
                         ) : null}
 
-                        {canClientReviewDelivery ? (
+                        {scope === "client" && matchedProject ? (
                           <div className="mt-4 space-y-2">
-                            <div className="rounded-xl border border-[#dbeafe] bg-[#eff6ff] p-3 text-sm text-[#1d4ed8]">
-                              Review the delivered work first. Once you approve it, the next step is
-                              payment confirmation.
+                            <div
+                              className={`rounded-xl border p-3 text-sm ${
+                                canClientReviewDelivery
+                                  ? "border-[#dbeafe] bg-[#eff6ff] text-[#1d4ed8]"
+                                  : "border-[#fde68a] bg-[#fffbeb] text-[#92400e]"
+                              }`}
+                            >
+                              {canClientReviewDelivery
+                                ? "Review the delivered work first. Once you approve it, the next step is payment confirmation."
+                                : "If the freelancer has already handed over the work, continue to the payment step from here. Use revision only when you need changes."}
                             </div>
                             {confirmOrderHref ? (
                               <Link
                                 className="inline-flex w-full items-center justify-center rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-sm font-semibold text-[#2563eb] transition hover:bg-[#eff6ff]"
                                 href={confirmOrderHref}
                               >
-                                Open Payment Step
+                                Continue to Payment
                               </Link>
                             ) : null}
 

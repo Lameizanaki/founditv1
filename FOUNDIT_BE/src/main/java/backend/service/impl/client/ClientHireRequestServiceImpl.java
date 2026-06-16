@@ -271,7 +271,13 @@ public class ClientHireRequestServiceImpl implements ClientHireRequestService {
             throw new RuntimeException("Unauthorized action");
         }
 
-        if (project.getStatus() != ProjectStatusEnum.DELIVERED) {
+        boolean hasDeliveryEvidence =
+                project.getStatus() == ProjectStatusEnum.DELIVERED
+                        || project.getDeliveryDate() != null
+                        || (project.getDeliveryMessage() != null && !project.getDeliveryMessage().isBlank())
+                        || project.getDeliveryFileData() != null;
+
+        if (!hasDeliveryEvidence) {
             throw new RuntimeException("Only delivered projects can be approved");
         }
 
@@ -295,7 +301,13 @@ public class ClientHireRequestServiceImpl implements ClientHireRequestService {
             throw new RuntimeException("Unauthorized action");
         }
 
-        if (project.getStatus() != ProjectStatusEnum.DELIVERED) {
+        boolean hasDeliveryEvidence =
+                project.getStatus() == ProjectStatusEnum.DELIVERED
+                        || project.getDeliveryDate() != null
+                        || (project.getDeliveryMessage() != null && !project.getDeliveryMessage().isBlank())
+                        || project.getDeliveryFileData() != null;
+
+        if (!hasDeliveryEvidence) {
             throw new RuntimeException("Only delivered projects can request revision");
         }
 

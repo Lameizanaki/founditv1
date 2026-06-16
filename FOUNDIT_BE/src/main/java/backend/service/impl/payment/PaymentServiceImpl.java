@@ -69,8 +69,9 @@ public class PaymentServiceImpl implements PaymentService {
 			throw new RuntimeException("Unauthorized action");
 		}
 
-		if (project.getStatus() != ProjectStatusEnum.COMPLETED) {
-			throw new RuntimeException("Payment proof can only be submitted after the client accepts the delivered work");
+		if (project.getStatus() != ProjectStatusEnum.COMPLETED
+				&& project.getStatus() != ProjectStatusEnum.DELIVERED) {
+			throw new RuntimeException("Payment proof can only be submitted after the freelancer delivers the work");
 		}
 
 		if ((reference == null || reference.isBlank()) && (proofFile == null || proofFile.isEmpty())) {

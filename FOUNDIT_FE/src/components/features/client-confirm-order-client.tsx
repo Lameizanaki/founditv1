@@ -128,7 +128,6 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
   const resolvedProjectId = projectIdParam || toNumber(matchedRequest?.projectId, 0) || null;
   const resolvedRequestId = requestIdParam || toNumber(matchedRequest?.id, 0) || null;
   const requestStatus = normalizeStatus(matchedRequest?.status);
-  const projectStatus = normalizeStatus(matchedRequest?.projectStatus);
 
   const matchedSubmittedTransaction =
     transactions.data.find(
@@ -142,11 +141,7 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
 
   const effectiveMode: "request" | "pay" =
     modeParam === "pay" || resolvedProjectId ? "pay" : "request";
-  const paymentLocked =
-    effectiveMode === "pay" &&
-    !["completed"].includes(projectStatus) &&
-    !matchedPaidTransaction &&
-    !matchedSubmittedTransaction;
+  const paymentLocked = effectiveMode === "pay" && !resolvedProjectId;
   const paymentStatus =
     matchedPaidTransaction
       ? "paid"
@@ -495,7 +490,7 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
 
             {paymentLocked ? (
               <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                Payment is locked until the project reaches the completed stage.
+                Payment opens after the freelancer delivers the work and you are ready to continue.
               </div>
             ) : null}
 
@@ -636,8 +631,8 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
 
             {matchedRequest && effectiveMode === "request" ? (
               <div className="mt-5 rounded-xl border border-[#d1fae5] bg-[#f0fdf4] p-4 text-sm text-[#166534]">
-                Request status: {requestStatus || "pending"}. Once the project reaches the completed
-                stage, you can switch back here and submit proof.
+                Request status: {requestStatus || "pending"}. Once the freelancer delivers the work,
+                you can come back here and submit payment proof.
               </div>
             ) : null}
 
