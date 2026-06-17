@@ -8,7 +8,13 @@ import { useAuth } from "@/components/providers/auth-provider";
 import { getDefaultRouteForRole } from "@/lib/auth";
 import { toErrorMessage } from "@/lib/api";
 
-export function SignInClient({ nextPath }: { nextPath: string | null }) {
+export function SignInClient({
+  googleSetupComplete,
+  nextPath,
+}: {
+  googleSetupComplete: boolean;
+  nextPath: string | null;
+}) {
   const router = useRouter();
   const { continueWithGoogle, isGoogleAuthEnabled, signIn } = useAuth();
   const [email, setEmail] = useState("");
@@ -66,6 +72,12 @@ export function SignInClient({ nextPath }: { nextPath: string | null }) {
                 Welcome back
               </h2>
               <p className="mb-8 text-[18px] text-gray-500">Sign in to continue</p>
+
+              {googleSetupComplete ? (
+                <div className="mb-6 rounded-2xl border border-[#bbf7d0] bg-[#f0fdf4] px-4 py-3 text-sm font-medium leading-6 text-[#166534]">
+                  Your Google account is ready. Continue with Google once more to enter your dashboard with the role you selected.
+                </div>
+              ) : null}
 
               {isGoogleAuthEnabled ? (
                 <div className="space-y-3">

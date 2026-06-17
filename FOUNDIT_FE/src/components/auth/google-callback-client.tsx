@@ -44,7 +44,7 @@ export function GoogleCallbackClient({
   token,
 }: GoogleCallbackClientProps) {
   const router = useRouter();
-  const { acceptGoogleToken } = useAuth();
+  const { acceptGoogleToken, signOut } = useAuth();
   const [error, setError] = useState<string | null>(
     token ? null : "Google sign-in did not return a valid session token.",
   );
@@ -94,8 +94,12 @@ export function GoogleCallbackClient({
         body: { role: selectedRole },
       });
 
-      const session = acceptGoogleToken(response.token);
-      redirectToWorkspace(session.user.role ?? response.role ?? selectedRole);
+      signOut();
+      window.location.replace(
+        `/auth/sign-in?googleSetup=1&role=${encodeURIComponent(
+          response.role ?? selectedRole,
+        )}`,
+      );
     } catch (submitError) {
       setError(toErrorMessage(submitError));
       setIsSubmittingRole(false);
@@ -120,9 +124,9 @@ export function GoogleCallbackClient({
 
   return (
     <section className="min-h-screen bg-[#f8f8f8] px-6 py-8 md:px-10 lg:px-16">
-      <div className="mx-auto flex min-h-[calc(100vh-64px)] w-full max-w-7xl items-center justify-center">
-        <div className="grid w-full overflow-hidden rounded-[32px] border border-[#e5e7eb] bg-white shadow-[0_30px_90px_rgba(15,23,42,0.08)] lg:grid-cols-[1.25fr_0.75fr]">
-          <div className="px-6 py-10 sm:px-10 lg:px-14 xl:px-16">
+      <div className="mx-auto flex min-h-[calc(100vh-64px)] w-full max-w-[1760px] items-center justify-center">
+        <div className="grid w-full overflow-hidden rounded-[32px] border border-[#e5e7eb] bg-white shadow-[0_30px_90px_rgba(15,23,42,0.08)] lg:grid-cols-[1.4fr_0.6fr]">
+          <div className="px-6 py-10 sm:px-10 lg:px-16 xl:px-20">
             <span className="inline-flex rounded-full bg-[#eff6ff] px-3 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-[#2563eb]">
               Google Account Setup
             </span>
@@ -131,7 +135,7 @@ export function GoogleCallbackClient({
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-[#6b7280]">
               Your Google account is connected. Pick the role that matches your first login.
-              You&apos;ll be taken directly to the right workspace after this step.
+              After saving the role, we&apos;ll send you back to sign in so the next Google login opens the correct workspace cleanly.
             </p>
 
             {error ? (
