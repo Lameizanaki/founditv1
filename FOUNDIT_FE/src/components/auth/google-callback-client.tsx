@@ -18,6 +18,10 @@ interface ChooseRoleResponse {
   token: string;
 }
 
+const redirectToWorkspace = (role: AppRole | null) => {
+  window.location.replace(getDefaultRouteForRole(role));
+};
+
 const roleCards: Array<{
   description: string;
   label: string;
@@ -59,7 +63,7 @@ export function GoogleCallbackClient({
       const session = acceptGoogleToken(token);
 
       if (!setupRole && session.user.role) {
-        router.replace(getDefaultRouteForRole(session.user.role));
+        redirectToWorkspace(session.user.role);
         return;
       }
 
@@ -91,7 +95,7 @@ export function GoogleCallbackClient({
       });
 
       const session = acceptGoogleToken(response.token);
-      router.replace(getDefaultRouteForRole(session.user.role));
+      redirectToWorkspace(session.user.role ?? response.role ?? selectedRole);
     } catch (submitError) {
       setError(toErrorMessage(submitError));
       setIsSubmittingRole(false);
@@ -116,9 +120,9 @@ export function GoogleCallbackClient({
 
   return (
     <section className="min-h-screen bg-[#f8f8f8] px-6 py-8 md:px-10 lg:px-16">
-      <div className="mx-auto flex min-h-[calc(100vh-64px)] w-full max-w-5xl items-center justify-center">
-        <div className="grid w-full overflow-hidden rounded-[32px] border border-[#e5e7eb] bg-white shadow-[0_30px_90px_rgba(15,23,42,0.08)] lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="px-6 py-10 sm:px-10 lg:px-12">
+      <div className="mx-auto flex min-h-[calc(100vh-64px)] w-full max-w-7xl items-center justify-center">
+        <div className="grid w-full overflow-hidden rounded-[32px] border border-[#e5e7eb] bg-white shadow-[0_30px_90px_rgba(15,23,42,0.08)] lg:grid-cols-[1.25fr_0.75fr]">
+          <div className="px-6 py-10 sm:px-10 lg:px-14 xl:px-16">
             <span className="inline-flex rounded-full bg-[#eff6ff] px-3 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-[#2563eb]">
               Google Account Setup
             </span>
