@@ -109,7 +109,7 @@ export function GoogleCallbackClient({
   if (isHydrating) {
     return (
       <section className="flex min-h-screen items-center justify-center bg-[#f8f8f8] px-6 py-10">
-        <div className="w-full max-w-xl rounded-[28px] border border-[#e5e7eb] bg-white px-8 py-12 text-center shadow-[0_30px_90px_rgba(15,23,42,0.08)]">
+        <div className="w-full max-w-5xl rounded-[28px] border border-[#e5e7eb] bg-white px-8 py-12 text-center shadow-[0_30px_90px_rgba(15,23,42,0.08)]">
           <div className="mx-auto mb-5 h-12 w-12 animate-spin rounded-full border-4 border-[#dbeafe] border-t-[#2563eb]" />
           <h1 className="text-2xl font-semibold text-[#0f172a]">
             Completing Google sign-in
