@@ -72,6 +72,38 @@ npm run build
 npm run start
 ```
 
+## Google OAuth deployment
+
+To make `Continue with Google` work in production:
+
+1. In Google Cloud Console, create a Web OAuth client.
+2. Add this authorized redirect URI:
+
+```text
+https://founditv1.onrender.com/login/oauth2/code/google
+```
+
+3. In Render backend env vars, set:
+
+```text
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+```
+
+4. In Vercel frontend env vars, set:
+
+```text
+NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=true
+```
+
+5. Redeploy both backend and frontend.
+
+The backend will redirect successful Google logins to:
+
+```text
+https://founditv1.vercel.app/auth/google/callback?token=...
+```
+
 ## Current migration status
 
 The Angular app was replaced with Next and then rebuilt using the old app as the design reference.

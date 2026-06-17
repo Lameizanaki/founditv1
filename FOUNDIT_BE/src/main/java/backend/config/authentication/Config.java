@@ -68,7 +68,8 @@ public class Config {
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authenticationProvider(getAuthenticationProvider())
 				.authorizeHttpRequests(
-					rq -> rq.requestMatchers("/").permitAll()
+						rq -> rq.requestMatchers("/").permitAll()
+							.requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
 							.requestMatchers("/ws/**").permitAll()
 							.requestMatchers(HttpMethod.POST, "/auth/register", "/auth/login", "/auth/send-code", "/auth/reset-password", "/auth/resend-code").permitAll()
 							.requestMatchers(
