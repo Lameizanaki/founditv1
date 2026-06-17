@@ -2,11 +2,13 @@ package backend.controller.authenticaiton;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,7 +44,9 @@ public class ChoosRoleController {
 		
 	    try {
 	        Register user = chooseRoleService.chooseRole(auth.getName(), request.getRole());
-	        var authorities = user.getRole() != null ? user.getRole().getAuthorities() : java.util.List.of();
+	        Collection<? extends GrantedAuthority> authorities = user.getRole() != null
+	        		? user.getRole().getAuthorities()
+	        		: java.util.List.<GrantedAuthority>of();
 	        String token = Jwts.builder()
 	                .setSubject(user.getEmail())
 	                .setIssuedAt(new Date())
