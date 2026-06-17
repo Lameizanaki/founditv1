@@ -1,7 +1,8 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useState } from "react";
+import { CheckCircle2, ClipboardList, CreditCard, LoaderCircle } from "lucide-react";
 import { useApiQuery } from "@/hooks/use-api-query";
 import { asRecord, formatMoney, normalizeStatus, toNumber, toText } from "@/lib/data-utils";
 import type { PaymentTransactionResponse } from "@/types/payment";
@@ -12,15 +13,15 @@ const statusLabel = (value: string) =>
 const statusClass = (value: string) => {
   const status = normalizeStatus(value);
   if (status.includes("accept") || status.includes("progress")) {
-    return "bg-[#eff6ff] text-[#2563eb]";
+    return "bg-blue-50 text-blue-600";
   }
   if (status.includes("complete")) {
-    return "bg-[#dcfce7] text-[#16a34a]";
+    return "bg-green-100 text-green-600";
   }
   if (status.includes("reject") || status.includes("cancel")) {
-    return "bg-[#fee2e2] text-[#ef4444]";
+    return "bg-red-100 text-red-500";
   }
-  return "bg-[#fef3c7] text-[#d97706]";
+  return "bg-amber-100 text-amber-600";
 };
 
 const paymentStatusLabel = (value: string) =>
@@ -29,15 +30,15 @@ const paymentStatusLabel = (value: string) =>
 const paymentStatusClass = (value: string) => {
   const status = normalizeStatus(value);
   if (status.includes("paid")) {
-    return "bg-[#dcfce7] text-[#16a34a]";
+    return "bg-green-100 text-green-600";
   }
   if (status.includes("submitted")) {
-    return "bg-[#fef3c7] text-[#d97706]";
+    return "bg-amber-100 text-amber-600";
   }
   if (status.includes("cancel") || status.includes("fail")) {
-    return "bg-[#fee2e2] text-[#ef4444]";
+    return "bg-red-100 text-red-500";
   }
-  return "bg-[#eef2ff] text-[#2563eb]";
+  return "bg-blue-50 text-blue-600";
 };
 
 export function ClientOrdersClient() {
@@ -112,17 +113,17 @@ export function ClientOrdersClient() {
   );
 
   return (
-    <div className="mx-auto max-w-full bg-[#f8fafc] px-8 pt-12">
+    <div className="mx-auto max-w-full bg-slate-50 px-8 pt-12">
       <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <h1 className="text-[32px] font-semibold text-[#111827]">My Orders</h1>
-          <p className="mt-1 text-sm text-[#6b7280]">
+          <h1 className="text-[32px] font-semibold text-slate-900">My Orders</h1>
+          <p className="mt-1 text-sm text-slate-500">
             Track all your hired projects and freelancer engagements.
           </p>
         </div>
 
         <Link
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-4 py-3 text-sm font-medium text-white transition hover:bg-[#1d4ed8]"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-medium text-white transition hover:bg-blue-700"
           href="/client/browse-gigs"
         >
           Browse Gigs
@@ -131,29 +132,34 @@ export function ClientOrdersClient() {
 
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[
-          { label: "Total Orders", value: orders.length, note: "All time" },
-          { label: "Active", value: orders.filter((order) => order.status.includes("progress")).length, note: "Currently running" },
-          { label: "Completed", value: orders.filter((order) => order.status.includes("complete")).length, note: "Successfully delivered" },
+          { label: "Total Orders", value: orders.length, note: "All time", icon: ClipboardList },
+          { label: "Active", value: orders.filter((order) => order.status.includes("progress")).length, note: "Currently running", icon: LoaderCircle },
+          { label: "Completed", value: orders.filter((order) => order.status.includes("complete")).length, note: "Successfully delivered", icon: CheckCircle2 },
           {
             label: "Total Spent",
             value: formatMoney(totalSpent),
             note: `${submittedTransactions.length} awaiting seller confirmation`,
+            icon: CreditCard,
           },
-        ].map((card) => (
-          <div key={card.label} className="rounded-2xl border border-[#e5e7eb] bg-white p-5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#eef2ff] text-[#2563eb]">
-              •
+        ].map((card) => {
+          const Icon = card.icon;
+
+          return (
+          <div key={card.label} className="rounded-2xl border border-slate-200 bg-white p-5">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+              <Icon className="h-5 w-5" />
             </div>
-            <p className="mt-5 text-3xl font-semibold text-[#111827]">{card.value}</p>
-            <p className="mt-1 text-sm font-medium text-[#111827]">{card.label}</p>
-            <p className="mt-1 text-xs text-[#9ca3af]">{card.note}</p>
+            <p className="mt-5 text-3xl font-semibold text-slate-900">{card.value}</p>
+            <p className="mt-1 text-sm font-medium text-slate-900">{card.label}</p>
+            <p className="mt-1 text-xs text-slate-400">{card.note}</p>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="mt-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <input
-          className="h-11 w-full rounded-xl border border-[#e5e7eb] bg-white px-4 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#2563eb] lg:max-w-xl"
+          className="h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-600 lg:max-w-xl"
           onChange={(event) => setSearchTerm(event.target.value)}
           placeholder="Search by title, freelancer, or category..."
           value={searchTerm}
@@ -165,8 +171,8 @@ export function ClientOrdersClient() {
               key={value}
               className={
                 filter === value
-                  ? "rounded-xl bg-[#2563eb] px-4 py-2.5 text-sm font-medium text-white transition"
-                  : "rounded-xl border border-[#e5e7eb] bg-white px-4 py-2.5 text-sm font-medium text-[#4b5563] transition hover:bg-[#f9fafb]"
+                  ? "rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition"
+                  : "rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
               }
               onClick={() => setFilter(value)}
               type="button"
@@ -183,29 +189,29 @@ export function ClientOrdersClient() {
             {hireRequests.error || projects.error || transactions.error}
           </div>
         ) : hireRequests.isLoading || projects.isLoading || transactions.isLoading ? (
-          <div className="rounded-2xl border border-[#e5e7eb] bg-white p-6 text-sm text-[#6b7280]">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-500">
             Loading your orders...
           </div>
         ) : filteredOrders.length ? (
           filteredOrders.map((order) => (
             <div
               key={order.id}
-              className="rounded-2xl border border-[#e5e7eb] bg-white p-5 transition hover:shadow-sm"
+              className="rounded-2xl border border-slate-200 bg-white p-5 transition hover:shadow-sm"
             >
               <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
                 <div className="flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-lg font-semibold text-[#111827]">{order.title}</h3>
+                    <h3 className="text-lg font-semibold text-slate-900">{order.title}</h3>
                     <span className={`rounded-full px-3 py-1 text-xs font-medium ${statusClass(order.status)}`}>
                       {statusLabel(order.status)}
                     </span>
                   </div>
 
-                  <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-[#6b7280]">
+                  <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-slate-500">
                     <span>{order.freelancerName}</span>
                     <span>Due {order.dueDate}</span>
                     <span>{formatMoney(order.price)}</span>
-                    <span className="rounded-md bg-[#f3f4f6] px-2 py-1 text-[10px] font-medium text-[#6b7280]">
+                    <span className="rounded-md bg-slate-100 px-2 py-1 text-[10px] font-medium text-slate-500">
                       {order.category}
                     </span>
                   </div>
@@ -216,10 +222,10 @@ export function ClientOrdersClient() {
                         Payment {paymentStatusLabel(order.paymentStatus)}
                       </span>
                       {order.paymentTranId ? (
-                        <span className="text-[#6b7280]">Transaction {order.paymentTranId}</span>
+                        <span className="text-slate-500">Transaction {order.paymentTranId}</span>
                       ) : null}
                       {order.paymentSubmittedAt ? (
-                        <span className="text-[#6b7280]">Updated {order.paymentSubmittedAt}</span>
+                        <span className="text-slate-500">Updated {order.paymentSubmittedAt}</span>
                       ) : null}
                     </div>
                   ) : order.status.includes("deliver") ? (
@@ -236,7 +242,7 @@ export function ClientOrdersClient() {
                 <div className="flex shrink-0 flex-col gap-3 xl:w-[190px]">
                   {order.projectId ? (
                     <Link
-                      className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#d1d5db] bg-white px-4 py-2.5 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+                      className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
                       href={`/client/my-orders/${order.projectId}`}
                     >
                       View Details
@@ -247,8 +253,8 @@ export function ClientOrdersClient() {
                     <Link
                       className={
                         order.paymentStatus
-                          ? "inline-flex items-center justify-center gap-2 rounded-xl border border-[#d1d5db] bg-white px-4 py-2.5 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
-                          : "inline-flex items-center justify-center gap-2 rounded-xl bg-[#16a34a] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#15803d]"
+                          ? "inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                          : "inline-flex items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700"
                       }
                       href={`/client/browse-gigs/gig/${order.gigId}/confirm-order?mode=pay&projectId=${order.projectId}${order.roomId ? `&roomId=${order.roomId}` : ""}`}
                     >
@@ -262,14 +268,14 @@ export function ClientOrdersClient() {
 
                   {order.roomId ? (
                     <Link
-                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#1d4ed8]"
+                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700"
                       href={`/client/${order.roomId}/chat`}
                     >
                       Open Chat
                     </Link>
                   ) : (
                     <button
-                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-4 py-2.5 text-sm font-medium text-white opacity-70"
+                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white opacity-70"
                       disabled
                       type="button"
                     >
@@ -281,9 +287,9 @@ export function ClientOrdersClient() {
             </div>
           ))
         ) : (
-          <div className="rounded-2xl border border-dashed border-[#d1d5db] bg-white p-10 text-center">
-            <h3 className="text-lg font-semibold text-[#111827]">No orders found</h3>
-            <p className="mt-2 text-sm text-[#6b7280]">
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
+            <h3 className="text-lg font-semibold text-slate-900">No orders found</h3>
+            <p className="mt-2 text-sm text-slate-500">
               Try changing the filter or searching with another keyword.
             </p>
           </div>

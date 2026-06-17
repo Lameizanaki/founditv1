@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f6efe6;
-  --foreground: #1f1711;
-  --surface: rgba(255, 249, 241, 0.78);
-  --surface-strong: rgba(255, 253, 249, 0.92);
-  --border: rgba(111, 74, 42, 0.16);
-  --muted: #6f6156;
-  --accent: #c85f34;
-  --accent-strong: #9f3f18;
-  --accent-soft: #f4d5b3;
-  --success: #2d7a58;
-  --warning: #a15a17;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --surface: rgba(255, 255, 255, 0.86);
+  --surface-strong: rgba(255, 255, 255, 0.96);
+  --border: rgba(148, 163, 184, 0.28);
+  --muted: #64748b;
+  --accent: #16a34a;
+  --accent-strong: #15803d;
+  --accent-soft: #dcfce7;
+  --success: #16a34a;
+  --warning: #d97706;
 }
 
 @theme inline {
@@ -26,10 +26,7 @@
 }
 
 html {
-  background:
-    radial-gradient(circle at top left, rgba(255, 214, 153, 0.6), transparent 28%),
-    radial-gradient(circle at top right, rgba(210, 103, 50, 0.18), transparent 24%),
-    linear-gradient(180deg, #fbf4ea 0%, #f3eadf 46%, #efe4d6 100%);
+  background: #f8fafc;
 }
 
 body {
@@ -40,11 +37,10 @@ body {
 }
 
 a {
-  color: inherit;
   text-decoration: none;
 }
 
 ::selection {
-  color: #fff8f2;
-  background: rgba(159, 63, 24, 0.8);
+  color: #f8fafc;
+  background: rgba(22, 163, 74, 0.8);
 }

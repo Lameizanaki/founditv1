@@ -1,7 +1,8 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useMemo } from "react";
+import { CheckCircle2 } from "lucide-react";
 import { useApiQuery } from "@/hooks/use-api-query";
 import { asRecord, formatDate, formatMoney, normalizeStatus, toNumber, toText } from "@/lib/data-utils";
 import type { ConversationResponse } from "@/types/chat";
@@ -16,23 +17,23 @@ type TimelineItem = {
 };
 
 const toneClass: Record<TimelineItem["tone"], string> = {
-  good: "bg-[#dcfce7] text-[#16a34a]",
-  neutral: "bg-[#eef2ff] text-[#2563eb]",
-  warn: "bg-[#fef3c7] text-[#d97706]",
+  good: "bg-green-100 text-green-600",
+  neutral: "bg-blue-50 text-blue-600",
+  warn: "bg-amber-100 text-amber-600",
 };
 
 const paymentStatusClass = (value: string) => {
   const status = normalizeStatus(value);
   if (status.includes("paid")) {
-    return "bg-[#dcfce7] text-[#16a34a]";
+    return "bg-green-100 text-green-600";
   }
   if (status.includes("submitted")) {
-    return "bg-[#fef3c7] text-[#d97706]";
+    return "bg-amber-100 text-amber-600";
   }
   if (status.includes("cancel") || status.includes("fail")) {
-    return "bg-[#fee2e2] text-[#ef4444]";
+    return "bg-red-100 text-red-500";
   }
-  return "bg-[#eef2ff] text-[#2563eb]";
+  return "bg-blue-50 text-blue-600";
 };
 
 export function ClientOrderDetailClient({ projectId }: { projectId: string }) {
@@ -188,14 +189,14 @@ export function ClientOrderDetailClient({ projectId }: { projectId: string }) {
 
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-8 md:px-6">
-      <Link className="inline-flex text-sm font-medium text-[#6b7280] transition hover:text-[#111827]" href="/client/my-orders">
+      <Link className="inline-flex text-sm font-medium text-slate-500 transition hover:text-slate-900" href="/client/my-orders">
         Back to Orders
       </Link>
 
       <div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <h1 className="text-[32px] font-semibold text-[#111827]">{orderTitle}</h1>
-          <p className="mt-2 text-sm text-[#6b7280]">
+          <h1 className="text-[32px] font-semibold text-slate-900">{orderTitle}</h1>
+          <p className="mt-2 text-sm text-slate-500">
             Track request, delivery, revision, and payment activity in one place.
           </p>
         </div>
@@ -203,7 +204,7 @@ export function ClientOrderDetailClient({ projectId }: { projectId: string }) {
         <div className="flex flex-wrap gap-3">
           {conversation?.roomId ? (
             <Link
-              className="inline-flex items-center justify-center rounded-xl bg-[#2563eb] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1d4ed8]"
+              className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
               href={`/client/${conversation.roomId}/chat`}
             >
               Open Chat
@@ -211,7 +212,7 @@ export function ClientOrderDetailClient({ projectId }: { projectId: string }) {
           ) : null}
           {confirmOrderHref ? (
             <Link
-              className="inline-flex items-center justify-center rounded-xl border border-[#d1d5db] bg-white px-4 py-2.5 text-sm font-semibold text-[#2563eb] transition hover:bg-[#eff6ff]"
+              className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-blue-600 transition hover:bg-blue-50"
               href={confirmOrderHref}
             >
               {paymentStatus ? "View Payment" : "Submit Payment"}
@@ -227,63 +228,63 @@ export function ClientOrderDetailClient({ projectId }: { projectId: string }) {
       ) : null}
 
       {isLoading ? (
-        <div className="mt-6 rounded-2xl border border-[#e5e7eb] bg-white p-6 text-sm text-[#6b7280]">
+        <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-500">
           Loading order detail...
         </div>
       ) : !hireRequest && !project ? (
-        <div className="mt-6 rounded-2xl border border-dashed border-[#d1d5db] bg-white p-8 text-center">
-          <h2 className="text-lg font-semibold text-[#111827]">Order not found</h2>
-          <p className="mt-2 text-sm text-[#6b7280]">
+        <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">
+          <h2 className="text-lg font-semibold text-slate-900">Order not found</h2>
+          <p className="mt-2 text-sm text-slate-500">
             This order is not available in your current account history.
           </p>
         </div>
       ) : (
         <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[1.3fr_0.7fr]">
-          <section className="rounded-2xl border border-[#e5e7eb] bg-white p-6">
-            <h2 className="text-lg font-semibold text-[#111827]">Timeline</h2>
+          <section className="rounded-2xl border border-slate-200 bg-white p-6">
+            <h2 className="text-lg font-semibold text-slate-900">Timeline</h2>
             <div className="mt-5 space-y-4">
               {timeline.length ? (
                 timeline.map((item) => (
-                  <div key={item.id} className="flex gap-4 rounded-2xl border border-[#eef2f7] p-4">
+                  <div key={item.id} className="flex gap-4 rounded-2xl border border-slate-100 p-4">
                     <div className={`mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold ${toneClass[item.tone]}`}>
-                      •
+                      <CheckCircle2 className="h-4 w-4" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-[#111827]">{item.label}</p>
-                      <p className="mt-1 text-sm text-[#4b5563]">{item.detail}</p>
-                      <p className="mt-2 text-xs text-[#9ca3af]">
+                      <p className="text-sm font-semibold text-slate-900">{item.label}</p>
+                      <p className="mt-1 text-sm text-slate-600">{item.detail}</p>
+                      <p className="mt-2 text-xs text-slate-400">
                         {item.date ? formatDate(item.date, "Recently") : "Time not recorded"}
                       </p>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-[#6b7280]">No timeline events are available yet.</p>
+                <p className="text-sm text-slate-500">No timeline events are available yet.</p>
               )}
             </div>
           </section>
 
           <aside className="space-y-6">
-            <section className="rounded-2xl border border-[#e5e7eb] bg-white p-6">
-              <h2 className="text-lg font-semibold text-[#111827]">Overview</h2>
-              <div className="mt-4 space-y-3 text-sm text-[#4b5563]">
+            <section className="rounded-2xl border border-slate-200 bg-white p-6">
+              <h2 className="text-lg font-semibold text-slate-900">Overview</h2>
+              <div className="mt-4 space-y-3 text-sm text-slate-600">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#9ca3af]">Freelancer</p>
-                  <p className="mt-1 font-medium text-[#111827]">{freelancerName}</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">Freelancer</p>
+                  <p className="mt-1 font-medium text-slate-900">{freelancerName}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#9ca3af]">Project Status</p>
-                  <p className="mt-1 font-medium text-[#111827]">{projectStatus.replace(/_/g, " ")}</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">Project Status</p>
+                  <p className="mt-1 font-medium text-slate-900">{projectStatus.replace(/_/g, " ")}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#9ca3af]">Deadline</p>
-                  <p className="mt-1 font-medium text-[#111827]">
+                  <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">Deadline</p>
+                  <p className="mt-1 font-medium text-slate-900">
                     {formatDate(project?.deadline ?? hireRequest?.deadline, "No deadline")}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#9ca3af]">Budget</p>
-                  <p className="mt-1 font-medium text-[#111827]">
+                  <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">Budget</p>
+                  <p className="mt-1 font-medium text-slate-900">
                     {formatMoney(
                       toNumber(project?.agreedPrice ?? hireRequest?.projectAgreedPrice ?? hireRequest?.agreedPrice, 0),
                     )}
@@ -292,24 +293,24 @@ export function ClientOrderDetailClient({ projectId }: { projectId: string }) {
               </div>
             </section>
 
-            <section className="rounded-2xl border border-[#e5e7eb] bg-white p-6">
-              <h2 className="text-lg font-semibold text-[#111827]">Payment</h2>
-              <div className="mt-4 space-y-3 text-sm text-[#4b5563]">
+            <section className="rounded-2xl border border-slate-200 bg-white p-6">
+              <h2 className="text-lg font-semibold text-slate-900">Payment</h2>
+              <div className="mt-4 space-y-3 text-sm text-slate-600">
                 {transaction ? (
                   <>
                     <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${paymentStatusClass(paymentStatus)}`}>
                       {paymentStatus.replace(/_/g, " ")}
                     </span>
-                    <p>Transaction ID: <span className="font-medium text-[#111827]">{transaction.tranId || "Pending"}</span></p>
-                    <p>Amount: <span className="font-medium text-[#111827]">{formatMoney(toNumber(transaction.amount, 0))}</span></p>
+                    <p>Transaction ID: <span className="font-medium text-slate-900">{transaction.tranId || "Pending"}</span></p>
+                    <p>Amount: <span className="font-medium text-slate-900">{formatMoney(toNumber(transaction.amount, 0))}</span></p>
                     {transaction.proofReference ? (
-                      <p>Proof reference: <span className="font-medium text-[#111827]">{transaction.proofReference}</span></p>
+                      <p>Proof reference: <span className="font-medium text-slate-900">{transaction.proofReference}</span></p>
                     ) : null}
                     {transaction.submittedAt ? (
-                      <p>Submitted: <span className="font-medium text-[#111827]">{formatDate(transaction.submittedAt, "Recently")}</span></p>
+                      <p>Submitted: <span className="font-medium text-slate-900">{formatDate(transaction.submittedAt, "Recently")}</span></p>
                     ) : null}
                     {transaction.paidAt ? (
-                      <p>Confirmed: <span className="font-medium text-[#111827]">{formatDate(transaction.paidAt, "Recently")}</span></p>
+                      <p>Confirmed: <span className="font-medium text-slate-900">{formatDate(transaction.paidAt, "Recently")}</span></p>
                     ) : null}
                   </>
                 ) : (
@@ -318,19 +319,19 @@ export function ClientOrderDetailClient({ projectId }: { projectId: string }) {
               </div>
             </section>
 
-            <section className="rounded-2xl border border-[#e5e7eb] bg-white p-6">
-              <h2 className="text-lg font-semibold text-[#111827]">Project Details</h2>
-              <div className="mt-4 space-y-3 text-sm text-[#4b5563]">
+            <section className="rounded-2xl border border-slate-200 bg-white p-6">
+              <h2 className="text-lg font-semibold text-slate-900">Project Details</h2>
+              <div className="mt-4 space-y-3 text-sm text-slate-600">
                 <p>{toText(project?.requirements ?? hireRequest?.requirements, "No requirements saved yet.")}</p>
                 {toText(project?.deliveryMessage, "") ? (
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#9ca3af]">Delivery Note</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">Delivery Note</p>
                     <p className="mt-1">{toText(project?.deliveryMessage, "")}</p>
                   </div>
                 ) : null}
                 {toText(project?.revisionMessage, "") ? (
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#9ca3af]">Revision Note</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">Revision Note</p>
                     <p className="mt-1">{toText(project?.revisionMessage, "")}</p>
                   </div>
                 ) : null}

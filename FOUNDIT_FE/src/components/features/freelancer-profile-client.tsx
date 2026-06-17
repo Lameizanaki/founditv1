@@ -117,7 +117,7 @@ export function FreelancerProfileClient() {
       <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
         <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex flex-col gap-6 md:flex-row">
-            <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border border-[#e5e7eb] bg-[#eef2ff] text-2xl font-semibold text-[#2563eb]">
+            <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-blue-50 text-2xl font-semibold text-blue-600">
               {avatar ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img alt={effective.freelancerName} className="h-full w-full object-cover" src={avatar} />

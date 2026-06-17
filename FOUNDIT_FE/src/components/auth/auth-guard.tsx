@@ -35,7 +35,7 @@ export function AuthGuard({
   if (status === "loading") {
     return (
       <div className="flex min-h-screen items-center justify-center px-6">
-        <div className="rounded-[28px] border border-[var(--border)] bg-[var(--surface-strong)] px-8 py-6 text-sm text-[var(--muted)] shadow-[0_18px_60px_rgba(67,38,18,0.12)] backdrop-blur">
+        <div className="rounded-[28px] border border-slate-200 bg-white/95 px-8 py-6 text-sm text-slate-500 shadow-[0_18px_60px_rgba(67,38,18,0.12)] backdrop-blur">
           Restoring your session...
         </div>
       </div>
@@ -48,7 +48,7 @@ export function AuthGuard({
   ) {
     return (
       <div className="flex min-h-screen items-center justify-center px-6">
-        <div className="rounded-[28px] border border-[var(--border)] bg-[var(--surface-strong)] px-8 py-6 text-sm text-[var(--muted)] shadow-[0_18px_60px_rgba(67,38,18,0.12)] backdrop-blur">
+        <div className="rounded-[28px] border border-slate-200 bg-white/95 px-8 py-6 text-sm text-slate-500 shadow-[0_18px_60px_rgba(67,38,18,0.12)] backdrop-blur">
           Redirecting to the correct workspace...
         </div>
       </div>

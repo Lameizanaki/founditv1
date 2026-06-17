@@ -1,8 +1,22 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
+import {
+  BriefcaseBusiness,
+  ClipboardList,
+  LayoutDashboard,
+  Menu,
+  MessageSquare,
+  Search,
+  Settings,
+  ShieldCheck,
+  Users,
+  X,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { useAuth } from "@/components/providers/auth-provider";
 import { useChatNotifications } from "@/components/providers/chat-notification-provider";
@@ -29,9 +43,23 @@ const matchesNavItem = (pathname: string, href: string) => {
 };
 
 const roleAccentMap: Record<AppRole, string> = {
-  CLIENT: "text-[#2563eb]",
-  FREELANCER: "text-[#2563eb]",
-  ADMIN: "text-[#2563eb]",
+  CLIENT: "text-green-700",
+  FREELANCER: "text-green-700",
+  ADMIN: "text-blue-700",
+};
+
+const navIconMap: Record<string, LucideIcon> = {
+  Dashboard: LayoutDashboard,
+  "Find Freelancers": Users,
+  "Browse Gigs": Search,
+  "My Orders": ClipboardList,
+  "My Work": BriefcaseBusiness,
+  "My Services": BriefcaseBusiness,
+  "Incoming Requests": ClipboardList,
+  Chat: MessageSquare,
+  Reports: ShieldCheck,
+  Settings,
+  Users,
 };
 
 export function DashboardShell({
@@ -46,14 +74,14 @@ export function DashboardShell({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const router = useRouter();
-  const { session, signOut } = useAuth();
+  const { session } = useAuth();
   const { unreadCount } = useChatNotifications();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <AuthGuard requiredRole={role}>
-      <div className="min-h-screen w-full bg-[#f6f7f9]">
-        <header className="sticky top-0 z-50 border-b border-b-gray-300 bg-white">
+      <div className="min-h-screen w-full bg-slate-50">
+        <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
           <div className="mx-auto flex h-16 w-full max-w-[1600px] items-center justify-between px-6 py-4 lg:px-10">
             <div className="flex items-center gap-8">
               <Link className="flex h-16 w-32 items-center" href="/">
@@ -70,20 +98,22 @@ export function DashboardShell({
               <nav className="hidden items-center gap-2 lg:flex">
                 {navItems.map((item) => {
                   const isActive = matchesNavItem(pathname, item.href);
+                  const Icon = navIconMap[item.label] ?? LayoutDashboard;
                   return (
                     <Link
                       key={item.href}
                       className={
                         isActive
-                          ? `inline-flex items-center gap-2 rounded-xl bg-[#eef2ff] px-4 py-3 text-[15px] font-medium ${roleAccentMap[role]}`
-                          : "inline-flex items-center gap-2 rounded-xl px-4 py-3 text-[15px] font-medium text-[#4b5563] transition hover:bg-[#f9fafb]"
+                          ? `inline-flex items-center gap-2 rounded-xl bg-green-50 px-3.5 py-2.5 text-sm font-semibold ${roleAccentMap[role]}`
+                          : "inline-flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
                       }
                       href={item.href}
                     >
+                      <Icon className="h-4 w-4" />
                       <span className="relative inline-flex items-center gap-2">
                         {item.label}
                         {item.href.endsWith("/chat") && unreadCount > 0 ? (
-                          <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-[#dc2626] px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white">
+                          <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white">
                             {unreadCount > 99 ? "99+" : unreadCount}
                           </span>
                         ) : null}
@@ -96,31 +126,57 @@ export function DashboardShell({
 
             <div className="flex items-center gap-4">
               <div className="hidden text-right sm:block">
-                <p className="text-[15px] font-semibold leading-5 text-[#111827]">
+                <p className="text-[15px] font-semibold leading-5 text-slate-900">
                   {session?.user.email ?? "Unknown user"}
                 </p>
-                <p className="text-sm leading-5 text-[#6b7280]">{roleLabel(role)}</p>
+                <p className="text-sm leading-5 text-slate-500">{roleLabel(role)}</p>
               </div>
 
               <button
-                className="rounded-xl border border-transparent px-4 py-2 text-sm font-medium text-[#374151] transition hover:border-gray-200 hover:bg-[#f9fafb]"
-                onClick={() => router.push("/")}
+                aria-expanded={isMenuOpen}
+                aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-50 lg:hidden"
+                onClick={() => setIsMenuOpen((value) => !value)}
                 type="button"
               >
-                Home
-              </button>
-              <button
-                className="rounded-xl bg-[#111827] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#0b1220]"
-                onClick={() => {
-                  signOut();
-                  router.push("/");
-                }}
-                type="button"
-              >
-                Logout
+                {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </button>
             </div>
           </div>
+
+          {isMenuOpen ? (
+            <div className="border-t border-slate-200 bg-white px-4 py-3 shadow-sm lg:hidden">
+              <div className="mx-auto grid w-full max-w-[1600px] gap-2 sm:grid-cols-2">
+                {navItems.map((item) => {
+                  const isActive = matchesNavItem(pathname, item.href);
+                  const Icon = navIconMap[item.label] ?? LayoutDashboard;
+
+                  return (
+                    <Link
+                      key={item.href}
+                      className={
+                        isActive
+                          ? `inline-flex items-center gap-2 rounded-xl bg-green-50 px-3.5 py-2.5 text-sm font-semibold ${roleAccentMap[role]}`
+                          : "inline-flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                      }
+                      href={item.href}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span className="relative inline-flex items-center gap-2">
+                        {item.label}
+                        {item.href.endsWith("/chat") && unreadCount > 0 ? (
+                          <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white">
+                            {unreadCount > 99 ? "99+" : unreadCount}
+                          </span>
+                        ) : null}
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
         </header>
 
         <main className="mt-6">{children}</main>

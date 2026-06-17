@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useState } from "react";
@@ -85,10 +85,10 @@ export function BrowseGigsClient({ mode, basePath }: BrowseGigsClientProps) {
   const paginatedGigs = filteredGigs.slice((safePage - 1) * itemsPerPage, safePage * itemsPerPage);
 
   const content = (
-    <div className="overflow-y-auto bg-[#f6f7f9] px-4 py-8 md:px-8">
+    <div className="overflow-y-auto bg-slate-50 px-4 py-8 md:px-8">
       <div className="mb-6">
-        <h1 className="text-[32px] font-semibold leading-tight text-[#111827]">Browse Gigs</h1>
-        <p className="mt-1 text-[14px] text-[#6b7280]">
+        <h1 className="text-[32px] font-semibold leading-tight text-slate-900">Browse Gigs</h1>
+        <p className="mt-1 text-[14px] text-slate-500">
           Discover services from talented freelancers.
         </p>
       </div>
@@ -100,8 +100,8 @@ export function BrowseGigsClient({ mode, basePath }: BrowseGigsClientProps) {
               key={category}
               className={
                 selectedCategory === category
-                  ? "rounded-full border border-[#2563eb] bg-[#2563eb] px-4 py-2 text-[12px] font-medium text-white"
-                  : "rounded-full border border-[#e5e7eb] bg-white px-4 py-2 text-[12px] font-medium text-[#374151] transition hover:bg-gray-50"
+                  ? "rounded-full border border-blue-600 bg-blue-600 px-4 py-2 text-[12px] font-medium text-white"
+                  : "rounded-full border border-slate-200 bg-white px-4 py-2 text-[12px] font-medium text-slate-700 transition hover:bg-gray-50"
               }
               onClick={() => {
                 setSelectedCategory(category);
@@ -115,7 +115,7 @@ export function BrowseGigsClient({ mode, basePath }: BrowseGigsClientProps) {
         </div>
 
         <input
-          className="w-full rounded-lg border border-[#e5e7eb] bg-white px-4 py-2.5 text-sm outline-none xl:w-72"
+          className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none xl:w-72"
           onChange={(event) => {
             setSearchTerm(event.target.value);
             setCurrentPage(1);
@@ -125,16 +125,16 @@ export function BrowseGigsClient({ mode, basePath }: BrowseGigsClientProps) {
         />
       </div>
 
-      <div className="mb-4 text-[13px] text-[#6b7280]">
+      <div className="mb-4 text-[13px] text-slate-500">
         Showing {filteredGigs.length} results
       </div>
 
       {isLoading ? (
-        <div className="rounded-xl border border-[#e5e7eb] bg-white p-5 text-sm text-[#6b7280]">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 text-sm text-slate-500">
           Loading gigs...
         </div>
       ) : error ? (
-        <div className="rounded-xl border border-[#fecaca] bg-[#fef2f2] p-5 text-sm text-[#b91c1c]">
+        <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">
           {error}
         </div>
       ) : null}
@@ -143,13 +143,13 @@ export function BrowseGigsClient({ mode, basePath }: BrowseGigsClientProps) {
         {paginatedGigs.map((gig) => (
           <Link
             key={gig.id}
-            className="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white transition hover:shadow-md"
+            className="overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:shadow-md"
             href={`${basePath}/${gig.id}`}
           >
             <div className="relative h-52 w-full overflow-hidden bg-gray-100">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img alt={gig.title} className="h-full w-full object-cover" src={gig.image} />
-              <span className="absolute left-3 top-3 rounded-full bg-white px-2.5 py-1 text-[11px] font-medium text-[#374151] shadow-sm">
+              <span className="absolute left-3 top-3 rounded-full bg-white px-2.5 py-1 text-[11px] font-medium text-slate-700 shadow-sm">
                 {gig.category}
               </span>
             </div>
@@ -157,7 +157,7 @@ export function BrowseGigsClient({ mode, basePath }: BrowseGigsClientProps) {
             <div className="p-4">
               <div className="mb-3 flex items-center gap-2">
                 {gig.sellerAvatar ? (
-                  <div className="h-7 w-7 overflow-hidden rounded-full border border-[#e5e7eb] bg-gray-100">
+                  <div className="h-7 w-7 overflow-hidden rounded-full border border-slate-200 bg-gray-100">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       alt={gig.seller}
@@ -166,27 +166,27 @@ export function BrowseGigsClient({ mode, basePath }: BrowseGigsClientProps) {
                     />
                   </div>
                 ) : (
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#eef2ff] text-[11px] font-semibold text-[#2563eb]">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-50 text-[11px] font-semibold text-blue-600">
                     {getInitials(gig.seller)}
                   </div>
                 )}
-                <span className="text-[12px] text-[#4b5563]">{gig.seller}</span>
+                <span className="text-[12px] text-slate-600">{gig.seller}</span>
               </div>
 
-              <h3 className="mb-3 line-clamp-2 min-h-11 text-[14px] font-medium leading-6 text-[#111827]">
+              <h3 className="mb-3 line-clamp-2 min-h-11 text-[14px] font-medium leading-6 text-slate-900">
                 {gig.title}
               </h3>
 
-              <div className="mb-4 flex items-center gap-1 text-[13px] text-[#6b7280]">
-                <span className="font-medium text-[#111827]">{gig.rating.toFixed(1)}</span>
+              <div className="mb-4 flex items-center gap-1 text-[13px] text-slate-500">
+                <span className="font-medium text-slate-900">{gig.rating.toFixed(1)}</span>
                 <span>({gig.reviews})</span>
               </div>
 
-              <div className="flex items-center justify-between border-t border-[#f0f0f0] pt-3">
-                <div className="text-[12px] text-[#6b7280]">{gig.delivery}</div>
+              <div className="flex items-center justify-between border-t border-slate-200 pt-3">
+                <div className="text-[12px] text-slate-500">{gig.delivery}</div>
                 <div className="text-right">
-                  <p className="text-[11px] text-[#9ca3af]">Starting at</p>
-                  <p className="text-[20px] font-semibold text-[#111827]">${gig.price}</p>
+                  <p className="text-[11px] text-slate-400">Starting at</p>
+                  <p className="text-[20px] font-semibold text-slate-900">${gig.price}</p>
                 </div>
               </div>
             </div>
@@ -195,7 +195,7 @@ export function BrowseGigsClient({ mode, basePath }: BrowseGigsClientProps) {
       </div>
 
       {!isLoading && !error && !filteredGigs.length ? (
-        <div className="mt-6 rounded-xl border border-[#e5e7eb] bg-white p-5 text-sm text-[#6b7280]">
+        <div className="mt-6 rounded-xl border border-slate-200 bg-white p-5 text-sm text-slate-500">
           No gigs found.
         </div>
       ) : null}
@@ -203,7 +203,7 @@ export function BrowseGigsClient({ mode, basePath }: BrowseGigsClientProps) {
       {totalPages > 1 ? (
         <div className="mt-12 flex items-center justify-center gap-2">
           <button
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#e5e7eb] bg-white text-sm text-[#374151] transition hover:bg-gray-50 disabled:opacity-50"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm text-slate-700 transition hover:bg-gray-50 disabled:opacity-50"
             disabled={safePage === 1}
             onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
             type="button"
@@ -215,8 +215,8 @@ export function BrowseGigsClient({ mode, basePath }: BrowseGigsClientProps) {
               key={page}
               className={
                 page === safePage
-                  ? "flex h-9 w-9 items-center justify-center rounded-lg border border-[#2563eb] bg-[#2563eb] text-sm text-white"
-                  : "flex h-9 w-9 items-center justify-center rounded-lg border border-[#e5e7eb] bg-white text-sm text-[#374151] transition hover:bg-gray-50"
+                  ? "flex h-9 w-9 items-center justify-center rounded-lg border border-blue-600 bg-blue-600 text-sm text-white"
+                  : "flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm text-slate-700 transition hover:bg-gray-50"
               }
               onClick={() => setCurrentPage(page)}
               type="button"
@@ -225,7 +225,7 @@ export function BrowseGigsClient({ mode, basePath }: BrowseGigsClientProps) {
             </button>
           ))}
           <button
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#e5e7eb] bg-white text-sm text-[#374151] transition hover:bg-gray-50 disabled:opacity-50"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm text-slate-700 transition hover:bg-gray-50 disabled:opacity-50"
             disabled={safePage === totalPages}
             onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
             type="button"
@@ -239,7 +239,7 @@ export function BrowseGigsClient({ mode, basePath }: BrowseGigsClientProps) {
 
   if (mode === "public") {
     return (
-      <div className="w-full bg-[#f6f7f9]">
+      <div className="w-full bg-slate-50">
         <PublicHeader />
         {content}
         <PublicFooter />
@@ -247,5 +247,5 @@ export function BrowseGigsClient({ mode, basePath }: BrowseGigsClientProps) {
     );
   }
 
-  return <div className="w-full bg-[#f6f7f9] px-8 py-8">{content}</div>;
+  return <div className="w-full bg-slate-50 px-8 py-8">{content}</div>;
 }

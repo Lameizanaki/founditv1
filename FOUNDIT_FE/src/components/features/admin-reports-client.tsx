@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/providers/auth-provider";
@@ -105,16 +105,16 @@ export function AdminReportsClient() {
 
   return (
     <div className="mx-auto w-full max-w-[1600px] space-y-6 px-4 pb-8 md:px-6 lg:px-10">
-      <div className="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <h1 className="text-[28px] font-semibold text-[#222]">Reports</h1>
-            <p className="mt-2 text-[15px] text-[#6b7280]">
+            <h1 className="text-[28px] font-semibold text-slate-900">Reports</h1>
+            <p className="mt-2 text-[15px] text-slate-500">
               Review account reports, leave admin notes, and close moderation requests.
             </p>
           </div>
           <button
-            className="rounded-xl border border-[#d1d5db] bg-white px-4 py-2.5 text-sm font-semibold text-[#111827] transition hover:bg-[#f9fafb]"
+            className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
             onClick={() => void loadReports()}
             type="button"
           >
@@ -124,33 +124,33 @@ export function AdminReportsClient() {
       </div>
 
       {error ? (
-        <div className="rounded-lg border border-[#fed7aa] bg-[#fff7ed] p-4 text-sm text-[#9a3412]">
+        <div className="rounded-lg border border-orange-200 bg-orange-50 p-4 text-sm text-orange-800">
           {error}
         </div>
       ) : null}
       {message ? (
-        <div className="rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] p-4 text-sm text-[#166534]">
+        <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">
           {message}
         </div>
       ) : null}
 
       <div className="grid gap-5 md:grid-cols-3">
         {[
-          ["Pending", counts.pending, "bg-[#fff7ed] text-[#c2410c]"],
-          ["Reviewed", counts.reviewed, "bg-[#eef2ff] text-[#4338ca]"],
-          ["Resolved", counts.resolved, "bg-[#ecfdf5] text-[#166534]"],
+          ["Pending", counts.pending, "bg-orange-50 text-orange-700"],
+          ["Reviewed", counts.reviewed, "bg-blue-50 text-indigo-700"],
+          ["Resolved", counts.resolved, "bg-emerald-50 text-green-800"],
         ].map(([label, value, tone]) => (
-          <div key={label} className="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-sm">
+          <div key={label} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div className={`inline-flex rounded-xl px-3 py-2 text-sm font-semibold ${tone}`}>{label}</div>
-            <p className="mt-5 text-3xl font-semibold text-[#111827]">{value}</p>
+            <p className="mt-5 text-3xl font-semibold text-slate-900">{value}</p>
           </div>
         ))}
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-        <section className="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-sm">
-          <div className="border-b border-[#e5e7eb] px-5 py-4">
-            <h2 className="text-lg font-semibold text-[#111827]">Report Queue</h2>
+        <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="border-b border-slate-200 px-5 py-4">
+            <h2 className="text-lg font-semibold text-slate-900">Report Queue</h2>
           </div>
           <div className="max-h-[680px] overflow-y-auto">
             {reports.map((report) => (
@@ -158,8 +158,8 @@ export function AdminReportsClient() {
                 key={report.id}
                 className={
                   selectedId === report.id
-                    ? "w-full border-b border-[#e5e7eb] bg-[#f8fafc] px-5 py-4 text-left"
-                    : "w-full border-b border-[#e5e7eb] px-5 py-4 text-left transition hover:bg-[#f9fafb]"
+                    ? "w-full border-b border-slate-200 bg-slate-50 px-5 py-4 text-left"
+                    : "w-full border-b border-slate-200 px-5 py-4 text-left transition hover:bg-slate-50"
                 }
                 onClick={() => {
                   setSelectedId(report.id);
@@ -169,48 +169,48 @@ export function AdminReportsClient() {
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="text-sm font-semibold text-[#111827]">
+                    <p className="text-sm font-semibold text-slate-900">
                       {toText(report.subject, "Suspended account review request")}
                     </p>
-                    <p className="mt-1 text-xs text-[#6b7280]">
-                      {toText(report.username, "Unknown user")} · {toText(report.email, "No email")}
+                    <p className="mt-1 text-xs text-slate-500">
+                      {toText(report.username, "Unknown user")} / {toText(report.email, "No email")}
                     </p>
                   </div>
                   <span
                     className={`rounded-full px-2.5 py-1 text-xs font-medium ${
                       report.status === "PENDING"
-                        ? "bg-[#fff7ed] text-[#c2410c]"
+                        ? "bg-orange-50 text-orange-700"
                         : report.status === "RESOLVED"
-                          ? "bg-[#ecfdf5] text-[#166534]"
+                          ? "bg-emerald-50 text-green-800"
                           : report.status === "DISMISSED"
-                            ? "bg-[#fef2f2] text-[#b91c1c]"
-                            : "bg-[#eef2ff] text-[#4338ca]"
+                            ? "bg-red-50 text-red-700"
+                            : "bg-blue-50 text-indigo-700"
                     }`}
                   >
                     {report.status}
                   </span>
                 </div>
-                <p className="mt-3 line-clamp-2 text-sm text-[#4b5563]">{toText(report.message, "No message")}</p>
-                <p className="mt-3 text-xs text-[#9ca3af]">{formatDate(report.createdAt)}</p>
+                <p className="mt-3 line-clamp-2 text-sm text-slate-600">{toText(report.message, "No message")}</p>
+                <p className="mt-3 text-xs text-slate-400">{formatDate(report.createdAt)}</p>
               </button>
             ))}
             {!isLoading && reports.length === 0 ? (
-              <div className="px-5 py-12 text-center text-sm text-[#6b7280]">No reports were submitted.</div>
+              <div className="px-5 py-12 text-center text-sm text-slate-500">No reports were submitted.</div>
             ) : null}
           </div>
         </section>
 
-        <section className="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           {selectedReport ? (
             <>
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <h2 className="text-2xl font-semibold text-[#111827]">{toText(selectedReport.subject, "Report detail")}</h2>
-                  <p className="mt-2 text-sm text-[#6b7280]">
-                    {toText(selectedReport.username, "Unknown user")} · {toText(selectedReport.role, "Unknown role")} · {toText(selectedReport.accountStatus, "Unknown status")}
+                  <h2 className="text-2xl font-semibold text-slate-900">{toText(selectedReport.subject, "Report detail")}</h2>
+                  <p className="mt-2 text-sm text-slate-500">
+                    {toText(selectedReport.username, "Unknown user")} / {toText(selectedReport.role, "Unknown role")} / {toText(selectedReport.accountStatus, "Unknown status")}
                   </p>
                 </div>
-                <span className="rounded-full bg-[#f3f4f6] px-3 py-1 text-xs font-semibold text-[#4b5563]">
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
                   #{selectedReport.id}
                 </span>
               </div>
@@ -222,22 +222,22 @@ export function AdminReportsClient() {
                   ["Updated", formatDate(selectedReport.updatedAt)],
                   ["Status", selectedReport.status],
                 ].map(([label, value]) => (
-                  <div key={label} className="rounded-2xl border border-[#e5e7eb] bg-[#f9fafb] p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6b7280]">{label}</p>
-                    <p className="mt-2 text-sm font-medium text-[#111827]">{value}</p>
+                  <div key={label} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{label}</p>
+                    <p className="mt-2 text-sm font-medium text-slate-900">{value}</p>
                   </div>
                 ))}
               </div>
 
-              <div className="mt-6 rounded-2xl border border-[#e5e7eb] bg-[#f9fafb] p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6b7280]">Report Message</p>
-                <p className="mt-3 text-sm leading-7 text-[#374151]">{toText(selectedReport.message, "No message provided.")}</p>
+              <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Report Message</p>
+                <p className="mt-3 text-sm leading-7 text-slate-700">{toText(selectedReport.message, "No message provided.")}</p>
               </div>
 
               <div className="mt-6">
-                <label className="mb-2 block text-sm font-medium text-[#374151]">Admin Note</label>
+                <label className="mb-2 block text-sm font-medium text-slate-700">Admin Note</label>
                 <textarea
-                  className="w-full rounded-2xl border border-[#d1d5db] bg-white px-4 py-3 text-sm text-[#111827] outline-none focus:border-[#2563eb]"
+                  className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-600"
                   onChange={(event) => setAdminNote(event.target.value)}
                   rows={6}
                   value={adminNote}
@@ -250,8 +250,8 @@ export function AdminReportsClient() {
                     key={status}
                     className={
                       status === "RESOLVED"
-                        ? "rounded-xl bg-[#16a34a] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#15803d] disabled:opacity-60"
-                        : "rounded-xl border border-[#d1d5db] bg-white px-4 py-2.5 text-sm font-semibold text-[#111827] transition hover:bg-[#f9fafb] disabled:opacity-60"
+                        ? "rounded-xl bg-green-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700 disabled:opacity-60"
+                        : "rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-slate-50 disabled:opacity-60"
                     }
                     disabled={isSaving}
                     onClick={() => void updateReport(status)}
@@ -263,7 +263,7 @@ export function AdminReportsClient() {
               </div>
             </>
           ) : (
-            <div className="flex min-h-[320px] items-center justify-center rounded-2xl border border-dashed border-[#d1d5db] bg-[#f9fafb] text-sm text-[#6b7280]">
+            <div className="flex min-h-[320px] items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500">
               Select a report to review it.
             </div>
           )}

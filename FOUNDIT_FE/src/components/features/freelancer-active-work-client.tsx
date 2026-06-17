@@ -1,7 +1,8 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useState } from "react";
+import { CheckCircle2, ClipboardList, PackageCheck, Timer } from "lucide-react";
 import { useAuth } from "@/components/providers/auth-provider";
 import { useApiQuery } from "@/hooks/use-api-query";
 import { apiRequest, toErrorMessage } from "@/lib/api";
@@ -71,7 +72,7 @@ export function FreelancerActiveWorkClient() {
     <div className="mx-auto max-w-[1600px] px-4 py-6 md:px-6">
       <div className="mb-3">
         <Link
-          className="inline-flex items-center gap-2 text-sm font-medium text-[#6b7280] transition hover:text-[#111827]"
+          className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-slate-900"
           href="/freelancer/dashboard"
         >
           Back to Dashboard
@@ -79,27 +80,31 @@ export function FreelancerActiveWorkClient() {
       </div>
 
       <div className="mb-6">
-        <h1 className="text-[28px] font-bold tracking-[-0.02em] text-[#111827]">Active Work</h1>
-        <p className="mt-1 text-sm text-[#6b7280]">
+        <h1 className="text-[28px] font-bold tracking-[-0.02em] text-slate-900">Active Work</h1>
+        <p className="mt-1 text-sm text-slate-500">
           Projects that are already agreed with clients and ready to work on.
         </p>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[
-          { label: "All Projects", value: cards.length },
-          { label: "In Progress", value: filterCount(projects.data, "in_progress") },
-          { label: "Delivered", value: filterCount(projects.data, "delivered") },
-          { label: "Completed", value: filterCount(projects.data, "completed") },
-        ].map((stat) => (
-          <div key={stat.label} className="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
-            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#dcfce7] text-[#16a34a]">
-              •
+          { label: "All Projects", value: cards.length, icon: ClipboardList },
+          { label: "In Progress", value: filterCount(projects.data, "in_progress"), icon: Timer },
+          { label: "Delivered", value: filterCount(projects.data, "delivered"), icon: PackageCheck },
+          { label: "Completed", value: filterCount(projects.data, "completed"), icon: CheckCircle2 },
+        ].map((stat) => {
+          const Icon = stat.icon;
+
+          return (
+          <div key={stat.label} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
+            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-green-100 text-green-600">
+              <Icon className="h-5 w-5" />
             </div>
-            <div className="text-[34px] font-bold leading-none text-[#111827]">{stat.value}</div>
-            <div className="mt-2 text-[15px] font-medium text-[#374151]">{stat.label}</div>
+            <div className="text-[34px] font-bold leading-none text-slate-900">{stat.value}</div>
+            <div className="mt-2 text-[15px] font-medium text-slate-700">{stat.label}</div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {projects.error ? (
@@ -115,13 +120,13 @@ export function FreelancerActiveWorkClient() {
       ) : null}
 
       {projects.isLoading ? (
-        <div className="mt-5 rounded-2xl border border-[#e5e7eb] bg-white px-5 py-10 text-center text-sm text-[#6b7280]">
+        <div className="mt-5 rounded-2xl border border-slate-200 bg-white px-5 py-10 text-center text-sm text-slate-500">
           Loading your work...
         </div>
       ) : null}
 
       {!projects.isLoading && !cards.length ? (
-        <div className="mt-5 rounded-2xl border border-dashed border-[#d1d5db] bg-white px-5 py-10 text-center text-sm text-[#6b7280]">
+        <div className="mt-5 rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-10 text-center text-sm text-slate-500">
           No active work found.
         </div>
       ) : null}
@@ -130,19 +135,19 @@ export function FreelancerActiveWorkClient() {
         {cards.map((item) => (
           <div
             key={item.id}
-            className="rounded-2xl border border-[#e5e7eb] bg-white px-5 py-4 shadow-[0_2px_8px_rgba(15,23,42,0.04)]"
+            className="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-[0_2px_8px_rgba(15,23,42,0.04)]"
           >
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="text-[16px] font-semibold text-[#111827]">{item.title}</h3>
-                  <span className="inline-flex rounded-full bg-[#eef2ff] px-2.5 py-1 text-[11px] font-medium text-[#2563eb]">
+                  <h3 className="text-[16px] font-semibold text-slate-900">{item.title}</h3>
+                  <span className="inline-flex rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-medium text-blue-600">
                     {item.status}
                   </span>
                 </div>
 
-                <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[#6b7280]">
-                  <span className="font-medium text-[#16a34a]">{item.client}</span>
+                <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-500">
+                  <span className="font-medium text-green-600">{item.client}</span>
                   {item.company ? <span>{item.company}</span> : null}
                   <span>{item.location}</span>
                   {item.email ? <span>{item.email}</span> : null}
@@ -154,7 +159,7 @@ export function FreelancerActiveWorkClient() {
               <div className="flex shrink-0 flex-wrap gap-3">
                 {item.canMarkDelivered ? (
                   <button
-                    className="inline-flex h-11 items-center justify-center rounded-xl bg-[#111827] px-4 text-sm font-semibold text-white transition hover:bg-[#0b1220] disabled:cursor-not-allowed disabled:opacity-60"
+                    className="inline-flex h-11 items-center justify-center rounded-xl bg-slate-900 px-4 text-sm font-semibold text-white transition hover:bg-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
                     disabled={busyProjectId === item.id}
                     onClick={() => void handleMarkDelivered(item.id)}
                     type="button"
@@ -164,14 +169,14 @@ export function FreelancerActiveWorkClient() {
                 ) : null}
                 {item.roomId ? (
                   <Link
-                    className="inline-flex h-11 items-center justify-center rounded-xl bg-[#16a34a] px-4 text-sm font-semibold text-white transition hover:bg-[#15803d]"
+                    className="inline-flex h-11 items-center justify-center rounded-xl bg-green-600 px-4 text-sm font-semibold text-white transition hover:bg-green-700"
                     href={`/freelancer/${item.roomId}/chat`}
                   >
                     Message
                   </Link>
                 ) : (
                   <button
-                    className="inline-flex h-11 items-center justify-center rounded-xl bg-[#16a34a] px-4 text-sm font-semibold text-white opacity-70"
+                    className="inline-flex h-11 items-center justify-center rounded-xl bg-green-600 px-4 text-sm font-semibold text-white opacity-70"
                     disabled
                     type="button"
                   >

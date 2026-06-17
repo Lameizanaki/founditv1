@@ -1,6 +1,14 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
+import {
+  Clock,
+  CreditCard,
+  ShieldCheck,
+  UserCheck,
+  Users,
+  WalletCards,
+} from "lucide-react";
 import { useAuth } from "@/components/providers/auth-provider";
 import { apiRequest, toErrorMessage } from "@/lib/api";
 import { buildImageSource, formatMoney, toNumber, toText } from "@/lib/data-utils";
@@ -203,95 +211,108 @@ export function AdminDashboardClient() {
       title: "Total Freelancers",
       value: String(toNumber(dashboard.totalFreelancers)),
       badge: "Live",
-      tone: "bg-[#eef2ff] text-[#4f46e5]",
+      tone: "bg-blue-50 text-indigo-600",
+      icon: UserCheck,
     },
     {
       title: "Total Clients",
       value: String(toNumber(dashboard.totalClients)),
       badge: "Live",
-      tone: "bg-[#ecfdf5] text-[#10b981]",
+      tone: "bg-emerald-50 text-emerald-500",
+      icon: Users,
     },
     {
       title: "Total Users",
       value: String(toNumber(dashboard.totalUsers)),
       badge: "Registered",
-      tone: "bg-[#f0f9ff] text-[#0284c7]",
+      tone: "bg-sky-50 text-sky-600",
+      icon: Users,
     },
     {
       title: "Total Earnings",
       value: formatMoney(0),
       badge: "Paid",
-      tone: "bg-[#f0fdf4] text-[#16a34a]",
+      tone: "bg-green-50 text-green-600",
+      icon: WalletCards,
     },
     {
       title: "Paid Records",
       value: String(toNumber(dashboard.paidPaymentRecords)),
       badge: "Payments",
-      tone: "bg-[#fef3c7] text-[#d97706]",
+      tone: "bg-amber-100 text-amber-600",
+      icon: CreditCard,
     },
     {
       title: "Pending Earnings",
       value: formatMoney(dashboard.pendingRevenue),
       badge: `${toNumber(dashboard.submittedPaymentRecords)} submitted`,
-      tone: "bg-[#fffbeb] text-[#ca8a04]",
+      tone: "bg-amber-50 text-yellow-600",
+      icon: Clock,
     },
     {
       title: "Pending Reviews",
       value: String(toNumber(dashboard.pendingReviews)),
       badge: toNumber(dashboard.pendingReviews) > 0 ? "Attention" : "Clear",
-      tone: "bg-[#fff7ed] text-[#f97316]",
+      tone: "bg-orange-50 text-orange-500",
+      icon: ShieldCheck,
     },
   ];
 
   return (
     <div className="mx-auto w-full max-w-[1600px] space-y-6 px-4 pb-8 md:px-6 lg:px-10">
       <div className="mb-2">
-        <h1 className="text-[28px] font-semibold leading-tight text-[#222]">Dashboard Overview</h1>
-        <p className="mt-2 text-[15px] text-[#6b7280]">
+        <h1 className="text-[28px] font-semibold leading-tight text-slate-900">Dashboard Overview</h1>
+        <p className="mt-2 text-[15px] text-slate-500">
           Monitor platform activity and review pending verification work.
         </p>
       </div>
 
       {error ? (
-        <div className="rounded-lg border border-[#fed7aa] bg-[#fff7ed] p-4 text-sm text-[#9a3412]">
+        <div className="rounded-lg border border-orange-200 bg-orange-50 p-4 text-sm text-orange-800">
           {error}
         </div>
       ) : null}
       {message ? (
-        <div className="rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] p-4 text-sm text-[#166534]">
+        <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">
           {message}
         </div>
       ) : null}
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
-        {stats.map((stat) => (
-          <div key={stat.title} className="min-h-40 rounded-2xl border border-[#e5e7eb] bg-white px-5 py-5">
+        {stats.map((stat) => {
+          const Icon = stat.icon;
+
+          return (
+          <div key={stat.title} className="min-h-40 rounded-2xl border border-slate-200 bg-white px-5 py-5">
             <div className="mb-10 flex items-start justify-between">
-              <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${stat.tone}`}>•</div>
-              <span className="inline-flex min-w-10 items-center justify-center rounded-full bg-[#f3f4f6] px-2 py-1 text-[12px] font-medium leading-none text-[#4b5563]">
+              <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${stat.tone}`}>
+                <Icon className="h-5 w-5" />
+              </div>
+              <span className="inline-flex min-w-10 items-center justify-center rounded-full bg-slate-100 px-2 py-1 text-[12px] font-medium leading-none text-slate-600">
                 {stat.badge}
               </span>
             </div>
             <div>
-              <p className="text-[15px] text-[#6b7280]">{stat.title}</p>
-              <h2 className="mt-1 text-[24px] font-medium leading-none text-[#222]">{stat.value}</h2>
+              <p className="text-[15px] text-slate-500">{stat.title}</p>
+              <h2 className="mt-1 text-[24px] font-medium leading-none text-slate-900">{stat.value}</h2>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
-      <section className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white">
-        <div className="flex flex-col gap-3 border-b border-[#e5e7eb] px-5 py-4 md:flex-row md:items-center md:justify-between">
+      <section className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+        <div className="flex flex-col gap-3 border-b border-slate-200 px-5 py-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-[18px] font-semibold text-[#111827]">Pending E-KYC Reviews</h2>
-            <p className="text-sm text-[#6b7280]">Identity verification requests waiting for admin review.</p>
+            <h2 className="text-[18px] font-semibold text-slate-900">Pending E-KYC Reviews</h2>
+            <p className="text-sm text-slate-500">Identity verification requests waiting for admin review.</p>
           </div>
           <div className="flex items-center gap-3">
-            <span className="inline-flex rounded-full bg-[#fff7ed] px-3 py-1 text-xs font-medium text-[#c2410c]">
+            <span className="inline-flex rounded-full bg-orange-50 px-3 py-1 text-xs font-medium text-orange-700">
               {dashboard.pendingReviewItems.length} pending
             </span>
             <button
-              className="rounded-lg border border-[#d1d5db] bg-white px-4 py-2 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+              className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
               onClick={() => void loadDashboard()}
               type="button"
             >
@@ -302,7 +323,7 @@ export function AdminDashboardClient() {
 
         <div className="max-h-[420px] min-h-64 overflow-auto">
           <table className="w-full min-w-[860px] text-left text-sm">
-            <thead className="sticky top-0 bg-[#f9fafb] text-[#6b7280]">
+            <thead className="sticky top-0 bg-slate-50 text-slate-500">
               <tr>
                 <th className="px-5 py-3 font-medium">User</th>
                 <th className="px-5 py-3 font-medium">Role</th>
@@ -314,32 +335,32 @@ export function AdminDashboardClient() {
             </thead>
             <tbody>
               {dashboard.pendingReviewItems.map((review) => (
-                <tr key={review.ekycId} className="border-t border-[#e5e7eb]">
+                <tr key={review.ekycId} className="border-t border-slate-200">
                   <td className="px-5 py-4">
-                    <p className="font-medium text-[#111827]">{toText(review.username, "Unknown user")}</p>
-                    <p className="text-xs text-[#6b7280]">{toText(review.email, "No email")}</p>
+                    <p className="font-medium text-slate-900">{toText(review.username, "Unknown user")}</p>
+                    <p className="text-xs text-slate-500">{toText(review.email, "No email")}</p>
                   </td>
                   <td className="px-5 py-4">
-                    <span className="rounded-full bg-[#eef2ff] px-2.5 py-1 text-xs font-medium text-[#4338ca]">
+                    <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-indigo-700">
                       {toText(review.role, "Unknown")}
                     </span>
                   </td>
                   <td className="px-5 py-4">
-                    <p className="font-medium text-[#111827]">{toText(review.fullName, "No full name")}</p>
-                    <p className="text-xs text-[#6b7280]">
-                      {toText(review.nationality, "No nationality")} · {toText(review.country, "No country")}
+                    <p className="font-medium text-slate-900">{toText(review.fullName, "No full name")}</p>
+                    <p className="text-xs text-slate-500">
+                      {toText(review.nationality, "No nationality")} / {toText(review.country, "No country")}
                     </p>
                   </td>
-                  <td className="px-5 py-4 text-[#374151]">{toText(review.phoneNumber, "No phone")}</td>
+                  <td className="px-5 py-4 text-slate-700">{toText(review.phoneNumber, "No phone")}</td>
                   <td className="max-w-md px-5 py-4">
-                    <p className="line-clamp-2 text-[#6b7280]">
+                    <p className="line-clamp-2 text-slate-500">
                       {summarizeFailureReason(review.failureReason)}
                     </p>
                   </td>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-2">
                       <button
-                        className="rounded-md border border-[#d1d5db] bg-white px-3 py-1.5 text-xs font-medium text-[#374151] disabled:opacity-60"
+                        className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 disabled:opacity-60"
                         disabled={detailLoadingId === review.ekycId}
                         onClick={() => void openReview(review.ekycId)}
                         type="button"
@@ -347,7 +368,7 @@ export function AdminDashboardClient() {
                         {detailLoadingId === review.ekycId ? "Loading..." : "View"}
                       </button>
                       <button
-                        className="rounded-md bg-[#10b981] px-3 py-1.5 text-xs font-medium text-white disabled:opacity-60"
+                        className="rounded-md bg-emerald-500 px-3 py-1.5 text-xs font-medium text-white disabled:opacity-60"
                         disabled={actionLoadingId === review.ekycId}
                         onClick={() => void updateReview(review.ekycId, "approve")}
                         type="button"
@@ -355,7 +376,7 @@ export function AdminDashboardClient() {
                         Approve
                       </button>
                       <button
-                        className="rounded-md border border-[#fecaca] bg-white px-3 py-1.5 text-xs font-medium text-[#b91c1c] disabled:opacity-60"
+                        className="rounded-md border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-700 disabled:opacity-60"
                         disabled={actionLoadingId === review.ekycId}
                         onClick={() => void updateReview(review.ekycId, "reject")}
                         type="button"
@@ -368,7 +389,7 @@ export function AdminDashboardClient() {
               ))}
               {!isLoading && dashboard.pendingReviewItems.length === 0 ? (
                 <tr>
-                  <td className="px-5 py-12 text-center text-sm text-[#6b7280]" colSpan={6}>
+                  <td className="px-5 py-12 text-center text-sm text-slate-500" colSpan={6}>
                     No E-KYC reviews are waiting.
                   </td>
                 </tr>
@@ -387,15 +408,15 @@ export function AdminDashboardClient() {
             className="max-h-[92vh] w-full max-w-6xl overflow-auto rounded-lg bg-white shadow-xl"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="flex items-start justify-between border-b border-[#e5e7eb] px-6 py-4">
+            <div className="flex items-start justify-between border-b border-slate-200 px-6 py-4">
               <div>
-                <h3 className="text-[18px] font-semibold text-[#111827]">E-KYC Review Detail</h3>
-                <p className="text-sm text-[#6b7280]">
-                  {toText(selectedReview.username, "Unknown user")} · {toText(selectedReview.email, "No email")}
+                <h3 className="text-[18px] font-semibold text-slate-900">E-KYC Review Detail</h3>
+                <p className="text-sm text-slate-500">
+                  {toText(selectedReview.username, "Unknown user")} / {toText(selectedReview.email, "No email")}
                 </p>
               </div>
               <button
-                className="rounded-md px-3 py-1.5 text-sm text-[#374151] hover:bg-[#f3f4f6]"
+                className="rounded-md px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-100"
                 onClick={() => setSelectedReview(null)}
                 type="button"
               >
@@ -405,8 +426,8 @@ export function AdminDashboardClient() {
 
             <div className="grid gap-6 px-6 py-5 lg:grid-cols-[320px_1fr]">
               <div className="space-y-3 text-sm">
-                <div className="rounded-lg border border-[#e5e7eb] p-4">
-                  <p className="text-xs font-medium uppercase text-[#6b7280]">Identity</p>
+                <div className="rounded-lg border border-slate-200 p-4">
+                  <p className="text-xs font-medium uppercase text-slate-500">Identity</p>
                   <dl className="mt-3 space-y-2">
                     {[
                       ["Full name", toText(selectedReview.fullName, "N/A")],
@@ -417,24 +438,24 @@ export function AdminDashboardClient() {
                       ["Country", toText(selectedReview.country, "N/A")],
                     ].map(([label, value]) => (
                       <div key={label} className="flex justify-between gap-3">
-                        <dt className="text-[#6b7280]">{label}</dt>
-                        <dd className="text-right font-medium text-[#111827]">{value}</dd>
+                        <dt className="text-slate-500">{label}</dt>
+                        <dd className="text-right font-medium text-slate-900">{value}</dd>
                       </div>
                     ))}
                   </dl>
                 </div>
 
-                <div className="rounded-lg border border-[#e5e7eb] p-4">
-                  <p className="text-xs font-medium uppercase text-[#6b7280]">Checks</p>
+                <div className="rounded-lg border border-slate-200 p-4">
+                  <p className="text-xs font-medium uppercase text-slate-500">Checks</p>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${selectedReview.ocrVerified ? "bg-[#dcfce7] text-[#166534]" : "bg-[#fff7ed] text-[#9a3412]"}`}>
+                    <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${selectedReview.ocrVerified ? "bg-green-100 text-green-800" : "bg-orange-50 text-orange-800"}`}>
                       OCR {selectedReview.ocrVerified ? "passed" : "review"}
                     </span>
-                    <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${selectedReview.faceVerified ? "bg-[#dcfce7] text-[#166534]" : "bg-[#fff7ed] text-[#9a3412]"}`}>
+                    <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${selectedReview.faceVerified ? "bg-green-100 text-green-800" : "bg-orange-50 text-orange-800"}`}>
                       Face {selectedReview.faceVerified ? "passed" : "review"}
                     </span>
                   </div>
-                  <p className="mt-3 max-h-32 overflow-auto rounded-md bg-[#f9fafb] p-3 text-xs text-[#6b7280]">
+                  <p className="mt-3 max-h-32 overflow-auto rounded-md bg-slate-50 p-3 text-xs text-slate-500">
                     {summarizeFailureReason(selectedReview.failureReason)}
                   </p>
                 </div>
@@ -464,13 +485,13 @@ export function AdminDashboardClient() {
                     fallback: "",
                   });
                   return (
-                    <div key={item.label} className="rounded-lg border border-[#e5e7eb] p-3">
-                      <p className="mb-2 text-sm font-medium text-[#111827]">{item.label}</p>
+                    <div key={item.label} className="rounded-lg border border-slate-200 p-3">
+                      <p className="mb-2 text-sm font-medium text-slate-900">{item.label}</p>
                       {src ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img alt={item.label} className="aspect-[4/3] w-full rounded-md bg-[#f9fafb] object-contain" src={src} />
+                        <img alt={item.label} className="aspect-[4/3] w-full rounded-md bg-slate-50 object-contain" src={src} />
                       ) : (
-                        <p className="py-16 text-center text-sm text-[#6b7280]">No image</p>
+                        <p className="py-16 text-center text-sm text-slate-500">No image</p>
                       )}
                     </div>
                   );

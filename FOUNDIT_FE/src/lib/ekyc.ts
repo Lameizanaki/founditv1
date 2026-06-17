@@ -139,15 +139,15 @@ export const ekycStatusLabel = (status: EkycStoredStatus) => {
 export const ekycStatusClass = (status: EkycStoredStatus) => {
   switch (status) {
     case "verified":
-      return "inline-flex items-center rounded-full bg-[#dcfce7] px-3 py-1 text-xs font-medium text-[#166534]";
+      return "inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-800";
     case "in_review":
-      return "inline-flex items-center rounded-full bg-[#eff6ff] px-3 py-1 text-xs font-medium text-[#1d4ed8]";
+      return "inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700";
     case "pending":
-      return "inline-flex items-center rounded-full bg-[#fffbeb] px-3 py-1 text-xs font-medium text-[#a16207]";
+      return "inline-flex items-center rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700";
     case "failed":
-      return "inline-flex items-center rounded-full bg-[#fef2f2] px-3 py-1 text-xs font-medium text-[#b91c1c]";
+      return "inline-flex items-center rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-700";
     default:
-      return "inline-flex items-center rounded-full bg-[#f3f4f6] px-3 py-1 text-xs font-medium text-[#4b5563]";
+      return "inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600";
   }
 };
 

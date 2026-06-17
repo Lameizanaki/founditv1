@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -445,7 +445,7 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
   return (
     <div className="mx-auto max-w-[1600px] px-4 py-8 md:px-6">
       <button
-        className="inline-flex items-center gap-2 text-sm font-medium text-[#6b7280] transition hover:text-[#111827]"
+        className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-slate-900"
         onClick={() => router.back()}
         type="button"
       >
@@ -453,67 +453,67 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
       </button>
 
       <div className="mt-4">
-        <h1 className="text-[34px] font-semibold leading-none text-[#111827]">{heading}</h1>
-        <p className="mt-2 text-sm text-[#6b7280]">{helperText}</p>
+        <h1 className="text-[34px] font-semibold leading-none text-slate-900">{heading}</h1>
+        <p className="mt-2 text-sm text-slate-500">{helperText}</p>
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-5 xl:grid-cols-[1.9fr_0.9fr]">
         <div className="space-y-5">
-          <section className="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-sm">
-            <h2 className="text-[18px] font-semibold text-[#111827]">Service Details</h2>
+          <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 className="text-[18px] font-semibold text-slate-900">Service Details</h2>
 
             <div className="mt-4 flex gap-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img alt={toText(gigRecord.serviceTitle, "Gig")} className="h-[72px] w-[72px] rounded-xl object-cover" src={image} />
 
               <div className="min-w-0 flex-1">
-                <h3 className="text-[16px] font-semibold text-[#111827]">
+                <h3 className="text-[16px] font-semibold text-slate-900">
                   {toText(gigRecord.serviceTitle, "Untitled service")}
                 </h3>
-                <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-[#6b7280]">
+                <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-slate-500">
                   <span>{toText(gigRecord.freelancerName, "Freelancer")}</span>
                   <span>{toNumber(gigRecord.rating, 0).toFixed(1)} rating</span>
                 </div>
-                <div className="mt-3 inline-flex items-center rounded-full bg-[#dcfce7] px-3 py-1 text-xs font-semibold text-[#16a34a]">
+                <div className="mt-3 inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-600">
                   Manual bank transfer
                 </div>
               </div>
             </div>
           </section>
 
-          <section className="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-sm">
-            <h2 className="text-[18px] font-semibold text-[#111827]">Payment Method</h2>
+          <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 className="text-[18px] font-semibold text-slate-900">Payment Method</h2>
 
-            <div className="mt-4 rounded-2xl border border-[#dbeafe] bg-[#eff6ff] p-4 text-sm text-[#1e40af]">
-              <p className="font-semibold text-[#111827]">Manual bank transfer</p>
-              <p className="mt-1 text-[#6b7280]">
+            <div className="mt-4 rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
+              <p className="font-semibold text-slate-900">Manual bank transfer</p>
+              <p className="mt-1 text-slate-500">
                 Scan the seller&apos;s uploaded bank QR, then upload your screenshot or transaction reference.
                 The seller confirms after checking their bank app.
               </p>
             </div>
 
             {isLoadingSellerQr ? (
-              <div className="mt-4 rounded-xl border border-[#dbeafe] bg-[#eff6ff] p-4 text-sm text-[#1e40af]">
+              <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
                 Loading seller bank QR...
               </div>
             ) : null}
 
             {effectiveMode === "pay" && sellerQrImageUrl ? (
-              <div className="mt-4 rounded-2xl border border-[#e5e7eb] bg-[#f8fafc] p-4">
+              <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   alt="Seller bank QR"
                   className="mx-auto max-h-72 w-full max-w-sm rounded-xl object-contain"
                   src={sellerQrImageUrl}
                 />
-                <p className="mt-3 text-center text-xs text-[#6b7280]">
+                <p className="mt-3 text-center text-xs text-slate-500">
                   Scan this QR with your banking app, then submit the payment proof below.
                 </p>
               </div>
             ) : null}
 
             {!sellerQrImageUrl && !isLoadingSellerQr ? (
-              <div className="mt-4 rounded-xl border border-dashed border-[#cbd5e1] bg-[#f8fafc] p-4 text-sm text-[#6b7280]">
+              <div className="mt-4 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
                 {matchedPaidTransaction
                   ? `This gig is already paid${paidAt ? ` on ${paidAt}` : ""}.`
                   : sellerQrError || "The seller has not uploaded a bank QR yet."}
@@ -522,24 +522,24 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
 
             {effectiveMode === "pay" ? (
               <div className="mt-4 grid gap-3">
-                <label className="text-sm font-semibold text-[#111827]">Transaction reference</label>
+                <label className="text-sm font-semibold text-slate-900">Transaction reference</label>
                 <input
-                  className="h-11 w-full rounded-xl border border-[#e5e7eb] bg-white px-4 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#2563eb]"
+                  className="h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-600"
                   onChange={(event) => setPaymentReference(event.target.value)}
                   placeholder="Enter bank transaction ID or note"
                   type="text"
                   value={paymentReference}
                 />
 
-                <label className="text-sm font-semibold text-[#111827]">Payment screenshot</label>
+                <label className="text-sm font-semibold text-slate-900">Payment screenshot</label>
                 <input
                   accept="image/*,.pdf"
-                  className="block w-full rounded-xl border border-dashed border-[#cbd5e1] bg-[#f8fafc] px-4 py-3 text-sm text-[#374151] file:mr-3 file:rounded-lg file:border-0 file:bg-[#2563eb] file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white"
+                  className="block w-full rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-700 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-600 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white"
                   onChange={(event) => setSelectedProofFile(event.target.files?.[0] ?? null)}
                   type="file"
                 />
                 {selectedProofFile ? (
-                  <p className="text-xs text-[#6b7280]">Selected: {selectedProofFile.name}</p>
+                  <p className="text-xs text-slate-500">Selected: {selectedProofFile.name}</p>
                 ) : null}
               </div>
             ) : null}
@@ -551,8 +551,8 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
             ) : null}
 
             {paymentTranId ? (
-              <div className="mt-4 rounded-xl bg-[#f8fafc] px-4 py-3 text-xs text-[#6b7280]">
-                Transaction ID: <span className="font-medium text-[#111827]">{paymentTranId}</span>
+              <div className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-xs text-slate-500">
+                Transaction ID: <span className="font-medium text-slate-900">{paymentTranId}</span>
                 {paymentStatus === "submitted" ? (
                   <span className="ml-2 font-medium text-amber-700">Waiting for seller confirmation</span>
                 ) : null}
@@ -561,14 +561,14 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
           </section>
 
           {effectiveMode === "request" ? (
-            <section className="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-sm">
-              <h2 className="text-[18px] font-semibold text-[#111827]">Send Request to Freelancer</h2>
-              <p className="mt-1 text-xs text-[#6b7280]">
+            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <h2 className="text-[18px] font-semibold text-slate-900">Send Request to Freelancer</h2>
+              <p className="mt-1 text-xs text-slate-500">
                 Write a message to send along with your request.
               </p>
 
               <textarea
-                className="mt-4 min-h-[120px] w-full rounded-xl border border-[#e5e7eb] bg-white px-4 py-3 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#2563eb]"
+                className="mt-4 min-h-[120px] w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-blue-600"
                 onChange={(event) => setRequestMessage(event.target.value)}
                 placeholder="Hello! I&apos;m interested in your service. Here&apos;s what I need..."
                 value={requestMessage}
@@ -577,7 +577,7 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
           ) : null}
 
           <button
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#d1d5db] bg-white px-4 py-4 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-4 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
             onClick={() => void continueToChat()}
             type="button"
           >
@@ -586,16 +586,16 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
         </div>
 
         <div>
-          <section className="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-sm xl:sticky xl:top-6">
-            <h2 className="text-[18px] font-semibold text-[#111827]">
+          <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm xl:sticky xl:top-6">
+            <h2 className="text-[18px] font-semibold text-slate-900">
               {effectiveMode === "pay" ? "Payment Summary" : "Order Summary"}
             </h2>
 
             {effectiveMode === "pay" && sellerQrImageUrl ? (
-              <div className="mt-4 rounded-xl border border-[#e5e7eb] bg-[#f8fafc] p-3">
+              <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img alt="Seller bank QR" className="mx-auto max-h-64 w-full object-contain" src={sellerQrImageUrl} />
-                <p className="mt-3 text-center text-xs text-[#6b7280]">
+                <p className="mt-3 text-center text-xs text-slate-500">
                   {paymentStatus === "paid"
                     ? "Payment completed."
                     : "Scan this seller QR, then submit proof below."}
@@ -611,35 +611,35 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
 
             <div className="mt-5 space-y-3 text-sm">
               <div className="flex items-center justify-between">
-                <span className="text-[#6b7280]">Service Price</span>
-                <span className="font-medium text-[#111827]">{formatMoney(gigPrice)}</span>
+                <span className="text-slate-500">Service Price</span>
+                <span className="font-medium text-slate-900">{formatMoney(gigPrice)}</span>
               </div>
               {effectiveMode === "pay" ? (
                 <div className="flex items-center justify-between">
-                  <span className="text-[#6b7280]">Service Fee (5%)</span>
-                  <span className="font-medium text-[#111827]">{formatMoney(serviceFee)}</span>
+                  <span className="text-slate-500">Service Fee (5%)</span>
+                  <span className="font-medium text-slate-900">{formatMoney(serviceFee)}</span>
                 </div>
               ) : null}
             </div>
 
-            <div className="my-5 border-t border-[#e5e7eb]" />
+            <div className="my-5 border-t border-slate-200" />
 
             <div className="flex items-center justify-between">
-              <span className="text-[16px] font-semibold text-[#111827]">Total</span>
-              <span className="text-[30px] font-bold leading-none text-[#16a34a]">
+              <span className="text-[16px] font-semibold text-slate-900">Total</span>
+              <span className="text-[30px] font-bold leading-none text-green-600">
                 {formatMoney(gigPrice + (effectiveMode === "pay" ? serviceFee : 0))}
               </span>
             </div>
 
             {transactions.error || hireRequests.error ? (
-              <p className="mt-3 text-xs text-[#dc2626]">
+              <p className="mt-3 text-xs text-red-600">
                 {transactions.error || hireRequests.error}
               </p>
             ) : null}
 
             {effectiveMode === "request" ? (
               <button
-                className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-[#2563eb] px-4 py-3.5 text-sm font-semibold text-white transition hover:bg-[#1d4ed8] disabled:cursor-not-allowed disabled:opacity-50"
+                className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-3.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                 disabled={isSubmitting}
                 onClick={() => void sendRequest()}
                 type="button"
@@ -648,7 +648,7 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
               </button>
             ) : (
               <button
-                className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-[#2563eb] px-4 py-3.5 text-sm font-semibold text-white transition hover:bg-[#1d4ed8] disabled:cursor-not-allowed disabled:opacity-50"
+                className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-3.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                 disabled={isSubmitting || paymentStatus === "submitted"}
                 onClick={() => void submitPaymentProof()}
                 type="button"
@@ -663,30 +663,30 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
               </button>
             )}
 
-            <div className="mt-4 rounded-xl bg-[#eef2ff] p-4">
-              <p className="text-xs text-[#4f46e5]">
+            <div className="mt-4 rounded-xl bg-blue-50 p-4">
+              <p className="text-xs text-indigo-600">
                 Manual payment means money moves outside the platform. FoundIt only tracks proof
                 submission and seller confirmation.
               </p>
             </div>
 
-            <div className="mt-5 space-y-3 border-t border-[#e5e7eb] pt-5 text-sm">
+            <div className="mt-5 space-y-3 border-t border-slate-200 pt-5 text-sm">
               <div className="flex items-center justify-between">
-                <span className="text-[#6b7280]">Delivery Time</span>
-                <span className="font-medium text-[#111827]">
+                <span className="text-slate-500">Delivery Time</span>
+                <span className="font-medium text-slate-900">
                   {toNumber(gigRecord.deliveryDate, 0) ? `${toNumber(gigRecord.deliveryDate, 0)} days` : "Flexible"}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[#6b7280]">Current Request</span>
-                <span className="font-medium text-[#111827]">
+                <span className="text-slate-500">Current Request</span>
+                <span className="font-medium text-slate-900">
                   {requestStatus ? requestStatus.replace(/_/g, " ") : "Not sent"}
                 </span>
               </div>
             </div>
 
             {matchedRequest && effectiveMode === "request" ? (
-              <div className="mt-5 rounded-xl border border-[#d1fae5] bg-[#f0fdf4] p-4 text-sm text-[#166534]">
+              <div className="mt-5 rounded-xl border border-emerald-100 bg-green-50 p-4 text-sm text-green-800">
                 Request status: {requestStatus || "pending"}. Once the freelancer delivers the work,
                 you can come back here and submit payment proof.
               </div>
@@ -694,7 +694,7 @@ export function ClientConfirmOrderClient({ gigId }: { gigId: string }) {
 
             {paymentStatus === "paid" ? (
               <Link
-                className="mt-4 inline-flex w-full items-center justify-center rounded-xl border border-[#16a34a] bg-white px-4 py-3 text-sm font-semibold text-[#16a34a] transition hover:bg-[#f0fdf4]"
+                className="mt-4 inline-flex w-full items-center justify-center rounded-xl border border-green-600 bg-white px-4 py-3 text-sm font-semibold text-green-600 transition hover:bg-green-50"
                 href={buildSuccessHref({
                   freelancerId,
                   gigId,

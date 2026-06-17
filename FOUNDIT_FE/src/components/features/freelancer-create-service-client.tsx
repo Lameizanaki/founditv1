@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useState } from "react";
@@ -153,31 +153,31 @@ export function FreelancerCreateServiceClient() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] px-4 py-6 md:px-6">
+    <div className="min-h-screen bg-slate-50 px-4 py-6 md:px-6">
       <div className="mx-auto max-w-5xl">
         <Link
-          className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-[#4b5563] transition hover:text-[#111827]"
+          className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-slate-900"
           href="/freelancer/dashboard"
         >
           Back to Dashboard
         </Link>
 
         <div className="mb-6">
-          <h1 className="text-[38px] font-bold leading-tight tracking-[-0.02em] text-[#111827]">
+          <h1 className="text-[38px] font-bold leading-tight tracking-[-0.02em] text-slate-900">
             Create a New Service
           </h1>
-          <p className="mt-2 text-sm text-[#6b7280]">
+          <p className="mt-2 text-sm text-slate-500">
             List your service and start earning from clients worldwide.
           </p>
         </div>
 
         {error ? (
-          <div className="mb-6 rounded-xl border border-[#fecaca] bg-[#fee2e2] p-4 text-sm text-[#dc2626]">
+          <div className="mb-6 rounded-xl border border-red-200 bg-red-100 p-4 text-sm text-red-600">
             {error}
           </div>
         ) : null}
         {success ? (
-          <div className="mb-6 rounded-xl border border-[#bbf7d0] bg-[#f0fdf4] p-4 text-sm text-[#166534]">
+          <div className="mb-6 rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-800">
             {success}
           </div>
         ) : null}
@@ -188,8 +188,8 @@ export function FreelancerCreateServiceClient() {
               <div
                 className={
                   currentStep >= step
-                    ? "flex h-7 w-7 items-center justify-center rounded-full border border-[#16a34a] bg-white text-xs font-semibold text-[#16a34a]"
-                    : "flex h-7 w-7 items-center justify-center rounded-full border border-[#d1d5db] bg-white text-xs font-semibold text-[#9ca3af]"
+                    ? "flex h-7 w-7 items-center justify-center rounded-full border border-green-600 bg-white text-xs font-semibold text-green-600"
+                    : "flex h-7 w-7 items-center justify-center rounded-full border border-slate-300 bg-white text-xs font-semibold text-slate-400"
                 }
               >
                 {step}
@@ -197,8 +197,8 @@ export function FreelancerCreateServiceClient() {
               <span
                 className={
                   currentStep >= step
-                    ? "ml-2 text-sm font-medium text-[#16a34a]"
-                    : "ml-2 text-sm font-medium text-[#9ca3af]"
+                    ? "ml-2 text-sm font-medium text-green-600"
+                    : "ml-2 text-sm font-medium text-slate-400"
                 }
               >
                 {step === 1 ? "Overview" : step === 2 ? "Pricing" : "Publish"}
@@ -206,7 +206,7 @@ export function FreelancerCreateServiceClient() {
               {index < 2 ? (
                 <div
                   className={
-                    currentStep > step ? "mx-3 h-0.5 flex-1 rounded-full bg-[#22c55e]" : "mx-3 h-0.5 flex-1 rounded-full bg-[#e5e7eb]"
+                    currentStep > step ? "mx-3 h-0.5 flex-1 rounded-full bg-green-500" : "mx-3 h-0.5 flex-1 rounded-full bg-slate-200"
                   }
                 />
               ) : null}
@@ -214,15 +214,15 @@ export function FreelancerCreateServiceClient() {
           ))}
         </div>
 
-        <div className="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-[0_2px_8px_rgba(15,23,42,0.04)] md:p-6">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_2px_8px_rgba(15,23,42,0.04)] md:p-6">
           {currentStep === 1 ? (
             <>
-              <h2 className="text-[24px] font-semibold text-[#111827]">Service Overview</h2>
+              <h2 className="text-[24px] font-semibold text-slate-900">Service Overview</h2>
               <div className="mt-6 space-y-5">
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-[#374151]">Service Title</label>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">Service Title</label>
                   <input
-                    className="h-12 w-full rounded-xl border border-[#d1d5db] bg-white px-4 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#16a34a]"
+                    className="h-12 w-full rounded-xl border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-green-600"
                     maxLength={80}
                     onChange={(event) => setOverview((current) => ({ ...current, title: event.target.value }))}
                     placeholder="e.g. I will design a modern UI/UX for your app"
@@ -230,17 +230,17 @@ export function FreelancerCreateServiceClient() {
                   />
                 </div>
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-[#374151]">Category</label>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">Category</label>
                   <input
-                    className="h-12 w-full rounded-xl border border-[#d1d5db] bg-white px-4 text-sm text-[#111827] outline-none focus:border-[#16a34a]"
+                    className="h-12 w-full rounded-xl border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-none focus:border-green-600"
                     onChange={(event) => setOverview((current) => ({ ...current, category: event.target.value }))}
                     value={overview.category}
                   />
                 </div>
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-[#374151]">Service Description</label>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">Service Description</label>
                   <textarea
-                    className="w-full rounded-xl border border-[#d1d5db] bg-white px-4 py-3 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#16a34a]"
+                    className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-green-600"
                     onChange={(event) => setOverview((current) => ({ ...current, description: event.target.value }))}
                     placeholder="Describe your service in detail."
                     rows={6}
@@ -248,9 +248,9 @@ export function FreelancerCreateServiceClient() {
                   />
                 </div>
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-[#374151]">Tags</label>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">Tags</label>
                   <input
-                    className="h-12 w-full rounded-xl border border-[#d1d5db] bg-white px-4 text-sm text-[#111827] outline-none placeholder:text-[#9ca3af] focus:border-[#16a34a]"
+                    className="h-12 w-full rounded-xl border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-green-600"
                     onChange={(event) => setOverview((current) => ({ ...current, tags: event.target.value }))}
                     placeholder="react, ui, typescript"
                     value={overview.tags}
@@ -260,7 +260,7 @@ export function FreelancerCreateServiceClient() {
 
               <div className="mt-8 flex items-center justify-end">
                 <button
-                  className="rounded-xl bg-[#16a34a] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#15803d] disabled:opacity-60"
+                  className="rounded-xl bg-green-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-green-700 disabled:opacity-60"
                   disabled={isLoading}
                   onClick={() => void submitOverview()}
                   type="button"
@@ -273,15 +273,15 @@ export function FreelancerCreateServiceClient() {
 
           {currentStep === 2 ? (
             <>
-              <h2 className="text-[24px] font-semibold text-[#111827]">Standard Package</h2>
+              <h2 className="text-[24px] font-semibold text-slate-900">Standard Package</h2>
               <div className="mt-6 space-y-4">
-                <div className="rounded-2xl border border-[#16a34a] bg-[#f0fdf4] p-5 shadow-[inset_0_0_0_1px_rgba(22,163,74,0.2)]">
+                <div className="rounded-2xl border border-green-600 bg-green-50 p-5 shadow-[inset_0_0_0_1px_rgba(22,163,74,0.2)]">
                   <div className="mb-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#16a34a]">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-green-600">
                       Single Package
                     </p>
-                    <h3 className="mt-2 text-xl font-semibold text-[#111827]">Standard</h3>
-                    <p className="mt-1 text-sm text-[#6b7280]">
+                    <h3 className="mt-2 text-xl font-semibold text-slate-900">Standard</h3>
+                    <p className="mt-1 text-sm text-slate-500">
                       Keep one clear package so clients see one straightforward offer.
                     </p>
                   </div>
@@ -293,9 +293,9 @@ export function FreelancerCreateServiceClient() {
                       ["description", "Package Description"],
                     ].map(([field, label]) => (
                       <div key={field}>
-                        <label className="mb-2 block text-sm font-medium text-[#374151]">{label}</label>
+                        <label className="mb-2 block text-sm font-medium text-slate-700">{label}</label>
                         <input
-                          className="h-11 w-full rounded-xl border border-[#d1d5db] px-4 text-sm outline-none focus:border-[#16a34a]"
+                          className="h-11 w-full rounded-xl border border-slate-300 px-4 text-sm outline-none focus:border-green-600"
                           onChange={(event) =>
                             setPricing((current) => ({
                               ...current,
@@ -316,14 +316,14 @@ export function FreelancerCreateServiceClient() {
 
               <div className="mt-8 flex items-center justify-between">
                 <button
-                  className="rounded-xl border border-[#d1d5db] bg-white px-6 py-3 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+                  className="rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
                   onClick={() => setCurrentStep(1)}
                   type="button"
                 >
                   Back
                 </button>
                 <button
-                  className="rounded-xl bg-[#16a34a] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#15803d] disabled:opacity-60"
+                  className="rounded-xl bg-green-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-green-700 disabled:opacity-60"
                   disabled={isLoading}
                   onClick={() => void submitPricing()}
                   type="button"
@@ -336,20 +336,20 @@ export function FreelancerCreateServiceClient() {
 
           {currentStep === 3 ? (
             <>
-              <h2 className="text-[24px] font-semibold text-[#111827]">Upload & Publish</h2>
+              <h2 className="text-[24px] font-semibold text-slate-900">Upload & Publish</h2>
               <div className="mt-6 space-y-6">
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-[#374151]">Cover Image</label>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">Cover Image</label>
                   <input
                     accept="image/*"
-                    className="block rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-sm text-[#374151] file:mr-3 file:rounded-lg file:border-0 file:bg-[#16a34a] file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white"
+                    className="block rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 file:mr-3 file:rounded-lg file:border-0 file:bg-green-600 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white"
                     onChange={(event) => setMainImage(event.target.files?.[0] ?? null)}
                     type="file"
                   />
                 </div>
-                <div className="rounded-2xl border border-[#86efac] bg-[#ecfdf3] px-5 py-4">
-                  <p className="text-base font-semibold text-[#111827]">Ready to Publish?</p>
-                  <p className="mt-1 text-sm text-[#6b7280]">
+                <div className="rounded-2xl border border-green-300 bg-green-50 px-5 py-4">
+                  <p className="text-base font-semibold text-slate-900">Ready to Publish?</p>
+                  <p className="mt-1 text-sm text-slate-500">
                     One strong cover image is enough for this version of your listing.
                   </p>
                 </div>
@@ -357,14 +357,14 @@ export function FreelancerCreateServiceClient() {
 
               <div className="mt-8 flex items-center justify-between">
                 <button
-                  className="rounded-xl border border-[#d1d5db] bg-white px-6 py-3 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+                  className="rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
                   onClick={() => setCurrentStep(2)}
                   type="button"
                 >
                   Back
                 </button>
                 <button
-                  className="rounded-xl bg-[#16a34a] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#15803d] disabled:opacity-60"
+                  className="rounded-xl bg-green-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-green-700 disabled:opacity-60"
                   disabled={isLoading}
                   onClick={() => void submitPublish()}
                   type="button"

@@ -1,8 +1,9 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Paperclip, Send } from "lucide-react";
 import { useAuth } from "@/components/providers/auth-provider";
 import { useChatNotifications } from "@/components/providers/chat-notification-provider";
 import { useChatRealtime } from "@/hooks/use-chat-realtime";
@@ -96,23 +97,23 @@ function ProjectRequirementsEditor({
   const [file, setFile] = useState<File | null>(null);
 
   return (
-    <div className="mt-4 space-y-2 rounded-2xl border border-[#e5e7eb] bg-[#f8fafc] p-3">
-      <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6b7280]">
+    <div className="mt-4 space-y-2 rounded-2xl border border-slate-200 bg-slate-50 p-3">
+      <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">
         Actual Requirements
       </p>
       <input
-        className="w-full rounded-xl border border-[#d1d5db] px-3 py-2 text-sm text-[#111827] outline-none transition focus:border-[#2563eb]"
+        className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-blue-600"
         onChange={(event) => setTitle(event.target.value)}
         placeholder="Project title"
         value={title}
       />
       <textarea
-        className="min-h-[90px] w-full rounded-xl border border-[#d1d5db] px-3 py-2 text-sm text-[#111827] outline-none transition focus:border-[#2563eb]"
+        className="min-h-[90px] w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-blue-600"
         onChange={(event) => setRequirements(event.target.value)}
         placeholder="Share the exact scope, assets, or instructions"
         value={requirements}
       />
-      <label className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]">
+      <label className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
         {file ? file.name : "Attach requirement file"}
         <input
           className="hidden"
@@ -121,7 +122,7 @@ function ProjectRequirementsEditor({
         />
       </label>
       <button
-        className="w-full rounded-xl bg-[#2563eb] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#1d4ed8] disabled:opacity-60"
+        className="w-full rounded-xl bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
         disabled={disabled}
         onClick={() => void onSubmit({ file, requirements, title })}
         type="button"
@@ -275,15 +276,15 @@ const mapProject = (entry: unknown): WorkflowProject => {
 const statusToneClass = (status: string) => {
   const normalized = normalizeWorkflowState(status);
   if (normalized.includes("reject") || normalized.includes("cancel")) {
-    return "bg-[#fee2e2] text-[#dc2626]";
+    return "bg-red-100 text-red-600";
   }
   if (normalized.includes("deliver") || normalized.includes("review") || normalized.includes("pending")) {
-    return "bg-[#fef3c7] text-[#d97706]";
+    return "bg-amber-100 text-amber-600";
   }
   if (normalized.includes("complete")) {
-    return "bg-[#dcfce7] text-[#16a34a]";
+    return "bg-green-100 text-green-600";
   }
-  return "bg-[#eef2ff] text-[#2563eb]";
+  return "bg-blue-50 text-blue-600";
 };
 
 export function ChatWorkspaceClient({
@@ -1458,13 +1459,13 @@ export function ChatWorkspaceClient({
 
   return (
     <div className="mx-auto w-full max-w-[1600px] px-4 pb-8 md:px-6 lg:px-10">
-      <section className="rounded-2xl border border-[#e5e7eb] bg-white p-6">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-[30px] font-semibold leading-none text-[#111827] md:text-[18px]">
+            <h1 className="text-[30px] font-semibold leading-none text-slate-900 md:text-[18px]">
               Messages
             </h1>
-            <p className="mt-2 text-sm text-[#6b7280]">
+            <p className="mt-2 text-sm text-slate-500">
               Keep delivery updates, requirements, and direct messages in one thread.
             </p>
           </div>
@@ -1473,10 +1474,10 @@ export function ChatWorkspaceClient({
             <span
               className={`rounded-full px-3 py-1 text-xs font-semibold ${
                 realtimeStatus === "live"
-                  ? "bg-[#dcfce7] text-[#16a34a]"
+                  ? "bg-green-100 text-green-600"
                   : realtimeStatus === "connecting"
-                    ? "bg-[#fef3c7] text-[#d97706]"
-                    : "bg-[#fee2e2] text-[#dc2626]"
+                    ? "bg-amber-100 text-amber-600"
+                    : "bg-red-100 text-red-600"
               }`}
             >
               {realtimeStatus === "live"
@@ -1486,14 +1487,14 @@ export function ChatWorkspaceClient({
                   : "Realtime offline"}
             </span>
             <button
-              className="rounded-xl border border-[#d1d5db] bg-white px-4 py-2.5 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+              className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
               onClick={() => void Promise.all([loadConversations(true), loadWorkflowData()])}
               type="button"
             >
               Refresh
             </button>
             <button
-              className="rounded-xl border border-[#fecaca] bg-white px-4 py-2.5 text-sm font-semibold text-[#dc2626] transition hover:bg-[#fef2f2]"
+              className="rounded-xl border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50"
               onClick={openReportDialog}
               type="button"
             >
@@ -1504,22 +1505,22 @@ export function ChatWorkspaceClient({
       </section>
 
       {reportSuccess ? (
-        <div className="mt-4 rounded-2xl border border-[#bbf7d0] bg-[#f0fdf4] px-5 py-4 text-sm text-[#166534]">
+        <div className="mt-4 rounded-2xl border border-green-200 bg-green-50 px-5 py-4 text-sm text-green-800">
           {reportSuccess}
         </div>
       ) : null}
 
       {isReportDialogOpen ? (
-        <section className="mt-4 rounded-2xl border border-[#fecaca] bg-white p-5 shadow-sm">
+        <section className="mt-4 rounded-2xl border border-red-200 bg-white p-5 shadow-sm">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <h2 className="text-[18px] font-semibold text-[#111827]">Report This Situation</h2>
-              <p className="mt-1 text-sm text-[#6b7280]">
+              <h2 className="text-[18px] font-semibold text-slate-900">Report This Situation</h2>
+              <p className="mt-1 text-sm text-slate-500">
                 Send the current dispute or suspicious behavior to the admin team for review.
               </p>
             </div>
             <button
-              className="rounded-xl border border-[#d1d5db] bg-white px-4 py-2 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+              className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
               onClick={() => {
                 setIsReportDialogOpen(false);
                 setReportError(null);
@@ -1538,13 +1539,13 @@ export function ChatWorkspaceClient({
 
           <div className="mt-4 grid gap-4">
             <input
-              className="w-full rounded-xl border border-[#d1d5db] px-4 py-3 text-sm text-[#111827] outline-none transition focus:border-[#dc2626]"
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-red-600"
               onChange={(event) => setReportSubject(event.target.value)}
               placeholder="Report subject"
               value={reportSubject}
             />
             <textarea
-              className="min-h-[180px] w-full rounded-xl border border-[#d1d5db] px-4 py-3 text-sm text-[#111827] outline-none transition focus:border-[#dc2626]"
+              className="min-h-[180px] w-full rounded-xl border border-slate-300 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-red-600"
               onChange={(event) => setReportMessage(event.target.value)}
               placeholder="Describe what happened, what you need reviewed, and any important timestamps or behavior."
               value={reportMessage}
@@ -1553,7 +1554,7 @@ export function ChatWorkspaceClient({
 
           <div className="mt-5 flex flex-wrap justify-end gap-3">
             <button
-              className="rounded-xl border border-[#d1d5db] bg-white px-4 py-2.5 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]"
+              className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
               onClick={() => {
                 setReportSubject(reportDefaults.subject);
                 setReportMessage(reportDefaults.message);
@@ -1564,7 +1565,7 @@ export function ChatWorkspaceClient({
               Reset
             </button>
             <button
-              className="rounded-xl bg-[#dc2626] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#b91c1c] disabled:opacity-60"
+              className="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:opacity-60"
               disabled={isSubmittingReport}
               onClick={() => void handleSubmitReport()}
               type="button"
@@ -1576,10 +1577,10 @@ export function ChatWorkspaceClient({
       ) : null}
 
       <section className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
-        <aside className="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white">
-          <div className="border-b border-[#eef2f7] px-5 py-4">
-            <h2 className="text-[16px] font-bold text-[#111827]">Conversations</h2>
-            <p className="mt-1 text-sm text-[#6b7280]">
+        <aside className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <div className="border-b border-slate-100 px-5 py-4">
+            <h2 className="text-[16px] font-bold text-slate-900">Conversations</h2>
+            <p className="mt-1 text-sm text-slate-500">
               {conversations.length} active room{conversations.length === 1 ? "" : "s"}
             </p>
           </div>
@@ -1591,36 +1592,36 @@ export function ChatWorkspaceClient({
           ) : null}
 
           {isLoadingConversations ? (
-            <div className="px-5 py-8 text-sm text-[#6b7280]">Loading conversations...</div>
+            <div className="px-5 py-8 text-sm text-slate-500">Loading conversations...</div>
           ) : conversations.length ? (
-            <div className="divide-y divide-[#eef2f7]">
+            <div className="divide-y divide-slate-100">
               {conversations.map((conversation) => {
                 const isActive = conversation.roomId === selectedRoomId;
                 return (
                   <button
                     key={conversation.roomId}
                     className={`flex w-full items-start gap-3 px-5 py-4 text-left transition ${
-                      isActive ? "bg-[#f8fafc]" : "bg-white hover:bg-[#fafafa]"
+                      isActive ? "bg-slate-50" : "bg-white hover:bg-slate-50"
                     }`}
                     onClick={() => selectConversation(conversation.roomId)}
                     type="button"
                   >
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-sm font-semibold text-[#2563eb]">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-600">
                       {getConversationInitials(conversation)}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-3">
-                        <p className="truncate text-sm font-semibold text-[#111827]">
+                        <p className="truncate text-sm font-semibold text-slate-900">
                           {conversation.otherUsername}
                         </p>
-                        <span className="shrink-0 text-xs text-[#9ca3af]">
+                        <span className="shrink-0 text-xs text-slate-400">
                           {formatChatTimestamp(conversation.lastMessageTime)}
                         </span>
                       </div>
-                      <p className="mt-1 truncate text-xs font-medium uppercase tracking-[0.08em] text-[#6b7280]">
+                      <p className="mt-1 truncate text-xs font-medium uppercase tracking-[0.08em] text-slate-500">
                         {getConversationSubline(conversation)}
                       </p>
-                      <p className="mt-2 line-clamp-2 text-sm text-[#6b7280]">
+                      <p className="mt-2 line-clamp-2 text-sm text-slate-500">
                         {buildConversationPreview(conversation)}
                       </p>
                     </div>
@@ -1630,34 +1631,34 @@ export function ChatWorkspaceClient({
             </div>
           ) : (
             <div className="px-5 py-10 text-center">
-              <p className="text-base font-semibold text-[#111827]">No conversations yet</p>
-              <p className="mt-2 text-sm text-[#6b7280]">{emptyStateCopy}</p>
+              <p className="text-base font-semibold text-slate-900">No conversations yet</p>
+              <p className="mt-2 text-sm text-slate-500">{emptyStateCopy}</p>
             </div>
           )}
         </aside>
 
-        <div className="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white">
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
           {selectedConversation ? (
             <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_340px]">
-              <div className="min-w-0 border-b border-[#eef2f7] xl:border-b-0 xl:border-r">
-                <div className="border-b border-[#eef2f7] px-5 py-4">
+              <div className="min-w-0 border-b border-slate-100 xl:border-b-0 xl:border-r">
+                <div className="border-b border-slate-100 px-5 py-4">
                   <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#eef2ff] text-sm font-semibold text-[#2563eb]">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-600">
                         {getInitials(selectedConversation.otherUsername)}
                       </div>
                       <div>
-                        <h2 className="text-[16px] font-bold text-[#111827]">
+                        <h2 className="text-[16px] font-bold text-slate-900">
                           {getConversationHeadline(selectedConversation)}
                         </h2>
-                        <p className="mt-1 text-sm text-[#6b7280]">
+                        <p className="mt-1 text-sm text-slate-500">
                           {selectedConversation.otherUsername} | {getConversationSubline(selectedConversation)}
                         </p>
                       </div>
                     </div>
 
                     {selectedConversation.projectId ? (
-                      <span className="rounded-full bg-[#eef2ff] px-3 py-1 text-xs font-medium text-[#2563eb]">
+                      <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600">
                         Project #{selectedConversation.projectId}
                       </span>
                     ) : null}
@@ -1670,9 +1671,9 @@ export function ChatWorkspaceClient({
                   </div>
                 ) : null}
 
-                <div className="h-[520px] overflow-y-auto bg-[#f8fafc] px-5 py-5">
+                <div className="h-[520px] overflow-y-auto bg-slate-50 px-5 py-5">
                   {isLoadingMessages ? (
-                    <div className="text-sm text-[#6b7280]">Loading messages...</div>
+                    <div className="text-sm text-slate-500">Loading messages...</div>
                   ) : messages.length ? (
                     <div className="space-y-4">
                       {messages.map((message) => {
@@ -1697,21 +1698,21 @@ export function ChatWorkspaceClient({
                             <div
                               className={`max-w-[80%] rounded-2xl px-4 py-3 shadow-sm ${
                                 isCurrentUser
-                                  ? "bg-[#2563eb] text-white"
-                                  : "border border-[#e5e7eb] bg-white text-[#111827]"
+                                  ? "bg-blue-600 text-white"
+                                  : "border border-slate-200 bg-white text-slate-900"
                               }`}
                             >
                               <div className="flex items-center justify-between gap-3">
                                 <p
                                   className={`text-xs font-semibold uppercase tracking-[0.08em] ${
-                                    isCurrentUser ? "text-blue-100" : "text-[#6b7280]"
+                                    isCurrentUser ? "text-blue-100" : "text-slate-500"
                                   }`}
                                 >
                                   {isCurrentUser ? "You" : message.senderName || selectedConversation.otherUsername}
                                 </p>
                                 <span
                                   className={`text-xs ${
-                                    isCurrentUser ? "text-blue-100" : "text-[#9ca3af]"
+                                    isCurrentUser ? "text-blue-100" : "text-slate-400"
                                   }`}
                                 >
                                   {formatChatTimestamp(message.sentAt)}
@@ -1737,7 +1738,7 @@ export function ChatWorkspaceClient({
                               {meta?.amount ? (
                                 <p
                                   className={`mt-2 text-xs ${
-                                    isCurrentUser ? "text-blue-100" : "text-[#6b7280]"
+                                    isCurrentUser ? "text-blue-100" : "text-slate-500"
                                   }`}
                                 >
                                   Amount: {formatMoney(meta.amount)}
@@ -1747,7 +1748,7 @@ export function ChatWorkspaceClient({
                               {meta?.revisionMessage ? (
                                 <p
                                   className={`mt-2 text-xs ${
-                                    isCurrentUser ? "text-blue-100" : "text-[#6b7280]"
+                                    isCurrentUser ? "text-blue-100" : "text-slate-500"
                                   }`}
                                 >
                                   Revision note: {meta.revisionMessage}
@@ -1757,14 +1758,14 @@ export function ChatWorkspaceClient({
                               {canRespondToPrice && meta ? (
                                 <div className="mt-3 flex flex-wrap gap-2">
                                   <button
-                                    className="rounded-xl bg-[#16a34a] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#15803d]"
+                                    className="rounded-xl bg-green-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-green-700"
                                     onClick={() => void handleRespondToPriceProposal("accepted", meta)}
                                     type="button"
                                   >
                                     Accept Price
                                   </button>
                                   <button
-                                    className="rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-xs font-semibold text-[#374151] transition hover:bg-[#f9fafb]"
+                                    className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
                                     onClick={() => void handleRespondToPriceProposal("rejected", meta)}
                                     type="button"
                                   >
@@ -1778,7 +1779,7 @@ export function ChatWorkspaceClient({
                                   className={`mt-3 inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium ${
                                     isCurrentUser
                                       ? "bg-white/15 text-white hover:bg-white/20"
-                                      : "bg-[#f3f4f6] text-[#111827] hover:bg-[#e5e7eb]"
+                                      : "bg-slate-100 text-slate-900 hover:bg-slate-200"
                                   }`}
                                   onClick={() => void handleAttachmentDownload(message)}
                                   type="button"
@@ -1794,8 +1795,8 @@ export function ChatWorkspaceClient({
                   ) : (
                     <div className="flex h-full items-center justify-center text-center">
                       <div>
-                        <p className="text-base font-semibold text-[#111827]">No messages yet</p>
-                        <p className="mt-2 text-sm text-[#6b7280]">
+                        <p className="text-base font-semibold text-slate-900">No messages yet</p>
+                        <p className="mt-2 text-sm text-slate-500">
                           Start the conversation from the composer below.
                         </p>
                       </div>
@@ -1803,12 +1804,12 @@ export function ChatWorkspaceClient({
                   )}
                 </div>
 
-                <div className="border-t border-[#eef2f7] bg-white p-5">
+                <div className="border-t border-slate-100 bg-white p-5">
                   {selectedFile ? (
-                    <div className="mb-4 flex items-center justify-between rounded-2xl border border-[#dbeafe] bg-[#eff6ff] px-4 py-3 text-sm text-[#1d4ed8]">
+                    <div className="mb-4 flex items-center justify-between rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
                       <span className="truncate font-medium">{selectedFile.name}</span>
                       <button
-                        className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-[#1d4ed8] transition hover:bg-[#dbeafe]"
+                        className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-blue-700 transition hover:bg-blue-100"
                         onClick={() => setSelectedFile(null)}
                         type="button"
                       >
@@ -1817,64 +1818,45 @@ export function ChatWorkspaceClient({
                     </div>
                   ) : null}
 
-                  <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_186px] lg:items-end">
-                    <div className="flex-1">
-                      <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.08em] text-[#6b7280]">
-                        Message
-                      </label>
-                      <textarea
-                        className="min-h-[120px] w-full rounded-2xl border border-[#d1d5db] bg-[#fcfcfd] px-4 py-3 text-sm text-[#111827] outline-none transition focus:border-[#2563eb]"
-                        onChange={(event) => setComposerText(event.target.value)}
-                        placeholder="Write a message, share next steps, or send an update..."
-                        value={composerText}
+                  <div className="flex items-end gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2">
+                    <label
+                      className="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-blue-200 bg-white text-blue-600 transition hover:bg-blue-50"
+                      title={selectedFile ? `Change attachment: ${selectedFile.name}` : "Attach file"}
+                    >
+                      <Paperclip className="h-5 w-5" />
+                      <input
+                        accept="image/*,.pdf,.doc,.docx,.zip,.rar,.txt"
+                        className="hidden"
+                        onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
+                        type="file"
                       />
-                    </div>
+                    </label>
 
-                    <div className="flex shrink-0 flex-col gap-3">
-                      <label
-                        className="inline-flex min-h-[56px] cursor-pointer items-center justify-center rounded-2xl border border-dashed border-[#93c5fd] bg-gradient-to-br from-[#eff6ff] to-[#dbeafe] px-4 py-3 text-center text-sm font-semibold text-[#1d4ed8] transition hover:from-[#dbeafe] hover:to-[#bfdbfe]"
-                        title={selectedFile ? `Change attachment: ${selectedFile.name}` : "Attach file"}
-                      >
-                        <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/80 shadow-sm">
-                          <svg
-                            aria-hidden="true"
-                            className="h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              d="m15.5 6.5-6.8 6.8a2.5 2.5 0 1 0 3.54 3.53l7.07-7.07a4 4 0 0 0-5.66-5.66L6.25 11.9a5.5 5.5 0 0 0 7.78 7.78l6.01-6.01"
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="1.8"
-                            />
-                          </svg>
-                        </span>
-                        <input
-                          accept="image/*,.pdf,.doc,.docx,.zip,.rar,.txt"
-                          className="hidden"
-                          onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
-                          type="file"
-                        />
-                      </label>
-                      <button
-                        className="inline-flex min-h-[56px] items-center justify-center rounded-2xl bg-gradient-to-r from-[#111827] to-[#1f2937] px-4 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(17,24,39,0.18)] transition hover:from-[#0b1220] hover:to-[#111827] disabled:cursor-not-allowed disabled:opacity-60"
-                        disabled={isSending || (!composerText.trim() && !selectedFile)}
-                        onClick={() => void handleSendMessage()}
-                        type="button"
-                      >
-                        {isSending ? "Sending..." : "Send Message"}
-                      </button>
-                    </div>
+                    <textarea
+                      className="min-h-11 flex-1 resize-none rounded-xl border border-transparent bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-300"
+                      onChange={(event) => setComposerText(event.target.value)}
+                      placeholder="Message"
+                      rows={1}
+                      value={composerText}
+                    />
+
+                    <button
+                      className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                      disabled={isSending || (!composerText.trim() && !selectedFile)}
+                      onClick={() => void handleSendMessage()}
+                      type="button"
+                    >
+                      <Send className="h-4 w-4" />
+                      <span className="hidden sm:inline">{isSending ? "Sending" : "Send"}</span>
+                    </button>
                   </div>
                 </div>
               </div>
 
               <aside className="bg-white">
-                <div className="border-b border-[#eef2f7] px-5 py-4">
-                  <h3 className="text-[16px] font-bold text-[#111827]">Workflow Actions</h3>
-                  <p className="mt-1 text-sm text-[#6b7280]">
+                <div className="border-b border-slate-100 px-5 py-4">
+                  <h3 className="text-[16px] font-bold text-slate-900">Workflow Actions</h3>
+                  <p className="mt-1 text-sm text-slate-500">
                     Manage request, pricing, delivery, and revision steps in this room.
                   </p>
                 </div>
@@ -1887,16 +1869,16 @@ export function ChatWorkspaceClient({
 
                 <div className="space-y-5 px-5 py-5">
                   {isLoadingWorkflow ? (
-                    <div className="text-sm text-[#6b7280]">Loading workflow context...</div>
+                    <div className="text-sm text-slate-500">Loading workflow context...</div>
                   ) : null}
 
-                  <section className="rounded-2xl border border-[#e5e7eb] p-4">
+                  <section className="rounded-2xl border border-slate-200 p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6b7280]">
+                        <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">
                           Hire Request
                         </p>
-                        <h4 className="mt-1 text-sm font-semibold text-[#111827]">
+                        <h4 className="mt-1 text-sm font-semibold text-slate-900">
                           {matchedHireRequest?.gigTitle || "No linked request"}
                         </h4>
                       </div>
@@ -1909,7 +1891,7 @@ export function ChatWorkspaceClient({
 
                     {matchedHireRequest ? (
                       <>
-                        <div className="mt-3 space-y-2 text-sm text-[#6b7280]">
+                        <div className="mt-3 space-y-2 text-sm text-slate-500">
                           <p>
                             Agreed price:{" "}
                             {formatMoney(
@@ -1921,7 +1903,7 @@ export function ChatWorkspaceClient({
                         <div className="mt-4 space-y-3">
                           {scope === "client" && confirmOrderHref ? (
                             <Link
-                              className="inline-flex w-full items-center justify-center rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-sm font-semibold text-[#2563eb] transition hover:bg-[#eff6ff]"
+                              className="inline-flex w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50"
                               href={confirmOrderHref}
                             >
                               Open Order Page
@@ -1931,7 +1913,7 @@ export function ChatWorkspaceClient({
                           {canFreelancerRespondToHireRequest ? (
                             <div className="flex gap-2">
                               <button
-                                className="flex-1 rounded-xl bg-[#16a34a] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#15803d] disabled:opacity-60"
+                                className="flex-1 rounded-xl bg-green-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-green-700 disabled:opacity-60"
                                 disabled={isWorkflowBusy}
                                 onClick={() => void handleAcceptHireRequest()}
                                 type="button"
@@ -1939,7 +1921,7 @@ export function ChatWorkspaceClient({
                                 Accept
                               </button>
                               <button
-                                className="flex-1 rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-sm font-semibold text-[#374151] transition hover:bg-[#f9fafb] disabled:opacity-60"
+                                className="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
                                 disabled={isWorkflowBusy}
                                 onClick={() => void handleRejectHireRequest()}
                                 type="button"
@@ -1951,7 +1933,7 @@ export function ChatWorkspaceClient({
 
                           {canClientCancelRequest ? (
                             <button
-                              className="w-full rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-sm font-semibold text-[#374151] transition hover:bg-[#f9fafb] disabled:opacity-60"
+                              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
                               disabled={isWorkflowBusy}
                               onClick={() => void handleCancelHireRequest()}
                               type="button"
@@ -1962,17 +1944,17 @@ export function ChatWorkspaceClient({
 
                           {canProposePrice ? (
                             <div className="space-y-2">
-                              <p className="text-xs text-[#6b7280]">
+                              <p className="text-xs text-slate-500">
                                 Send a counteroffer only if the requested scope needs a different price.
                               </p>
                               <input
-                                className="w-full rounded-xl border border-[#d1d5db] px-3 py-2 text-sm text-[#111827] outline-none transition focus:border-[#2563eb]"
+                                className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-blue-600"
                                 onChange={(event) => setPriceDraft(event.target.value)}
                                 placeholder="Send a counteroffer"
                                 value={priceDraft}
                               />
                               <button
-                                className="w-full rounded-xl bg-[#2563eb] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#1d4ed8] disabled:opacity-60"
+                                className="w-full rounded-xl bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
                                 disabled={isWorkflowBusy || !priceDraft.trim() || hasPendingPriceProposal}
                                 onClick={() => void handleProposePrice()}
                                 type="button"
@@ -1983,18 +1965,18 @@ export function ChatWorkspaceClient({
                           ) : null}
 
                           {latestPendingIncomingPriceProposal?.meta ? (
-                            <div className="rounded-xl border border-[#dbeafe] bg-[#eff6ff] p-3">
-                              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#1d4ed8]">
+                            <div className="rounded-xl border border-blue-200 bg-blue-50 p-3">
+                              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-blue-700">
                                 Pending Price Proposal
                               </p>
-                              <p className="mt-1 text-sm text-[#1e3a8a]">
+                              <p className="mt-1 text-sm text-blue-900">
                                 {latestPendingIncomingPriceProposal.meta.amount
                                   ? formatMoney(latestPendingIncomingPriceProposal.meta.amount)
                                   : latestPendingIncomingPriceProposal.meta.text}
                               </p>
                               <div className="mt-3 flex gap-2">
                                 <button
-                                  className="flex-1 rounded-xl bg-[#16a34a] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#15803d] disabled:opacity-60"
+                                  className="flex-1 rounded-xl bg-green-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-green-700 disabled:opacity-60"
                                   disabled={isWorkflowBusy}
                                   onClick={() =>
                                     void handleRespondToPriceProposal(
@@ -2007,7 +1989,7 @@ export function ChatWorkspaceClient({
                                   Accept
                                 </button>
                                 <button
-                                  className="flex-1 rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-xs font-semibold text-[#374151] transition hover:bg-[#f9fafb] disabled:opacity-60"
+                                  className="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
                                   disabled={isWorkflowBusy}
                                   onClick={() =>
                                     void handleRespondToPriceProposal(
@@ -2024,19 +2006,19 @@ export function ChatWorkspaceClient({
                           ) : null}
 
                           {canFreelancerAcceptRequirements && latestPendingIncomingRequirementProposal ? (
-                            <div className="rounded-xl border border-[#dcfce7] bg-[#f0fdf4] p-3">
-                              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#15803d]">
+                            <div className="rounded-xl border border-green-100 bg-green-50 p-3">
+                              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-green-700">
                                 Requirement Update
                               </p>
-                              <p className="mt-1 text-sm font-semibold text-[#14532d]">
+                              <p className="mt-1 text-sm font-semibold text-green-900">
                                 {latestPendingIncomingRequirementProposal.meta.title || "Project requirements"}
                               </p>
-                              <p className="mt-1 text-sm text-[#166534]">
+                              <p className="mt-1 text-sm text-green-800">
                                 {latestPendingIncomingRequirementProposal.meta.text}
                               </p>
                               {latestPendingIncomingRequirementProposal.message.attachmentName ? (
                                 <button
-                                  className="mt-3 text-sm font-medium text-[#166534] underline underline-offset-2"
+                                  className="mt-3 text-sm font-medium text-green-800 underline underline-offset-2"
                                   onClick={() =>
                                     void handleAttachmentDownload(
                                       latestPendingIncomingRequirementProposal.message,
@@ -2050,8 +2032,8 @@ export function ChatWorkspaceClient({
                               <button
                                 className={`mt-3 w-full rounded-xl px-3 py-2 text-sm font-semibold transition ${
                                   canFreelancerAcceptRequirements
-                                    ? "bg-[#16a34a] text-white hover:bg-[#15803d]"
-                                    : "cursor-not-allowed bg-[#d1fae5] text-[#166534]"
+                                    ? "bg-green-600 text-white hover:bg-green-700"
+                                    : "cursor-not-allowed bg-emerald-100 text-green-800"
                                 } disabled:opacity-100`}
                                 disabled={isWorkflowBusy || !canFreelancerAcceptRequirements}
                                 onClick={() => void handleAcceptRequirementProposal()}
@@ -2064,19 +2046,19 @@ export function ChatWorkspaceClient({
                         </div>
                       </>
                     ) : (
-                      <p className="mt-3 text-sm text-[#6b7280]">
+                      <p className="mt-3 text-sm text-slate-500">
                         This conversation has not been tied to a hire request yet.
                       </p>
                     )}
                   </section>
 
-                  <section className="rounded-2xl border border-[#e5e7eb] p-4">
+                  <section className="rounded-2xl border border-slate-200 p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6b7280]">
+                        <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">
                           Project
                         </p>
-                        <h4 className="mt-1 text-sm font-semibold text-[#111827]">
+                        <h4 className="mt-1 text-sm font-semibold text-slate-900">
                           {matchedProject?.projectTitle || "No active project"}
                         </h4>
                       </div>
@@ -2089,11 +2071,11 @@ export function ChatWorkspaceClient({
 
                     {matchedProject ? (
                       <>
-                        <div className="mt-3 space-y-2 text-sm text-[#6b7280]">
+                        <div className="mt-3 space-y-2 text-sm text-slate-500">
                           <p>Budget: {formatMoney(matchedProject.agreedPrice)}</p>
                           {matchedProject.requirements ? (
-                            <div className="rounded-xl border border-[#e5e7eb] bg-[#f8fafc] p-3 text-[#374151]">
-                              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6b7280]">
+                            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-slate-700">
+                              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">
                                 Current Requirements
                               </p>
                               <p className="mt-2 whitespace-pre-wrap text-sm leading-6">
@@ -2103,7 +2085,7 @@ export function ChatWorkspaceClient({
                           ) : null}
                           {matchedProject.requirementFileName ? (
                             <button
-                              className="text-left font-medium text-[#2563eb] transition hover:text-[#1d4ed8]"
+                              className="text-left font-medium text-blue-600 transition hover:text-blue-700"
                               onClick={() => void handleRequirementDownload()}
                               type="button"
                             >
@@ -2112,7 +2094,7 @@ export function ChatWorkspaceClient({
                           ) : null}
                           {matchedProject.deliveryFileName ? (
                             <button
-                              className="text-left font-medium text-[#2563eb] transition hover:text-[#1d4ed8]"
+                              className="text-left font-medium text-blue-600 transition hover:text-blue-700"
                               onClick={() => void handleDeliveryDownload()}
                               type="button"
                             >
@@ -2125,19 +2107,19 @@ export function ChatWorkspaceClient({
                           <div className="mt-4 space-y-2">
                             {matchedProject?.id ? (
                               <Link
-                                className="inline-flex w-full items-center justify-center rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-sm font-semibold text-[#2563eb] transition hover:bg-[#eff6ff]"
+                                className="inline-flex w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50"
                                 href="/freelancer/active-work"
                               >
                                 Open Delivery Workspace
                               </Link>
                             ) : null}
                             <textarea
-                              className="min-h-[90px] w-full rounded-xl border border-[#d1d5db] px-3 py-2 text-sm text-[#111827] outline-none transition focus:border-[#2563eb]"
+                              className="min-h-[90px] w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-blue-600"
                               onChange={(event) => setDeliveryText(event.target.value)}
                               placeholder="Add a delivery note"
                               value={deliveryText}
                             />
-                            <label className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]">
+                            <label className="inline-flex w-full cursor-pointer items-center justify-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
                               {deliveryFile ? deliveryFile.name : "Attach delivery file"}
                               <input
                                 className="hidden"
@@ -2146,7 +2128,7 @@ export function ChatWorkspaceClient({
                               />
                             </label>
                             <button
-                              className="w-full rounded-xl bg-[#16a34a] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#15803d] disabled:opacity-60"
+                              className="w-full rounded-xl bg-green-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-green-700 disabled:opacity-60"
                               disabled={isWorkflowBusy || !canFreelancerDeliverProject}
                               onClick={() => void handleDeliverProject()}
                               type="button"
@@ -2161,8 +2143,8 @@ export function ChatWorkspaceClient({
                             <div
                               className={`rounded-xl border p-3 text-sm ${
                                 canClientReviewDelivery
-                                  ? "border-[#dbeafe] bg-[#eff6ff] text-[#1d4ed8]"
-                                  : "border-[#fde68a] bg-[#fffbeb] text-[#92400e]"
+                                  ? "border-blue-200 bg-blue-50 text-blue-700"
+                                  : "border-amber-200 bg-amber-50 text-amber-800"
                               }`}
                             >
                               {canClientReviewDelivery
@@ -2171,7 +2153,7 @@ export function ChatWorkspaceClient({
                             </div>
                             {confirmOrderHref ? (
                               <Link
-                                className="inline-flex w-full items-center justify-center rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-sm font-semibold text-[#2563eb] transition hover:bg-[#eff6ff]"
+                                className="inline-flex w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50"
                                 href={confirmOrderHref}
                               >
                                 Continue to Payment
@@ -2179,13 +2161,13 @@ export function ChatWorkspaceClient({
                             ) : null}
 
                             <textarea
-                              className="min-h-[90px] w-full rounded-xl border border-[#d1d5db] px-3 py-2 text-sm text-[#111827] outline-none transition focus:border-[#2563eb]"
+                              className="min-h-[90px] w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-blue-600"
                               onChange={(event) => setRevisionText(event.target.value)}
                               placeholder="Add revision notes if changes are needed"
                               value={revisionText}
                             />
                             <button
-                              className="w-full rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-sm font-semibold text-[#374151] transition hover:bg-[#f9fafb] disabled:opacity-60"
+                              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
                               disabled={isWorkflowBusy || !revisionText.trim() || !canClientReviewDelivery}
                               onClick={() => void handleRequestRevision()}
                               type="button"
@@ -2196,13 +2178,13 @@ export function ChatWorkspaceClient({
                         ) : null}
 
                         {(submittedPayment || paidPayment) ? (
-                          <div className="mt-4 rounded-xl border border-[#e5e7eb] bg-[#f8fafc] p-3">
+                          <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
                             <div className="flex items-start justify-between gap-3">
                               <div>
-                                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#6b7280]">
+                                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">
                                   Payment
                                 </p>
-                                <p className="mt-1 text-sm font-semibold text-[#111827]">
+                                <p className="mt-1 text-sm font-semibold text-slate-900">
                                   {submittedPayment
                                     ? "Payment proof submitted"
                                     : "Payment confirmed"}
@@ -2211,15 +2193,15 @@ export function ChatWorkspaceClient({
                               <span
                                 className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${
                                   submittedPayment
-                                    ? "bg-[#fef3c7] text-[#d97706]"
-                                    : "bg-[#dcfce7] text-[#16a34a]"
+                                    ? "bg-amber-100 text-amber-600"
+                                    : "bg-green-100 text-green-600"
                                 }`}
                               >
                                 {submittedPayment ? "Awaiting seller review" : "Paid"}
                               </span>
                             </div>
 
-                            <div className="mt-3 space-y-1 text-sm text-[#6b7280]">
+                            <div className="mt-3 space-y-1 text-sm text-slate-500">
                               <p>
                                 Amount:{" "}
                                 {formatMoney(
@@ -2244,7 +2226,7 @@ export function ChatWorkspaceClient({
                               <div className="mt-3 flex flex-wrap gap-2">
                                 {submittedPayment.hasProofFile ? (
                                   <button
-                                    className="inline-flex items-center justify-center rounded-xl border border-[#d1d5db] bg-white px-3 py-2 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb] disabled:opacity-60"
+                                    className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
                                     disabled={paymentActionId === `proof:${submittedPayment.tranId ?? ""}`}
                                     onClick={() =>
                                       void handlePaymentProofDownload(
@@ -2260,7 +2242,7 @@ export function ChatWorkspaceClient({
                                   </button>
                                 ) : null}
                                 <button
-                                  className="inline-flex items-center justify-center rounded-xl bg-[#16a34a] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#15803d] disabled:opacity-60"
+                                  className="inline-flex items-center justify-center rounded-xl bg-green-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-green-700 disabled:opacity-60"
                                   disabled={paymentActionId === `confirm:${submittedPayment.tranId ?? ""}`}
                                   onClick={() =>
                                     void handleConfirmPaymentReceived(submittedPayment.tranId ?? "")
@@ -2278,7 +2260,7 @@ export function ChatWorkspaceClient({
 
                         {canFreelancerAcceptRevision ? (
                           <button
-                            className="mt-4 w-full rounded-xl bg-[#2563eb] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#1d4ed8] disabled:opacity-60"
+                            className="mt-4 w-full rounded-xl bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
                             disabled={isWorkflowBusy || !canFreelancerAcceptRevision}
                             onClick={() => void handleAcceptRevision()}
                             type="button"
@@ -2298,7 +2280,7 @@ export function ChatWorkspaceClient({
                         ) : null}
                       </>
                     ) : (
-                      <p className="mt-3 text-sm text-[#6b7280]">
+                      <p className="mt-3 text-sm text-slate-500">
                         Project delivery and revision actions appear here after a request is accepted.
                       </p>
                     )}
@@ -2307,15 +2289,15 @@ export function ChatWorkspaceClient({
               </aside>
             </div>
           ) : (
-            <div className="flex min-h-[640px] items-center justify-center bg-[#f8fafc] px-6 text-center">
+            <div className="flex min-h-[640px] items-center justify-center bg-slate-50 px-6 text-center">
               <div>
-                <p className="text-2xl font-semibold text-[#111827]">Select a conversation</p>
-                <p className="mt-3 text-sm text-[#6b7280]">
+                <p className="text-2xl font-semibold text-slate-900">Select a conversation</p>
+                <p className="mt-3 text-sm text-slate-500">
                   Choose a room from the left sidebar to view messages.
                 </p>
                 {scope === "client" ? (
                   <Link
-                    className="mt-5 inline-flex items-center justify-center rounded-xl bg-[#2563eb] px-4 py-3 text-sm font-medium text-white transition hover:bg-[#1d4ed8]"
+                    className="mt-5 inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-3 text-sm font-medium text-white transition hover:bg-blue-700"
                     href="/client/browse-freelancers"
                   >
                     Find freelancers

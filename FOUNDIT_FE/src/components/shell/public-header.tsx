@@ -9,9 +9,9 @@ export function PublicHeader() {
   const { session, signOut, status } = useAuth();
 
   return (
-    <header className="sticky top-0 z-30 border-b border-b-gray-300 bg-[#eef5f0]/95 backdrop-blur">
-      <div className="mx-auto flex h-16 w-full max-w-[1600px] items-center justify-between px-6 py-4 lg:px-10">
-        <Link className="flex h-16 w-32 items-center" href="/">
+    <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
+      <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <Link className="flex h-14 w-28 items-center" href="/">
           <Image
             alt="FOUNDIT"
             className="h-full w-full object-contain"
@@ -22,7 +22,7 @@ export function PublicHeader() {
           />
         </Link>
 
-        <nav className="flex items-center gap-4 sm:gap-6">
+        <nav className="flex items-center gap-3 sm:gap-5">
           <Link
             className="hidden text-sm font-medium text-slate-600 transition hover:text-slate-900 md:inline-flex"
             href="/browse-freelancers"
@@ -44,7 +44,7 @@ export function PublicHeader() {
                 Workspace
               </Link>
               <button
-                className="rounded-lg bg-[#16a34a] px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#15803d]"
+                className="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-green-700"
                 onClick={signOut}
                 type="button"
               >
@@ -60,7 +60,7 @@ export function PublicHeader() {
                 Login
               </Link>
               <Link
-                className="rounded-lg bg-[#16a34a] px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#15803d]"
+                className="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-green-700"
                 href="/auth/sign-up"
               >
                 Sign Up

@@ -1,9 +1,11 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { ChevronDown } from "lucide-react";
+import { GoogleIcon } from "@/components/auth/google-icon";
 import { useAuth } from "@/components/providers/auth-provider";
 import { toErrorMessage } from "@/lib/api";
 import type { AppRole } from "@/types/auth";
@@ -61,7 +63,7 @@ export default function SignUpPage() {
   };
 
   return (
-    <section className="min-h-screen bg-[#f8f8f8] px-6 py-8 md:px-10 lg:px-16">
+    <section className="min-h-screen bg-slate-50 px-6 py-8 md:px-10 lg:px-16">
       <div className="mx-auto w-full">
         <div className="mb-3 flex justify-center">
           <div className="flex h-16 w-32 items-center">
@@ -79,65 +81,65 @@ export default function SignUpPage() {
         <div className="grid grid-cols-1 lg:grid-cols-[1.08fr_0.92fr]">
           <div className="flex items-start justify-center px-2 pt-8 md:px-6 lg:px-4 xl:px-8">
             <div className="w-full max-w-2xl">
-              <h1 className="text-[42px] font-bold leading-tight text-[#1b1b1b]">
+              <h1 className="text-[42px] font-bold leading-tight text-slate-900">
                 Create an account
               </h1>
-              <p className="mt-2 text-[18px] text-[#7b7b7b]">Sign Up With FoundIT</p>
+              <p className="mt-2 text-[18px] text-slate-500">Sign Up With FoundIT</p>
 
               {isGoogleAuthEnabled ? (
                 <>
                   <div className="mt-8 space-y-3">
                     <button
-                      className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-[#e3e3e3] bg-white text-[14px] font-medium text-[#222] transition hover:bg-gray-50"
+                      className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white text-[14px] font-medium text-slate-900 transition hover:bg-gray-50"
                       disabled={isSubmitting || isGoogleLoading}
                       onClick={() => void handleGoogleContinue()}
                       type="button"
                     >
-                      <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-gray-300 text-[11px] font-bold text-[#4285F4]">
-                        G
+                      <span className="inline-flex h-5 w-5 items-center justify-center">
+                        <GoogleIcon />
                       </span>
                       <span>{isGoogleLoading ? "Redirecting..." : "Continue with Google"}</span>
                     </button>
                   </div>
 
                   <div className="my-6 flex items-center gap-4">
-                    <div className="h-px flex-1 bg-[#e5e5e5]" />
-                    <span className="text-[13px] text-[#8a8a8a]">or use email</span>
-                    <div className="h-px flex-1 bg-[#e5e5e5]" />
+                    <div className="h-px flex-1 bg-slate-200" />
+                    <span className="text-[13px] text-slate-400">or use email</span>
+                    <div className="h-px flex-1 bg-slate-200" />
                   </div>
                 </>
               ) : (
                 <>
-                  <div className="mt-8 rounded-xl border border-[#dbeafe] bg-[#eff6ff] px-4 py-3 text-[14px] text-[#1d4ed8]">
+                  <div className="mt-8 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-[14px] text-blue-700">
                     Google sign-up is unavailable in this deployment. Create your account with email instead.
                   </div>
                   <div className="my-6 flex items-center gap-4">
-                    <div className="h-px flex-1 bg-[#e5e5e5]" />
-                    <span className="text-[13px] text-[#8a8a8a]">email sign up</span>
-                    <div className="h-px flex-1 bg-[#e5e5e5]" />
+                    <div className="h-px flex-1 bg-slate-200" />
+                    <span className="text-[13px] text-slate-400">email sign up</span>
+                    <div className="h-px flex-1 bg-slate-200" />
                   </div>
                 </>
               )}
 
               <form className="space-y-4" onSubmit={onSubmit}>
                 {error ? (
-                  <div className="rounded-xl border border-[#fecaca] bg-[#fef2f2] px-4 py-3 text-[14px] text-[#991b1b]">
+                  <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[14px] text-red-800">
                     {error}
                   </div>
                 ) : null}
 
                 {success ? (
-                  <div className="rounded-xl border border-[#bbf7d0] bg-[#f0fdf4] px-4 py-3 text-[14px] text-[#166534]">
+                  <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-[14px] text-green-800">
                     {success}
                   </div>
                 ) : null}
 
                 <div>
-                  <label className="mb-2 block text-[14px] font-medium text-[#6f6f6f]" htmlFor="fullName">
+                  <label className="mb-2 block text-[14px] font-medium text-slate-600" htmlFor="fullName">
                     Full name
                   </label>
                   <input
-                    className="h-12 w-full rounded-xl border border-transparent bg-[#f1f1f3] px-4 text-[14px] text-[#222] outline-none placeholder:text-[#9ca3af] focus:border-[#11a63a] focus:bg-white"
+                    className="h-12 w-full rounded-xl border border-transparent bg-slate-100 px-4 text-[14px] text-slate-900 outline-none placeholder:text-slate-400 focus:border-green-600 focus:bg-white"
                     id="fullName"
                     onChange={(event) => updateField("username", event.target.value)}
                     placeholder="Your name"
@@ -149,11 +151,11 @@ export default function SignUpPage() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-[14px] font-medium text-[#6f6f6f]" htmlFor="email">
+                  <label className="mb-2 block text-[14px] font-medium text-slate-600" htmlFor="email">
                     Email
                   </label>
                   <input
-                    className="h-12 w-full rounded-xl border border-transparent bg-[#f1f1f3] px-4 text-[14px] text-[#222] outline-none placeholder:text-[#9ca3af] focus:border-[#11a63a] focus:bg-white"
+                    className="h-12 w-full rounded-xl border border-transparent bg-slate-100 px-4 text-[14px] text-slate-900 outline-none placeholder:text-slate-400 focus:border-green-600 focus:bg-white"
                     id="email"
                     onChange={(event) => updateField("email", event.target.value)}
                     placeholder="you@example.com"
@@ -165,30 +167,33 @@ export default function SignUpPage() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-[14px] font-medium text-[#6f6f6f]" htmlFor="role">
+                  <label className="mb-2 block text-[14px] font-medium text-slate-600" htmlFor="role">
                     Role
                   </label>
-                  <select
-                    className="h-12 w-full rounded-xl border border-transparent bg-[#f1f1f3] px-4 text-[14px] text-[#222] outline-none focus:border-[#11a63a] focus:bg-white"
-                    id="role"
-                    onChange={(event) => updateField("role", event.target.value)}
-                    value={form.role}
-                    disabled={isSubmitting || isGoogleLoading}
-                  >
-                    {roles.map((role) => (
-                      <option key={role} value={role}>
-                        {role}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select
+                      className="h-12 w-full appearance-none rounded-xl border border-transparent bg-slate-100 px-4 pr-11 text-[14px] font-medium text-slate-900 outline-none transition focus:border-green-600 focus:bg-white disabled:cursor-not-allowed disabled:opacity-70"
+                      id="role"
+                      onChange={(event) => updateField("role", event.target.value)}
+                      value={form.role}
+                      disabled={isSubmitting || isGoogleLoading}
+                    >
+                      {roles.map((role) => (
+                        <option key={role} value={role}>
+                          {role}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                  </div>
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-[14px] font-medium text-[#6f6f6f]" htmlFor="password">
+                  <label className="mb-2 block text-[14px] font-medium text-slate-600" htmlFor="password">
                     Password
                   </label>
                   <input
-                    className="h-12 w-full rounded-xl border border-transparent bg-[#f1f1f3] px-4 text-[14px] text-[#222] outline-none placeholder:text-[#9ca3af] focus:border-[#11a63a] focus:bg-white"
+                    className="h-12 w-full rounded-xl border border-transparent bg-slate-100 px-4 text-[14px] text-slate-900 outline-none placeholder:text-slate-400 focus:border-green-600 focus:bg-white"
                     id="password"
                     onChange={(event) => updateField("password", event.target.value)}
                     placeholder="Enter your password"
@@ -201,7 +206,7 @@ export default function SignUpPage() {
 
                 <div className="pt-2">
                   <button
-                    className="mx-auto block h-12 w-full rounded-xl bg-[#08b239] text-[15px] font-semibold text-white transition hover:bg-[#069d32] disabled:cursor-not-allowed disabled:opacity-60"
+                    className="mx-auto block h-12 w-full rounded-xl bg-green-600 text-[15px] font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
                     disabled={isSubmitting || isGoogleLoading}
                     type="submit"
                   >
@@ -209,9 +214,9 @@ export default function SignUpPage() {
                   </button>
                 </div>
 
-                <p className="text-center text-[14px] text-[#8a8a8a]">
+                <p className="text-center text-[14px] text-slate-400">
                   Already have an account?
-                  <Link className="ml-1 text-[#2563eb] hover:underline" href="/auth/sign-in">
+                  <Link className="ml-1 text-blue-600 hover:underline" href="/auth/sign-in">
                     Sign in
                   </Link>
                 </p>
@@ -222,12 +227,12 @@ export default function SignUpPage() {
           <div className="hidden lg:flex lg:border-l lg:border-gray-200">
             <div className="flex w-full items-center justify-center p-8">
               <div className="flex h-full w-full items-center justify-center bg-transparent">
-                <div className="text-center text-gray-400">
+                <div className="flex h-full w-full items-center justify-center">
                   <Image
-                    alt="auth"
-                    className="h-full w-full object-contain"
+                    alt="Mobile login illustration"
+                    className="h-[min(72vh,760px)] w-full max-w-[760px] object-contain"
                     height={900}
-                    src="/assets/images/auth.png"
+                    src="/assets/images/auth-mobile-login.svg"
                     width={900}
                   />
                 </div>

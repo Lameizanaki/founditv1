@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useState } from "react";
@@ -145,7 +145,7 @@ export function FreelancerServiceWorkspaceClient({
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-6 md:px-6">
       <Link
-        className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-[#4b5563] transition hover:text-[#111827]"
+        className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-slate-900"
         href="/freelancer/my-services"
       >
         Back to My Services
@@ -164,40 +164,40 @@ export function FreelancerServiceWorkspaceClient({
       ) : null}
 
       <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <section className="rounded-3xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6b7280]">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                 {mode === "edit" ? "Edit Service" : "Service Details"}
               </p>
-              <h1 className="mt-2 text-[32px] font-semibold text-[#111827]">
+              <h1 className="mt-2 text-[32px] font-semibold text-slate-900">
                 {effectiveTitle || toText(record.serviceTitle, "Untitled service")}
               </h1>
-              <p className="mt-2 text-sm text-[#6b7280]">
+              <p className="mt-2 text-sm text-slate-500">
                 Use this workspace to review your listing, update the overview and image, and control visibility.
               </p>
             </div>
 
-            <span className="inline-flex rounded-full bg-[#eef2ff] px-3 py-1 text-xs font-semibold text-[#2563eb]">
+            <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
               {status}
             </span>
           </div>
 
-          <div className="overflow-hidden rounded-3xl border border-[#e5e7eb] bg-[#f8fafc]">
+          <div className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-50">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img alt={toText(record.serviceTitle, "Service image")} className="h-[280px] w-full object-cover" src={previewImage} />
           </div>
 
           {mode === "edit" ? (
-            <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-[#e5e7eb] bg-[#f8fafc] p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-sm font-semibold text-[#111827]">Update service image</p>
-                <p className="mt-1 text-xs text-[#6b7280]">
+                <p className="text-sm font-semibold text-slate-900">Update service image</p>
+                <p className="mt-1 text-xs text-slate-500">
                   Replace the main image shown on your listing card and detail page.
                 </p>
               </div>
               <div className="flex flex-col gap-2 sm:items-end">
-                <label className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-[#d1d5db] bg-white px-4 py-2 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb]">
+                <label className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
                   {mainImageFile ? mainImageFile.name : "Choose image"}
                   <input
                     accept="image/*"
@@ -207,7 +207,7 @@ export function FreelancerServiceWorkspaceClient({
                   />
                 </label>
                 <button
-                  className="rounded-xl bg-[#111827] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0b1220] disabled:opacity-60"
+                  className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-950 disabled:opacity-60"
                   disabled={isSaving || !mainImageFile}
                   onClick={() => void updateMainImage()}
                   type="button"
@@ -220,18 +220,18 @@ export function FreelancerServiceWorkspaceClient({
 
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <div>
-              <label className="mb-2 block text-sm font-medium text-[#374151]">Service Title</label>
+              <label className="mb-2 block text-sm font-medium text-slate-700">Service Title</label>
               <input
-                className="h-12 w-full rounded-xl border border-[#d1d5db] bg-white px-4 text-sm text-[#111827] outline-none focus:border-[#16a34a]"
+                className="h-12 w-full rounded-xl border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-none focus:border-green-600"
                 disabled={mode !== "edit"}
                 onChange={(event) => setDraft((current) => ({ ...current, title: event.target.value }))}
                 value={effectiveTitle}
               />
             </div>
             <div>
-              <label className="mb-2 block text-sm font-medium text-[#374151]">Category</label>
+              <label className="mb-2 block text-sm font-medium text-slate-700">Category</label>
               <input
-                className="h-12 w-full rounded-xl border border-[#d1d5db] bg-white px-4 text-sm text-[#111827] outline-none focus:border-[#16a34a]"
+                className="h-12 w-full rounded-xl border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-none focus:border-green-600"
                 disabled={mode !== "edit"}
                 onChange={(event) => setDraft((current) => ({ ...current, category: event.target.value }))}
                 value={effectiveCategory}
@@ -240,9 +240,9 @@ export function FreelancerServiceWorkspaceClient({
           </div>
 
           <div className="mt-4">
-            <label className="mb-2 block text-sm font-medium text-[#374151]">Tags</label>
+            <label className="mb-2 block text-sm font-medium text-slate-700">Tags</label>
             <input
-              className="h-12 w-full rounded-xl border border-[#d1d5db] bg-white px-4 text-sm text-[#111827] outline-none focus:border-[#16a34a]"
+              className="h-12 w-full rounded-xl border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-none focus:border-green-600"
               disabled={mode !== "edit"}
               onChange={(event) => setDraft((current) => ({ ...current, tags: event.target.value }))}
               value={effectiveTags}
@@ -250,9 +250,9 @@ export function FreelancerServiceWorkspaceClient({
           </div>
 
           <div className="mt-4">
-            <label className="mb-2 block text-sm font-medium text-[#374151]">Description</label>
+            <label className="mb-2 block text-sm font-medium text-slate-700">Description</label>
             <textarea
-              className="w-full rounded-2xl border border-[#d1d5db] bg-white px-4 py-3 text-sm leading-6 text-[#111827] outline-none focus:border-[#16a34a]"
+              className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm leading-6 text-slate-900 outline-none focus:border-green-600"
               disabled={mode !== "edit"}
               onChange={(event) => setDraft((current) => ({ ...current, description: event.target.value }))}
               rows={7}
@@ -263,7 +263,7 @@ export function FreelancerServiceWorkspaceClient({
           {mode === "edit" ? (
             <div className="mt-6 flex justify-end">
               <button
-                className="rounded-xl bg-[#16a34a] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#15803d] disabled:opacity-60"
+                className="rounded-xl bg-green-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700 disabled:opacity-60"
                 disabled={isSaving}
                 onClick={() => void saveOverview()}
                 type="button"
@@ -275,8 +275,8 @@ export function FreelancerServiceWorkspaceClient({
         </section>
 
         <section className="space-y-6">
-          <div className="rounded-3xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
-            <h2 className="text-xl font-semibold text-[#111827]">Performance</h2>
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-xl font-semibold text-slate-900">Performance</h2>
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
               {[
                 ["Price", formatMoney(toNumber(record.price, 0))],
@@ -284,23 +284,23 @@ export function FreelancerServiceWorkspaceClient({
                 ["Orders", String(toNumber(record.orders, 0))],
                 ["Rating", toNumber(record.rating, 0).toFixed(1)],
               ].map(([label, value]) => (
-                <div key={label} className="rounded-2xl border border-[#e5e7eb] bg-[#fcfcfd] p-4">
-                  <p className="text-xs font-medium uppercase tracking-[0.15em] text-[#6b7280]">{label}</p>
-                  <p className="mt-2 text-lg font-semibold text-[#111827]">{value}</p>
+                <div key={label} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <p className="text-xs font-medium uppercase tracking-[0.15em] text-slate-500">{label}</p>
+                  <p className="mt-2 text-lg font-semibold text-slate-900">{value}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="rounded-3xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
-            <h2 className="text-xl font-semibold text-[#111827]">Listing Controls</h2>
-            <p className="mt-2 text-sm text-[#6b7280]">
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-xl font-semibold text-slate-900">Listing Controls</h2>
+            <p className="mt-2 text-sm text-slate-500">
               Pause, resume, or remove the service from client browsing while keeping your past order records.
             </p>
 
             <div className="mt-5 flex flex-wrap gap-3">
               <button
-                className={`${actionButtonClass} border-[#f59e0b] bg-[#fffbeb] text-[#b45309] hover:bg-[#fef3c7]`}
+                className={`${actionButtonClass} border-amber-500 bg-amber-50 text-amber-700 hover:bg-amber-100`}
                 disabled={isSaving || normalizedStatus.includes("pause")}
                 onClick={() => void updateStatus("pause")}
                 type="button"
@@ -308,7 +308,7 @@ export function FreelancerServiceWorkspaceClient({
                 Pause
               </button>
               <button
-                className={`${actionButtonClass} border-[#16a34a] bg-[#f0fdf4] text-[#166534] hover:bg-[#dcfce7]`}
+                className={`${actionButtonClass} border-green-600 bg-green-50 text-green-800 hover:bg-green-100`}
                 disabled={isSaving || normalizedStatus.includes("active")}
                 onClick={() => void updateStatus("resume")}
                 type="button"
@@ -316,7 +316,7 @@ export function FreelancerServiceWorkspaceClient({
                 Resume
               </button>
               <button
-                className={`${actionButtonClass} border-[#ef4444] bg-[#fef2f2] text-[#b91c1c] hover:bg-[#fee2e2]`}
+                className={`${actionButtonClass} border-red-500 bg-red-50 text-red-700 hover:bg-red-100`}
                 disabled={isSaving || normalizedStatus.includes("disable")}
                 onClick={() => void updateStatus("disable")}
                 type="button"
@@ -327,7 +327,7 @@ export function FreelancerServiceWorkspaceClient({
 
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
-                className="inline-flex rounded-xl bg-[#111827] px-4 py-2 text-sm font-semibold !text-white transition visited:!text-white hover:!text-white hover:bg-[#0b1220] focus:!text-white"
+                className="inline-flex rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold !text-white transition visited:!text-white hover:!text-white hover:bg-slate-950 focus:!text-white"
                 href={`/freelancer/my-services/${gigId}/edit`}
               >
                 Edit Service

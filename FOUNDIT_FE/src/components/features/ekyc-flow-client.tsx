@@ -1,7 +1,8 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { ChevronDown } from "lucide-react";
 import {
   type ChangeEvent,
   type MutableRefObject,
@@ -144,13 +145,13 @@ const statusLabel = (status: VerificationState) => {
 const statusBadgeClass = (status: VerificationState) => {
   switch (status) {
     case "completed":
-      return "inline-flex items-center rounded-full bg-[#dcfce7] px-3 py-1 text-xs font-medium text-[#166534]";
+      return "inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-800";
     case "processing":
-      return "inline-flex items-center rounded-full bg-[#fffbeb] px-3 py-1 text-xs font-medium text-[#a16207]";
+      return "inline-flex items-center rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700";
     case "failed":
-      return "inline-flex items-center rounded-full bg-[#fef2f2] px-3 py-1 text-xs font-medium text-[#b91c1c]";
+      return "inline-flex items-center rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-700";
     default:
-      return "inline-flex items-center rounded-full bg-[#f3f4f6] px-3 py-1 text-xs font-medium text-[#4b5563]";
+      return "inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600";
   }
 };
 
@@ -857,7 +858,7 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
     hasSubmitted && (ekycStatus === "pending" || ekycStatus === "in_review" || ekycStatus === "verified");
 
   return (
-    <div className="min-h-screen bg-[#f9fafb] text-[#111827]">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       <div className="flex justify-center bg-white py-3">
         <div className="flex h-16 w-32 items-center">
           <Image
@@ -871,11 +872,11 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
         </div>
       </div>
 
-      <div className="border-b border-[#e5e7eb] bg-white px-8 py-6">
+      <div className="border-b border-slate-200 bg-white px-8 py-6">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div className="flex items-start gap-4">
             <button
-              className="mt-1 rounded-md p-1 text-[#374151] transition hover:bg-[#f3f4f6]"
+              className="mt-1 rounded-md p-1 text-slate-700 transition hover:bg-slate-100"
               onClick={() => router.push(dashboardRoute(role))}
               type="button"
             >
@@ -883,10 +884,10 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
             </button>
 
             <div>
-              <h1 className="text-[32px] font-semibold leading-none text-[#111827]">
+              <h1 className="text-[32px] font-semibold leading-none text-slate-900">
                 Identity Verification
               </h1>
-              <p className="mt-2 text-[14px] text-[#6b7280]">
+              <p className="mt-2 text-[14px] text-slate-500">
                 Verify your identity to unlock all features
               </p>
             </div>
@@ -894,7 +895,7 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
 
           <div className="flex items-center gap-3">
             <span className={ekycStatusClass(ekycStatus)}>{ekycStatusLabel(ekycStatus)}</span>
-            <div className="rounded-full border border-[#e5e7eb] bg-[#f9fafb] px-3 py-1.5 text-[12px] text-[#374151]">
+            <div className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-[12px] text-slate-700">
               Secure and encrypted
             </div>
           </div>
@@ -905,12 +906,12 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
             <span>
               Step {currentStep} of {totalSteps}
             </span>
-            <span className="text-[#6b7280]">{progress}% Complete</span>
+            <span className="text-slate-500">{progress}% Complete</span>
           </div>
 
-          <div className="h-2 w-full rounded-full bg-[#d1fae5]">
+          <div className="h-2 w-full rounded-full bg-emerald-100">
             <div
-              className="h-2 rounded-full bg-[#10b981] transition-all duration-300"
+              className="h-2 rounded-full bg-emerald-500 transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -923,7 +924,7 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
         </div>
       ) : null}
 
-      <div className="border-b border-[#e5e7eb] bg-white px-8 py-5">
+      <div className="border-b border-slate-200 bg-white px-8 py-5">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-4 md:gap-8">
           {[
             "Personal Info",
@@ -941,18 +942,18 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
                 <div
                   className={`flex h-8 w-8 items-center justify-center rounded-full border text-sm ${
                     done
-                      ? "border-[#22c55e] bg-[#22c55e] text-white"
+                      ? "border-green-500 bg-green-500 text-white"
                       : active
-                        ? "border-[#10b981] bg-[#10b981] text-white"
-                        : "border-[#d1d5db] bg-[#f3f4f6] text-[#6b7280]"
+                        ? "border-emerald-500 bg-emerald-500 text-white"
+                        : "border-slate-300 bg-slate-100 text-slate-500"
                   }`}
                 >
                   {done ? "OK" : step}
                 </div>
-                <span className={currentStep >= step ? "text-[14px] text-[#111827]" : "text-[14px] text-[#6b7280]"}>
+                <span className={currentStep >= step ? "text-[14px] text-slate-900" : "text-[14px] text-slate-500"}>
                   {label}
                 </span>
-                {step < totalSteps ? <span className="text-[#9ca3af]">/</span> : null}
+                {step < totalSteps ? <span className="text-slate-400">/</span> : null}
               </div>
             );
           })}
@@ -962,35 +963,35 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
       <div className="px-6 py-8 md:px-10">
         <div className="mx-auto max-w-4xl">
           {errorMessage ? (
-            <div className="mb-6 rounded-xl border border-[#fecaca] bg-[#fef2f2] p-4 text-[14px] text-[#991b1b]">
+            <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-[14px] text-red-800">
               {errorMessage}
             </div>
           ) : null}
 
           {successMessage ? (
-            <div className="mb-6 rounded-xl border border-[#bbf7d0] bg-[#f0fdf4] p-4 text-[14px] text-[#166534]">
+            <div className="mb-6 rounded-xl border border-green-200 bg-green-50 p-4 text-[14px] text-green-800">
               {successMessage}
             </div>
           ) : null}
 
           {reviewLocked ? (
-            <div className="mb-6 rounded-xl border border-[#bfdbfe] bg-[#eff6ff] p-4 text-[14px] text-[#1d4ed8]">
+            <div className="mb-6 rounded-xl border border-blue-200 bg-blue-50 p-4 text-[14px] text-blue-700">
               Your eKYC has already been submitted. You can review the details here while waiting for the final admin decision.
             </div>
           ) : null}
 
           {currentStep === 1 ? (
-            <div className="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
-              <h2 className="text-[24px] font-medium text-[#111827]">Personal Information</h2>
-              <p className="mt-1 text-[14px] text-[#6b7280]">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-[24px] font-medium text-slate-900">Personal Information</h2>
+              <p className="mt-1 text-[14px] text-slate-500">
                 Please provide your personal details as they appear on your government-issued ID
               </p>
 
               <div className="mt-6 space-y-4">
                 <div>
-                  <label className="mb-2 block text-[14px] font-medium text-[#111827]">Full Legal Name *</label>
+                  <label className="mb-2 block text-[14px] font-medium text-slate-900">Full Legal Name *</label>
                   <input
-                    className="h-12 w-full rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-4 text-[14px] outline-none focus:border-[#10b981]"
+                    className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-[14px] outline-none focus:border-emerald-500"
                     onChange={(event) => setFullName(event.target.value)}
                     placeholder="John Doe"
                     type="text"
@@ -1000,9 +1001,9 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
-                    <label className="mb-2 block text-[14px] font-medium text-[#111827]">Date of Birth *</label>
+                    <label className="mb-2 block text-[14px] font-medium text-slate-900">Date of Birth *</label>
                     <input
-                      className="h-12 w-full rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-4 text-[14px] outline-none focus:border-[#10b981]"
+                      className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-[14px] outline-none focus:border-emerald-500"
                       onChange={(event) => setDob(event.target.value)}
                       type="date"
                       value={dob}
@@ -1010,9 +1011,9 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
                   </div>
 
                   <div>
-                    <label className="mb-2 block text-[14px] font-medium text-[#111827]">Nationality *</label>
+                    <label className="mb-2 block text-[14px] font-medium text-slate-900">Nationality *</label>
                     <input
-                      className="h-12 w-full cursor-not-allowed rounded-xl border border-[#e5e7eb] bg-[#f3f4f6] px-4 text-[14px] text-[#374151] outline-none"
+                      className="h-12 w-full cursor-not-allowed rounded-xl border border-slate-200 bg-slate-100 px-4 text-[14px] text-slate-700 outline-none"
                       readOnly
                       type="text"
                       value={nationality}
@@ -1022,22 +1023,25 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
-                    <label className="mb-2 block text-[14px] font-medium text-[#111827]">Sex *</label>
-                    <select
-                      className="h-12 w-full rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-4 text-[14px] text-[#6b7280] outline-none focus:border-[#10b981]"
-                      onChange={(event) => setGender(event.target.value as GenderValue)}
-                      value={gender}
-                    >
-                      <option value="">Select sex</option>
-                      <option value="M">Male</option>
-                      <option value="F">Female</option>
-                    </select>
+                    <label className="mb-2 block text-[14px] font-medium text-slate-900">Sex *</label>
+                    <div className="relative">
+                      <select
+                        className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-4 pr-11 text-[14px] font-medium text-slate-900 outline-none transition focus:border-emerald-500 focus:bg-white"
+                        onChange={(event) => setGender(event.target.value as GenderValue)}
+                        value={gender}
+                      >
+                        <option value="">Select sex</option>
+                        <option value="M">Male</option>
+                        <option value="F">Female</option>
+                      </select>
+                      <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                    </div>
                   </div>
 
                   <div>
-                    <label className="mb-2 block text-[14px] font-medium text-[#111827]">Phone Number *</label>
-                    <div className="flex h-12 w-full overflow-hidden rounded-xl border border-[#e5e7eb] bg-[#f9fafb] text-[14px] focus-within:border-[#10b981]">
-                      <span className="flex items-center border-r border-[#e5e7eb] bg-[#f3f4f6] px-4 text-[#374151]">
+                    <label className="mb-2 block text-[14px] font-medium text-slate-900">Phone Number *</label>
+                    <div className="flex h-12 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-50 text-[14px] focus-within:border-emerald-500">
+                      <span className="flex items-center border-r border-slate-200 bg-slate-100 px-4 text-slate-700">
                         {phoneCountryCode}
                       </span>
                       <input
@@ -1053,9 +1057,9 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
                 </div>
               </div>
 
-              <div className="mt-5 rounded-xl border border-[#bfdbfe] bg-[#eff6ff] p-4">
-                <p className="text-[14px] font-medium text-[#1d4ed8]">Why do we need this information?</p>
-                <p className="mt-1 text-[14px] leading-6 text-[#1e40af]">
+              <div className="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4">
+                <p className="text-[14px] font-medium text-blue-700">Why do we need this information?</p>
+                <p className="mt-1 text-[14px] leading-6 text-blue-800">
                   We verify your identity to ensure platform safety and comply with legal requirements. Your data is encrypted and secure.
                 </p>
               </div>
@@ -1063,31 +1067,31 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
           ) : null}
 
           {currentStep === 2 ? (
-            <div className="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
-              <h2 className="text-[24px] font-medium text-[#111827]">Government-Issued ID</h2>
-              <p className="mt-1 text-[14px] text-[#6b7280]">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-[24px] font-medium text-slate-900">Government-Issued ID</h2>
+              <p className="mt-1 text-[14px] text-slate-500">
                 Upload a clear photo of your government-issued identification document
               </p>
 
               <div className="mt-6">
-                <label className="mb-2 block text-[14px] font-medium text-[#111827]">Choose ID Type *</label>
+                <label className="mb-2 block text-[14px] font-medium text-slate-900">Choose ID Type *</label>
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-                  <button className="h-12 rounded-xl border border-[#10b981] bg-[#10b981] text-[14px] font-medium text-white" type="button">
+                  <button className="h-12 rounded-xl border border-emerald-500 bg-emerald-500 text-[14px] font-medium text-white" type="button">
                     {selectedIdType}
                   </button>
-                  <button className="h-12 cursor-not-allowed rounded-xl border border-[#e5e7eb] bg-[#f3f4f6] text-[14px] font-medium text-[#9ca3af] opacity-70" disabled type="button">
+                  <button className="h-12 cursor-not-allowed rounded-xl border border-slate-200 bg-slate-100 text-[14px] font-medium text-slate-400 opacity-70" disabled type="button">
                     Driver&apos;s License
                   </button>
-                  <button className="h-12 cursor-not-allowed rounded-xl border border-[#e5e7eb] bg-[#f3f4f6] text-[14px] font-medium text-[#9ca3af] opacity-70" disabled type="button">
+                  <button className="h-12 cursor-not-allowed rounded-xl border border-slate-200 bg-slate-100 text-[14px] font-medium text-slate-400 opacity-70" disabled type="button">
                     Passport
                   </button>
                 </div>
               </div>
 
               <div className="mt-4">
-                <label className="mb-2 block text-[14px] font-medium text-[#111827]">ID Number *</label>
+                <label className="mb-2 block text-[14px] font-medium text-slate-900">ID Number *</label>
                 <input
-                  className="h-12 w-full rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-4 text-[14px] outline-none focus:border-[#10b981]"
+                  className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-[14px] outline-none focus:border-emerald-500"
                   onChange={(event) => setIdNumber(event.target.value)}
                   placeholder="Enter your ID number"
                   type="text"
@@ -1096,38 +1100,38 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
               </div>
 
               <div className="mt-4">
-                <label className="mb-2 block text-[14px] font-medium text-[#111827]">Upload Front of ID *</label>
-                <label className="flex min-h-52 w-full cursor-pointer flex-col items-center justify-center rounded-2xl border border-[#e5e7eb] bg-[#fcfcfd] text-center transition hover:bg-[#f9fafb]">
+                <label className="mb-2 block text-[14px] font-medium text-slate-900">Upload Front of ID *</label>
+                <label className="flex min-h-52 w-full cursor-pointer flex-col items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-center transition hover:bg-slate-50">
                   <input accept="image/jpeg,image/png,image/webp" className="hidden" onChange={onIdFrontUpload} type="file" />
-                  <div className="mt-4 inline-flex items-center gap-2 rounded-lg border border-[#d1d5db] bg-white px-4 py-2 text-[14px] text-[#111827]">
+                  <div className="mt-4 inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-[14px] text-slate-900">
                     Upload ID Front
                   </div>
-                  <p className="mt-3 text-[12px] text-[#6b7280]">JPG or PNG / Max 2MB</p>
-                  <p className="text-[12px] text-[#6b7280]">Make sure all corners are visible</p>
+                  <p className="mt-3 text-[12px] text-slate-500">JPG or PNG / Max 2MB</p>
+                  <p className="text-[12px] text-slate-500">Make sure all corners are visible</p>
                   {idFrontFile ? (
-                    <p className="mt-3 text-[13px] font-medium text-[#10b981]">{idFrontFile.name}</p>
+                    <p className="mt-3 text-[13px] font-medium text-emerald-500">{idFrontFile.name}</p>
                   ) : null}
                 </label>
               </div>
 
               <div className="mt-4">
-                <label className="mb-2 block text-[14px] font-medium text-[#111827]">Upload Back of ID *</label>
-                <label className="flex min-h-52 w-full cursor-pointer flex-col items-center justify-center rounded-2xl border border-[#e5e7eb] bg-[#fcfcfd] text-center transition hover:bg-[#f9fafb]">
+                <label className="mb-2 block text-[14px] font-medium text-slate-900">Upload Back of ID *</label>
+                <label className="flex min-h-52 w-full cursor-pointer flex-col items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-center transition hover:bg-slate-50">
                   <input accept="image/jpeg,image/png,image/webp" className="hidden" onChange={onIdBackUpload} type="file" />
-                  <div className="mt-4 inline-flex items-center gap-2 rounded-lg border border-[#d1d5db] bg-white px-4 py-2 text-[14px] text-[#111827]">
+                  <div className="mt-4 inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-[14px] text-slate-900">
                     Upload ID Back
                   </div>
-                  <p className="mt-3 text-[12px] text-[#6b7280]">JPG or PNG / Max 2MB</p>
-                  <p className="text-[12px] text-[#6b7280]">Make sure all corners are visible</p>
+                  <p className="mt-3 text-[12px] text-slate-500">JPG or PNG / Max 2MB</p>
+                  <p className="text-[12px] text-slate-500">Make sure all corners are visible</p>
                   {idBackFile ? (
-                    <p className="mt-3 text-[13px] font-medium text-[#10b981]">{idBackFile.name}</p>
+                    <p className="mt-3 text-[13px] font-medium text-emerald-500">{idBackFile.name}</p>
                   ) : null}
                 </label>
               </div>
 
-              <div className="mt-5 rounded-xl border border-[#fde68a] bg-[#fffbeb] p-4">
-                <p className="text-[14px] font-medium text-[#b45309]">Tips for a clear photo:</p>
-                <ul className="mt-2 space-y-1 text-[14px] text-[#92400e]">
+              <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                <p className="text-[14px] font-medium text-amber-700">Tips for a clear photo:</p>
+                <ul className="mt-2 space-y-1 text-[14px] text-amber-800">
                   <li>Use good lighting</li>
                   <li>Place ID on a plain background</li>
                   <li>Ensure all text is readable</li>
@@ -1138,14 +1142,14 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
           ) : null}
 
           {currentStep === 3 ? (
-            <div className="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
-              <h2 className="text-[24px] font-medium text-[#111827]">Liveness Verification</h2>
-              <p className="mt-1 text-[14px] text-[#6b7280]">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-[24px] font-medium text-slate-900">Liveness Verification</h2>
+              <p className="mt-1 text-[14px] text-slate-500">
                 Align your face in the frame and click Continue to verify.
               </p>
 
               <div className="mt-6">
-                <div className="relative overflow-hidden rounded-2xl border border-[#e5e7eb] bg-[#f9fafb]">
+                <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
                   <div className="aspect-video w-full">
                     <video ref={videoRef} autoPlay className="h-full w-full object-cover" muted playsInline />
                   </div>
@@ -1157,16 +1161,16 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
                 <canvas ref={canvasRef} className="hidden" />
 
                 {liveFacePreviewUrl ? (
-                  <p className="mt-3 text-[13px] font-medium text-[#10b981]">
+                  <p className="mt-3 text-[13px] font-medium text-emerald-500">
                     Face image captured.
                   </p>
                 ) : null}
 
-                <div className="mt-5 rounded-xl border border-[#e5e7eb] bg-[#fcfcfd] p-4">
+                <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4">
                   <div className="flex items-center justify-between gap-3">
                     <div>
-                      <p className="text-[14px] font-medium text-[#111827]">Liveness status</p>
-                      <p className="text-[12px] text-[#6b7280]">
+                      <p className="text-[14px] font-medium text-slate-900">Liveness status</p>
+                      <p className="text-[12px] text-slate-500">
                         This stage verifies that you are present in front of the camera.
                       </p>
                     </div>
@@ -1178,17 +1182,17 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
           ) : null}
 
           {currentStep === 4 ? (
-            <div className="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
-              <h2 className="text-[24px] font-medium text-[#111827]">OCR Verification</h2>
-              <p className="mt-1 text-[14px] text-[#6b7280]">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-[24px] font-medium text-slate-900">OCR Verification</h2>
+              <p className="mt-1 text-[14px] text-slate-500">
                 We will compare your ID image against the personal information you entered.
               </p>
 
-              <div className="mt-6 rounded-2xl border border-[#e5e7eb] bg-[#fcfcfd] p-5">
+              <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-[14px] font-medium text-[#111827]">OCR status</p>
-                    <p className="text-[12px] text-[#6b7280]">
+                    <p className="text-[14px] font-medium text-slate-900">OCR status</p>
+                    <p className="text-[12px] text-slate-500">
                       ID extraction and matching will run when you continue.
                     </p>
                   </div>
@@ -1199,15 +1203,15 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
           ) : null}
 
           {currentStep === 5 ? (
-            <div className="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
-              <h2 className="text-[24px] font-medium text-[#111827]">Address Verification</h2>
-              <p className="mt-1 text-[14px] text-[#6b7280]">Provide your address in Cambodia</p>
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-[24px] font-medium text-slate-900">Address Verification</h2>
+              <p className="mt-1 text-[14px] text-slate-500">Provide your address in Cambodia</p>
 
               <div className="mt-6 space-y-4">
                 <div>
-                  <label className="mb-2 block text-[14px] font-medium text-[#111827]">Address Line 1 *</label>
+                  <label className="mb-2 block text-[14px] font-medium text-slate-900">Address Line 1 *</label>
                   <input
-                    className="h-12 w-full rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-4 text-[14px] outline-none focus:border-[#10b981]"
+                    className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-[14px] outline-none focus:border-emerald-500"
                     onChange={(event) => setAddressLine1(event.target.value)}
                     placeholder="123 Main Street"
                     type="text"
@@ -1216,9 +1220,9 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-[14px] font-medium text-[#111827]">Address Line 2 (optional)</label>
+                  <label className="mb-2 block text-[14px] font-medium text-slate-900">Address Line 2 (optional)</label>
                   <input
-                    className="h-12 w-full rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-4 text-[14px] outline-none focus:border-[#10b981]"
+                    className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-[14px] outline-none focus:border-emerald-500"
                     onChange={(event) => setAddressLine2(event.target.value)}
                     placeholder="Apt 4B"
                     type="text"
@@ -1228,43 +1232,49 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
-                    <label className="mb-2 block text-[14px] font-medium text-[#111827]">City *</label>
-                    <select
-                      className="h-12 w-full rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-4 text-[14px] outline-none focus:border-[#10b981]"
-                      onChange={(event) => setCity(event.target.value)}
-                      value={city}
-                    >
-                      <option value="">Select city</option>
-                      {cambodianCities.map((item) => (
-                        <option key={item} value={item}>
-                          {item}
-                        </option>
-                      ))}
-                    </select>
+                    <label className="mb-2 block text-[14px] font-medium text-slate-900">City *</label>
+                    <div className="relative">
+                      <select
+                        className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-4 pr-11 text-[14px] font-medium text-slate-900 outline-none transition focus:border-emerald-500 focus:bg-white"
+                        onChange={(event) => setCity(event.target.value)}
+                        value={city}
+                      >
+                        <option value="">Select city</option>
+                        {cambodianCities.map((item) => (
+                          <option key={item} value={item}>
+                            {item}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                    </div>
                   </div>
 
                   <div>
-                    <label className="mb-2 block text-[14px] font-medium text-[#111827]">Province *</label>
-                    <select
-                      className="h-12 w-full rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-4 text-[14px] outline-none focus:border-[#10b981]"
-                      onChange={(event) => setStateProvince(event.target.value)}
-                      value={stateProvince}
-                    >
-                      <option value="">Select province</option>
-                      {cambodianProvinces.map((item) => (
-                        <option key={item} value={item}>
-                          {item}
-                        </option>
-                      ))}
-                    </select>
+                    <label className="mb-2 block text-[14px] font-medium text-slate-900">Province *</label>
+                    <div className="relative">
+                      <select
+                        className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-4 pr-11 text-[14px] font-medium text-slate-900 outline-none transition focus:border-emerald-500 focus:bg-white"
+                        onChange={(event) => setStateProvince(event.target.value)}
+                        value={stateProvince}
+                      >
+                        <option value="">Select province</option>
+                        {cambodianProvinces.map((item) => (
+                          <option key={item} value={item}>
+                            {item}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                    </div>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
-                    <label className="mb-2 block text-[14px] font-medium text-[#111827]">Postal Code (optional)</label>
+                    <label className="mb-2 block text-[14px] font-medium text-slate-900">Postal Code (optional)</label>
                     <input
-                      className="h-12 w-full rounded-xl border border-[#e5e7eb] bg-[#f9fafb] px-4 text-[14px] outline-none focus:border-[#10b981]"
+                      className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-[14px] outline-none focus:border-emerald-500"
                       onChange={(event) => setPostalCode(event.target.value)}
                       placeholder="12000"
                       type="text"
@@ -1273,9 +1283,9 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
                   </div>
 
                   <div>
-                    <label className="mb-2 block text-[14px] font-medium text-[#111827]">Country</label>
+                    <label className="mb-2 block text-[14px] font-medium text-slate-900">Country</label>
                     <input
-                      className="h-12 w-full cursor-not-allowed rounded-xl border border-[#e5e7eb] bg-[#f3f4f6] px-4 text-[14px] text-[#374151] outline-none"
+                      className="h-12 w-full cursor-not-allowed rounded-xl border border-slate-200 bg-slate-100 px-4 text-[14px] text-slate-700 outline-none"
                       readOnly
                       type="text"
                       value={country}
@@ -1287,34 +1297,34 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
           ) : null}
 
           {currentStep === 6 ? (
-            <div className="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
-              <h2 className="text-[24px] font-medium text-[#111827]">Review Your Information</h2>
-              <p className="mt-1 text-[14px] text-[#6b7280]">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-[24px] font-medium text-slate-900">Review Your Information</h2>
+              <p className="mt-1 text-[14px] text-slate-500">
                 Please review all information before submitting
               </p>
 
               <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-3">
-                <div className="rounded-xl border border-[#e5e7eb] bg-[#fcfcfd] p-4 text-[14px]">
-                  <p className="text-[#6b7280]">Overall KYC</p>
-                  <p className="mt-1 font-medium text-[#111827]">{ekycStatusLabel(ekycStatus)}</p>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-[14px]">
+                  <p className="text-slate-500">Overall KYC</p>
+                  <p className="mt-1 font-medium text-slate-900">{ekycStatusLabel(ekycStatus)}</p>
                   <span className={`mt-2 ${ekycStatusClass(ekycStatus)}`}>{ekycStatusLabel(ekycStatus)}</span>
                 </div>
 
-                <div className="rounded-xl border border-[#e5e7eb] bg-[#fcfcfd] p-4 text-[14px]">
-                  <p className="text-[#6b7280]">Liveness</p>
-                  <p className="mt-1 font-medium text-[#111827]">{statusLabel(livenessStatus)}</p>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-[14px]">
+                  <p className="text-slate-500">Liveness</p>
+                  <p className="mt-1 font-medium text-slate-900">{statusLabel(livenessStatus)}</p>
                   <span className={`mt-2 ${statusBadgeClass(livenessStatus)}`}>{statusLabel(livenessStatus)}</span>
                 </div>
 
-                <div className="rounded-xl border border-[#e5e7eb] bg-[#fcfcfd] p-4 text-[14px]">
-                  <p className="text-[#6b7280]">OCR</p>
-                  <p className="mt-1 font-medium text-[#111827]">{statusLabel(ocrStatus)}</p>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-[14px]">
+                  <p className="text-slate-500">OCR</p>
+                  <p className="mt-1 font-medium text-slate-900">{statusLabel(ocrStatus)}</p>
                   <span className={`mt-2 ${statusBadgeClass(ocrStatus)}`}>{statusLabel(ocrStatus)}</span>
                 </div>
               </div>
 
               {failureReason ? (
-                <div className="mt-5 rounded-xl border border-[#fecaca] bg-[#fef2f2] p-4 text-[14px] text-[#991b1b]">
+                <div className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-[14px] text-red-800">
                   {failureReason}
                 </div>
               ) : null}
@@ -1322,65 +1332,65 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
               <div className="mt-6 space-y-6">
                 <div>
                   <div className="mb-3 flex items-center justify-between">
-                    <h3 className="text-[18px] font-medium text-[#111827]">Personal Information</h3>
+                    <h3 className="text-[18px] font-medium text-slate-900">Personal Information</h3>
                     {!reviewLocked ? (
-                      <button className="text-[14px] text-[#374151] hover:underline" onClick={() => goToStep(1)} type="button">
+                      <button className="text-[14px] text-slate-700 hover:underline" onClick={() => goToStep(1)} type="button">
                         Edit
                       </button>
                     ) : null}
                   </div>
 
-                  <div className="rounded-xl bg-[#f9fafb] p-5 text-[14px]">
+                  <div className="rounded-xl bg-slate-50 p-5 text-[14px]">
                     <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                      <div className="text-[#6b7280]">Full Name:</div>
-                      <div className="text-right text-[#111827]">{fullName || "-"}</div>
+                      <div className="text-slate-500">Full Name:</div>
+                      <div className="text-right text-slate-900">{fullName || "-"}</div>
 
-                      <div className="text-[#6b7280]">Date of Birth:</div>
-                      <div className="text-right text-[#111827]">{dob || "-"}</div>
+                      <div className="text-slate-500">Date of Birth:</div>
+                      <div className="text-right text-slate-900">{dob || "-"}</div>
 
-                      <div className="text-[#6b7280]">Sex:</div>
-                      <div className="text-right text-[#111827]">
+                      <div className="text-slate-500">Sex:</div>
+                      <div className="text-right text-slate-900">
                         {gender === "M" ? "Male" : gender === "F" ? "Female" : "-"}
                       </div>
 
-                      <div className="text-[#6b7280]">Nationality:</div>
-                      <div className="text-right text-[#111827]">{nationality}</div>
+                      <div className="text-slate-500">Nationality:</div>
+                      <div className="text-right text-slate-900">{nationality}</div>
 
-                      <div className="text-[#6b7280]">Phone:</div>
-                      <div className="text-right text-[#111827]">{getCambodianPhoneNumber(phone)}</div>
+                      <div className="text-slate-500">Phone:</div>
+                      <div className="text-right text-slate-900">{getCambodianPhoneNumber(phone)}</div>
                     </div>
                   </div>
                 </div>
 
-                <div className="border-t border-[#e5e7eb] pt-6">
+                <div className="border-t border-slate-200 pt-6">
                   <div className="mb-3 flex items-center justify-between">
-                    <h3 className="text-[18px] font-medium text-[#111827]">ID Verification</h3>
+                    <h3 className="text-[18px] font-medium text-slate-900">ID Verification</h3>
                     {!reviewLocked ? (
-                      <button className="text-[14px] text-[#374151] hover:underline" onClick={() => goToStep(2)} type="button">
+                      <button className="text-[14px] text-slate-700 hover:underline" onClick={() => goToStep(2)} type="button">
                         Edit
                       </button>
                     ) : null}
                   </div>
 
-                  <div className="rounded-xl bg-[#f9fafb] p-5 text-[14px] text-[#111827]">
-                    <p><span className="text-[#6b7280]">ID Type:</span> {selectedIdType}</p>
-                    <p className="mt-2"><span className="text-[#6b7280]">ID Number:</span> {idNumber || "-"}</p>
-                    <p className="mt-2"><span className="text-[#6b7280]">Front:</span> {idFrontFile?.name || "-"}</p>
-                    <p className="mt-2"><span className="text-[#6b7280]">Back:</span> {idBackFile?.name || "-"}</p>
+                  <div className="rounded-xl bg-slate-50 p-5 text-[14px] text-slate-900">
+                    <p><span className="text-slate-500">ID Type:</span> {selectedIdType}</p>
+                    <p className="mt-2"><span className="text-slate-500">ID Number:</span> {idNumber || "-"}</p>
+                    <p className="mt-2"><span className="text-slate-500">Front:</span> {idFrontFile?.name || "-"}</p>
+                    <p className="mt-2"><span className="text-slate-500">Back:</span> {idBackFile?.name || "-"}</p>
                   </div>
                 </div>
 
-                <div className="border-t border-[#e5e7eb] pt-6">
+                <div className="border-t border-slate-200 pt-6">
                   <div className="mb-3 flex items-center justify-between">
-                    <h3 className="text-[18px] font-medium text-[#111827]">Address Verification</h3>
+                    <h3 className="text-[18px] font-medium text-slate-900">Address Verification</h3>
                     {!reviewLocked ? (
-                      <button className="text-[14px] text-[#374151] hover:underline" onClick={() => goToStep(5)} type="button">
+                      <button className="text-[14px] text-slate-700 hover:underline" onClick={() => goToStep(5)} type="button">
                         Edit
                       </button>
                     ) : null}
                   </div>
 
-                  <div className="rounded-xl bg-[#f9fafb] p-5 text-[14px] text-[#111827]">
+                  <div className="rounded-xl bg-slate-50 p-5 text-[14px] text-slate-900">
                     <p>{addressLine1 || "-"}{addressLine2 ? `, ${addressLine2}` : ""}</p>
                     <p className="mt-2">{city || "-"}{stateProvince ? `, ${stateProvince}` : ""} {postalCode}</p>
                     <p className="mt-2">{country}</p>
@@ -1388,9 +1398,9 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
                 </div>
               </div>
 
-              <div className="mt-5 rounded-xl border border-[#bfdbfe] bg-[#eff6ff] p-4">
-                <p className="text-[14px] font-medium text-[#1d4ed8]">What happens next?</p>
-                <p className="mt-1 text-[14px] leading-6 text-[#1e40af]">
+              <div className="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4">
+                <p className="text-[14px] font-medium text-blue-700">What happens next?</p>
+                <p className="mt-1 text-[14px] leading-6 text-blue-800">
                   Our team will review your documents. You can return to your dashboard while the verification decision is processed.
                 </p>
               </div>
@@ -1399,7 +1409,7 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
 
           <div className="mt-8 flex items-center justify-between">
             <button
-              className="rounded-lg border border-[#e5e7eb] bg-white px-5 py-2.5 text-[14px] text-[#374151] transition hover:bg-[#f9fafb] disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-[14px] text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
               disabled={currentStep === 1 || submitting || !identityVerificationRequired}
               onClick={() => setCurrentStep((value) => clampStep(value - 1))}
               type="button"
@@ -1410,7 +1420,7 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
             <div className="flex items-center gap-3">
               {currentStep < totalSteps ? (
                 <button
-                  className="rounded-lg bg-[#10b981] px-5 py-2.5 text-[14px] font-medium text-white transition hover:bg-[#059669] disabled:opacity-60"
+                  className="rounded-lg bg-emerald-500 px-5 py-2.5 text-[14px] font-medium text-white transition hover:bg-emerald-600 disabled:opacity-60"
                   disabled={submitting || loadingSettings || !identityVerificationRequired || reviewLocked}
                   onClick={() => void onContinue()}
                   type="button"
@@ -1421,7 +1431,7 @@ export function EkycFlowClient({ role }: { role: EkycRole }) {
 
               {currentStep === totalSteps ? (
                 <button
-                  className="rounded-lg bg-[#10b981] px-5 py-2.5 text-[14px] font-medium text-white transition hover:bg-[#059669] disabled:opacity-60"
+                  className="rounded-lg bg-emerald-500 px-5 py-2.5 text-[14px] font-medium text-white transition hover:bg-emerald-600 disabled:opacity-60"
                   disabled={submitting || loadingSettings || !identityVerificationRequired || reviewLocked}
                   onClick={() => void onSubmitReview()}
                   type="button"

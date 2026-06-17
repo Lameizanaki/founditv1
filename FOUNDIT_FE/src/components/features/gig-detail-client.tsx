@@ -85,7 +85,7 @@ export function GigDetailClient({
 
   const content = (
     <div className="mx-auto max-w-[1600px] px-4 py-8 md:px-8">
-      <Link className="mb-6 inline-flex text-sm font-medium text-[#6b7280] transition hover:text-[#111827]" href={backHref}>
+      <Link className="mb-6 inline-flex text-sm font-medium text-slate-500 transition hover:text-slate-900" href={backHref}>
         Back
       </Link>
 
@@ -96,26 +96,26 @@ export function GigDetailClient({
       ) : null}
 
       <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <section className="overflow-hidden rounded-3xl border border-[#e5e7eb] bg-white shadow-sm">
+        <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
           <div className="h-[380px] w-full bg-gray-100">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img alt={toText(record.serviceTitle, "Gig")} className="h-full w-full object-cover" src={image} />
           </div>
           <div className="p-6">
-            <span className="rounded-full bg-[#eef2ff] px-3 py-1 text-xs font-semibold text-[#2563eb]">
+            <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
               {toText(record.category, "General")}
             </span>
-            <h1 className="mt-4 text-[32px] font-semibold text-[#111827]">
+            <h1 className="mt-4 text-[32px] font-semibold text-slate-900">
               {toText(record.serviceTitle ?? record.packageDescription, "Untitled service")}
             </h1>
-            <p className="mt-4 text-sm leading-7 text-[#4b5563]">
+            <p className="mt-4 text-sm leading-7 text-slate-600">
               {toText(record.description ?? record.packageDescription, "Detailed package information is not available yet.")}
             </p>
           </div>
         </section>
 
-        <section className="rounded-3xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-[#111827]">Gig Overview</h2>
+        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-slate-900">Gig Overview</h2>
           <div className="mt-5 space-y-4">
             {[
               ["Freelancer", toText(record.freelancerName, "Freelancer")],
@@ -124,15 +124,15 @@ export function GigDetailClient({
               ["Rating", toNumber(record.rating, 0).toFixed(1)],
             ].map(([label, value]) => (
               <div key={label}>
-                <p className="text-xs font-medium uppercase tracking-[0.12em] text-[#6b7280]">{label}</p>
-                <p className="mt-1 text-sm font-semibold text-[#111827]">{value}</p>
+                <p className="text-xs font-medium uppercase tracking-[0.12em] text-slate-500">{label}</p>
+                <p className="mt-1 text-sm font-semibold text-slate-900">{value}</p>
               </div>
             ))}
           </div>
 
           <div className="mt-6 flex flex-col gap-3">
             <button
-              className="rounded-xl bg-[#16a34a] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#15803d] disabled:cursor-not-allowed disabled:opacity-70"
+              className="rounded-xl bg-green-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-70"
               disabled={!canOrder}
               onClick={openOrderPage}
               type="button"
@@ -140,7 +140,7 @@ export function GigDetailClient({
               Continue to Order
             </button>
             <button
-              className="rounded-xl border border-[#d1d5db] bg-white px-4 py-3 text-sm font-medium text-[#374151] transition hover:bg-[#f9fafb] disabled:cursor-not-allowed disabled:opacity-70"
+              className="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-70"
               disabled={!canOpenChat || isOpeningChat}
               onClick={() => void openChat()}
               type="button"
@@ -150,7 +150,7 @@ export function GigDetailClient({
           </div>
 
           {chatError ? (
-            <p className="mt-4 text-sm text-[#dc2626]">{chatError}</p>
+            <p className="mt-4 text-sm text-red-600">{chatError}</p>
           ) : null}
         </section>
       </div>
@@ -159,7 +159,7 @@ export function GigDetailClient({
 
   if (mode === "public") {
     return (
-      <div className="min-h-screen bg-[#f6f7f9]">
+      <div className="min-h-screen bg-slate-50">
         <PublicHeader />
         {content}
         <PublicFooter />
@@ -167,5 +167,5 @@ export function GigDetailClient({
     );
   }
 
-  return <div className="min-h-screen bg-[#f6f7f9]">{content}</div>;
+  return <div className="min-h-screen bg-slate-50">{content}</div>;
 }

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useState } from "react";
@@ -48,7 +48,7 @@ export function BrowseFreelancersClient({
   const [category, setCategory] = useState("");
   const [rating, setRating] = useState("");
   const [location, setLocation] = useState("");
-  const [showFilters, setShowFilters] = useState(mode === "workspace");
+  const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
   const cards = data.map((entry, index) => {
@@ -111,18 +111,18 @@ export function BrowseFreelancersClient({
   );
 
   const content = (
-    <div className="overflow-y-auto bg-[#f6f7f9] px-4 py-8 md:px-8">
+    <div className="overflow-y-auto bg-slate-50 px-4 py-8 md:px-8">
       <div className="mb-6 flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
         <div>
-          <h1 className="text-[32px] font-semibold text-[#111827]">Browse Freelancers</h1>
-          <p className="text-[14px] text-[#6b7280]">
+          <h1 className="text-[32px] font-semibold text-slate-900">Browse Freelancers</h1>
+          <p className="text-[14px] text-slate-500">
             Find and hire talented freelancers for your projects.
           </p>
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row">
           <input
-            className="w-full rounded-lg border border-[#e5e7eb] bg-white px-4 py-2.5 text-sm outline-none focus:border-[#16a34a] sm:w-72"
+            className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-green-600 sm:w-72"
             onChange={(event) => {
               setSearchQuery(event.target.value);
               setCurrentPage(1);
@@ -131,7 +131,7 @@ export function BrowseFreelancersClient({
             value={searchQuery}
           />
           <button
-            className="rounded-lg border border-[#e5e7eb] bg-white px-4 py-2.5 text-sm transition hover:bg-gray-50"
+            className="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm transition hover:bg-gray-50"
             onClick={() => setShowFilters((value) => !value)}
             type="button"
           >
@@ -141,9 +141,9 @@ export function BrowseFreelancersClient({
       </div>
 
       {showFilters ? (
-        <div className="mb-6 rounded-xl border border-[#e5e7eb] bg-white p-5">
+        <div className="mb-6 rounded-xl border border-slate-200 bg-white p-5">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-[15px] font-medium text-[#111827]">Filters</h2>
+            <h2 className="text-[15px] font-medium text-slate-900">Filters</h2>
             <button
               className="text-[13px] text-blue-600 hover:underline"
               onClick={() => {
@@ -161,7 +161,7 @@ export function BrowseFreelancersClient({
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <input
-              className="rounded-lg border border-[#d1d5db] px-3 py-2 text-sm outline-none focus:border-[#16a34a]"
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-green-600"
               onChange={(event) => {
                 setCategory(event.target.value);
                 setCurrentPage(1);
@@ -170,7 +170,7 @@ export function BrowseFreelancersClient({
               value={category}
             />
             <input
-              className="rounded-lg border border-[#d1d5db] px-3 py-2 text-sm outline-none focus:border-[#16a34a]"
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-green-600"
               onChange={(event) => {
                 setRating(event.target.value);
                 setCurrentPage(1);
@@ -179,7 +179,7 @@ export function BrowseFreelancersClient({
               value={rating}
             />
             <input
-              className="rounded-lg border border-[#d1d5db] px-3 py-2 text-sm outline-none focus:border-[#16a34a]"
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-green-600"
               onChange={(event) => {
                 setLocation(event.target.value);
                 setCurrentPage(1);
@@ -192,11 +192,11 @@ export function BrowseFreelancersClient({
       ) : null}
 
       {isLoading ? (
-        <div className="rounded-xl border border-[#e5e7eb] bg-white p-5 text-sm text-[#6b7280]">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 text-sm text-slate-500">
           Loading freelancers...
         </div>
       ) : error ? (
-        <div className="rounded-xl border border-[#fecaca] bg-[#fef2f2] p-5 text-sm text-[#b91c1c]">
+        <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">
           {error}
         </div>
       ) : null}
@@ -205,7 +205,7 @@ export function BrowseFreelancersClient({
         {paginatedCards.map((card) => (
           <Link
             key={card.id}
-            className="rounded-xl border border-[#e5e7eb] bg-white p-5 transition hover:shadow-sm"
+            className="rounded-xl border border-slate-200 bg-white p-5 transition hover:shadow-sm"
             href={`${basePath}/${card.id}`}
           >
             <div className="mb-4 flex gap-4">
@@ -214,16 +214,16 @@ export function BrowseFreelancersClient({
                   // eslint-disable-next-line @next/next/no-img-element
                   <img alt={card.name} className="h-full w-full object-cover" src={card.avatar} />
                 ) : (
-                  <span className="text-sm font-semibold text-[#374151]">{getInitials(card.name)}</span>
+                  <span className="text-sm font-semibold text-slate-700">{getInitials(card.name)}</span>
                 )}
               </div>
 
               <div className="min-w-0">
-                <h3 className="text-[15px] font-semibold text-[#111827]">{card.name}</h3>
+                <h3 className="text-[15px] font-semibold text-slate-900">{card.name}</h3>
                 <p className="text-sm text-green-600">{card.job}</p>
                 <div className="flex items-center gap-2 text-sm text-gray-500">
                   <span>{card.rating.toFixed(1)}</span>
-                  <span>•</span>
+                  <span>/</span>
                   <span>{formatCompactNumber(card.views)} views</span>
                 </div>
               </div>
@@ -244,9 +244,9 @@ export function BrowseFreelancersClient({
               </div>
             ) : null}
 
-            <p className="line-clamp-2 text-sm text-[#6b7280]">{card.about}</p>
+            <p className="line-clamp-2 text-sm text-slate-500">{card.about}</p>
 
-            <div className="mt-4 border-t border-gray-200 pt-3 text-[15px] font-semibold text-[#111827]">
+            <div className="mt-4 border-t border-gray-200 pt-3 text-[15px] font-semibold text-slate-900">
               {card.price ? `From $${card.price}` : "View portfolio"}
             </div>
           </Link>
@@ -254,7 +254,7 @@ export function BrowseFreelancersClient({
       </div>
 
       {!isLoading && !error && !filteredCards.length ? (
-        <div className="mt-6 rounded-xl border border-[#e5e7eb] bg-white p-5 text-sm text-[#6b7280]">
+        <div className="mt-6 rounded-xl border border-slate-200 bg-white p-5 text-sm text-slate-500">
           No freelancers found.
         </div>
       ) : null}
@@ -262,7 +262,7 @@ export function BrowseFreelancersClient({
       {totalPages > 1 ? (
         <div className="mt-8 flex items-center justify-center gap-2">
           <button
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#e5e7eb] bg-white text-sm text-[#374151] transition hover:bg-gray-50 disabled:opacity-50"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm text-slate-700 transition hover:bg-gray-50 disabled:opacity-50"
             disabled={visiblePage === 1}
             onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
             type="button"
@@ -274,8 +274,8 @@ export function BrowseFreelancersClient({
               key={page}
               className={
                 page === visiblePage
-                  ? "flex h-9 w-9 items-center justify-center rounded-lg border border-[#16a34a] bg-[#16a34a] text-sm text-white"
-                  : "flex h-9 w-9 items-center justify-center rounded-lg border border-[#e5e7eb] bg-white text-sm text-[#374151] transition hover:bg-gray-50"
+                  ? "flex h-9 w-9 items-center justify-center rounded-lg border border-green-600 bg-green-600 text-sm text-white"
+                  : "flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm text-slate-700 transition hover:bg-gray-50"
               }
               onClick={() => setCurrentPage(page)}
               type="button"
@@ -284,7 +284,7 @@ export function BrowseFreelancersClient({
             </button>
           ))}
           <button
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#e5e7eb] bg-white text-sm text-[#374151] transition hover:bg-gray-50 disabled:opacity-50"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm text-slate-700 transition hover:bg-gray-50 disabled:opacity-50"
             disabled={visiblePage === totalPages}
             onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
             type="button"
@@ -298,7 +298,7 @@ export function BrowseFreelancersClient({
 
   if (mode === "public") {
     return (
-      <div className="w-full bg-[#f6f7f9]">
+      <div className="w-full bg-slate-50">
         <PublicHeader />
         {content}
         <PublicFooter />
@@ -306,6 +306,6 @@ export function BrowseFreelancersClient({
     );
   }
 
-  return <div className="w-full bg-[#f6f7f9] px-8 py-8">{content}</div>;
+  return <div className="w-full bg-slate-50 px-8 py-8">{content}</div>;
 }
 

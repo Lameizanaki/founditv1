@@ -171,17 +171,17 @@ export function DataPreviewPanel({
   const summary = payload === null ? null : buildSummary(payload);
 
   return (
-    <section className="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#6b7280]">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
             Connected data
           </p>
-          <h2 className="mt-2 text-[18px] font-bold text-[#111827]">{title}</h2>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6b7280]">{description}</p>
+          <h2 className="mt-2 text-[18px] font-bold text-slate-900">{title}</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{description}</p>
         </div>
         <button
-          className="rounded-xl border border-[#d1d5db] bg-white px-4 py-2 text-sm font-semibold text-[#374151] transition hover:bg-[#f9fafb]"
+          className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
           onClick={() => void loadPreview()}
           type="button"
         >
@@ -189,38 +189,38 @@ export function DataPreviewPanel({
         </button>
       </div>
 
-      <div className="mt-5 rounded-2xl border border-[#e5e7eb] bg-[#f9fafb] p-4">
-        <p className="mb-3 font-mono text-xs uppercase tracking-[0.24em] text-[#6b7280]">{endpoint}</p>
+      <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <p className="mb-3 font-mono text-xs uppercase tracking-[0.24em] text-slate-500">{endpoint}</p>
         {isLoading ? (
-          <p className="text-sm text-[#6b7280]">Loading response...</p>
+          <p className="text-sm text-slate-500">Loading response...</p>
         ) : error ? (
           <div className="space-y-2">
-            <p className="font-semibold text-[#b91c1c]">Request failed</p>
-            <p className="text-sm text-[#7f1d1d]">{error}</p>
+            <p className="font-semibold text-red-700">Request failed</p>
+            <p className="text-sm text-red-900">{error}</p>
           </div>
         ) : (
           <div className="space-y-4">
             {summary ? (
               <div>
-                <p className="text-sm font-semibold text-[#111827]">{summary.headline}</p>
+                <p className="text-sm font-semibold text-slate-900">{summary.headline}</p>
                 <div className="mt-3 grid gap-3 sm:grid-cols-2">
                   {summary.items.map((item) => (
-                    <div key={item.key} className="rounded-xl border border-[#e5e7eb] bg-white px-4 py-3">
-                      <p className="text-xs font-medium uppercase tracking-[0.12em] text-[#6b7280]">
+                    <div key={item.key} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+                      <p className="text-xs font-medium uppercase tracking-[0.12em] text-slate-500">
                         {item.key}
                       </p>
-                      <p className="mt-1 text-sm font-medium text-[#111827]">{item.value}</p>
+                      <p className="mt-1 text-sm font-medium text-slate-900">{item.value}</p>
                     </div>
                   ))}
                 </div>
               </div>
             ) : null}
 
-            <details className="rounded-xl border border-[#e5e7eb] bg-white p-4">
-              <summary className="cursor-pointer text-sm font-semibold text-[#374151]">
+            <details className="rounded-xl border border-slate-200 bg-white p-4">
+              <summary className="cursor-pointer text-sm font-semibold text-slate-700">
                 View raw response
               </summary>
-              <pre className="mt-4 overflow-x-auto whitespace-pre-wrap break-words font-mono text-xs leading-6 text-[#111827]">
+              <pre className="mt-4 overflow-x-auto whitespace-pre-wrap break-words font-mono text-xs leading-6 text-slate-900">
                 {preview}
               </pre>
             </details>

@@ -1,6 +1,7 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
+import { BriefcaseBusiness, DollarSign, Eye, Star } from "lucide-react";
 import { useApiQuery } from "@/hooks/use-api-query";
 import {
   asRecord,
@@ -17,20 +18,20 @@ import type { PaymentTransactionResponse } from "@/types/payment";
 const serviceStatusClass = (value: string) => {
   const status = normalizeStatus(value);
   if (status.includes("pause")) {
-    return "bg-[#fef3c7] text-[#d97706]";
+    return "bg-amber-100 text-amber-600";
   }
-  return "bg-[#dcfce7] text-[#16a34a]";
+  return "bg-green-100 text-green-600";
 };
 
 const projectStatusClass = (value: string) => {
   const status = normalizeStatus(value);
   if (status.includes("review") || status.includes("submitted") || status.includes("delivered")) {
-    return "bg-[#fef3c7] text-[#d97706]";
+    return "bg-amber-100 text-amber-600";
   }
   if (status.includes("completed")) {
-    return "bg-[#dcfce7] text-[#16a34a]";
+    return "bg-green-100 text-green-600";
   }
-  return "bg-[#eff6ff] text-[#2563eb]";
+  return "bg-blue-50 text-blue-600";
 };
 
 export function FreelancerDashboardClient() {
@@ -119,38 +120,38 @@ export function FreelancerDashboardClient() {
 
   return (
     <div className="mx-auto w-full max-w-[1600px] space-y-6 px-4 pb-8 md:px-6 lg:px-10">
-      <section className="rounded-2xl border border-[#e5e7eb] bg-white p-6">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-[30px] font-semibold leading-none text-[#111827] md:text-[18px]">
+            <h1 className="text-[30px] font-semibold leading-none text-slate-900 md:text-[18px]">
               Freelancer Dashboard
             </h1>
-            <p className="mt-1 text-sm text-[#6b7280]">
+            <p className="mt-1 text-sm text-slate-500">
               Manage your services, track earnings, and grow your freelance business.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
             {isVerified ? (
-              <span className="inline-flex items-center gap-2 rounded-full bg-[#dcfce7] px-4 py-2.5 text-sm font-semibold text-[#166534]">
+              <span className="inline-flex items-center gap-2 rounded-full bg-green-100 px-4 py-2.5 text-sm font-semibold text-green-800">
                 Verified
               </span>
             ) : (
               <Link
-                className="inline-flex items-center gap-2 rounded-xl border border-[#d1d5db] bg-white px-4 py-2.5 text-sm font-semibold text-[#2563eb] transition hover:bg-[#f9fafb]"
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-blue-600 transition hover:bg-slate-50"
                 href="/freelancer/ekyc"
               >
                 Verify Identity
               </Link>
             )}
             <Link
-              className="inline-flex items-center gap-2 rounded-xl bg-[#16a34a] px-4 py-2.5 text-sm font-semibold !text-white shadow-sm transition visited:!text-white hover:!text-white hover:bg-[#15803d] focus:!text-white"
+              className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2.5 text-sm font-semibold !text-white shadow-sm transition visited:!text-white hover:!text-white hover:bg-green-700 focus:!text-white"
               href="/freelancer/create-new-service"
             >
               Post a Gig
             </Link>
             <Link
-              className="inline-flex items-center gap-2 rounded-xl border border-[#d1d5db] bg-white px-4 py-2.5 text-sm font-semibold text-[#16a34a] transition hover:bg-[#f9fafb]"
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-green-600 transition hover:bg-slate-50"
               href="/freelancer/profile"
             >
               View Profile
@@ -167,53 +168,57 @@ export function FreelancerDashboardClient() {
 
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[
-          { label: "Total Earnings", value: formatMoney(totalEarnings), badge: `${paidTransactions.length} paid` },
-          { label: "Active Orders", value: String(activeOrders.length), badge: `${requests.data.length} requests` },
-          { label: "Profile Views", value: String(profileViews), badge: "Live" },
-          { label: "Avg. Rating", value: averageRating ? averageRating.toFixed(1) : "0.0", badge: "Portfolio" },
-        ].map((stat) => (
-          <div key={stat.label} className="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-sm">
+          { label: "Total Earnings", value: formatMoney(totalEarnings), badge: `${paidTransactions.length} paid`, icon: DollarSign },
+          { label: "Active Orders", value: String(activeOrders.length), badge: `${requests.data.length} requests`, icon: BriefcaseBusiness },
+          { label: "Profile Views", value: String(profileViews), badge: "Live", icon: Eye },
+          { label: "Avg. Rating", value: averageRating ? averageRating.toFixed(1) : "0.0", badge: "Portfolio", icon: Star },
+        ].map((stat) => {
+          const Icon = stat.icon;
+
+          return (
+          <div key={stat.label} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div className="flex items-start justify-between">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#dcfce7] text-[#16a34a]">
-                •
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-100 text-green-600">
+                <Icon className="h-5 w-5" />
               </div>
-              <span className="rounded-full bg-[#eef2ff] px-2.5 py-1 text-[11px] font-medium text-[#2563eb]">
+              <span className="rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-medium text-blue-600">
                 {stat.badge}
               </span>
             </div>
-            <p className="mt-4 text-sm text-[#6b7280]">{stat.label}</p>
-            <h3 className="mt-1 text-[20px] font-bold text-[#111827]">{stat.value}</h3>
+            <p className="mt-4 text-sm text-slate-500">{stat.label}</p>
+            <h3 className="mt-1 text-[20px] font-bold text-slate-900">{stat.value}</h3>
           </div>
-        ))}
+          );
+        })}
       </section>
 
-      <section className="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-sm">
-        <div className="flex items-center justify-between border-b border-[#eef2f7] px-5 py-4">
+      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
           <div>
-            <h2 className="text-[16px] font-bold text-[#111827]">Confirmed Payments</h2>
-            <p className="mt-1 text-sm text-[#6b7280]">
+            <h2 className="text-[16px] font-bold text-slate-900">Confirmed Payments</h2>
+            <p className="mt-1 text-sm text-slate-500">
               Recent transfers you have already confirmed from your bank app.
             </p>
           </div>
-          <span className="rounded-full bg-[#dcfce7] px-3 py-1 text-xs font-semibold text-[#16a34a]">
+          <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-600">
             {paidTransactions.length} paid
           </span>
         </div>
 
         {isLoading ? (
-          <div className="px-5 py-8 text-sm text-[#6b7280]">Loading confirmed payments...</div>
+          <div className="px-5 py-8 text-sm text-slate-500">Loading confirmed payments...</div>
         ) : recentPaidPayments.length ? (
-          <div className="divide-y divide-[#eef2f7]">
+          <div className="divide-y divide-slate-100">
             {recentPaidPayments.map((payment) => (
               <div
                 key={payment.tranId ?? payment.id}
                 className="flex flex-col gap-4 px-5 py-4 lg:flex-row lg:items-center lg:justify-between"
               >
                 <div className="min-w-0">
-                  <h3 className="truncate text-sm font-semibold text-[#111827]">
+                  <h3 className="truncate text-sm font-semibold text-slate-900">
                     {payment.projectTitle || (payment.projectId ? `Project #${payment.projectId}` : "Project payment")}
                   </h3>
-                  <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#6b7280]">
+                  <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
                     <span>{payment.clientName || "Client"}</span>
                     <span>{payment.tranId || "No transaction ID"}</span>
                     <span>{formatMoney(payment.amount)}</span>
@@ -222,25 +227,25 @@ export function FreelancerDashboardClient() {
                   </div>
                 </div>
 
-                <span className="inline-flex w-fit rounded-full bg-[#dcfce7] px-3 py-1 text-xs font-semibold text-[#16a34a]">
+                <span className="inline-flex w-fit rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-600">
                   Paid
                 </span>
               </div>
             ))}
           </div>
         ) : (
-          <div className="px-5 py-8 text-sm text-[#6b7280]">
+          <div className="px-5 py-8 text-sm text-slate-500">
             Confirmed payments will appear here after you approve submitted proofs.
           </div>
         )}
       </section>
 
       <section>
-          <div className="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-sm">
-            <div className="flex items-center justify-between border-b border-[#eef2f7] px-5 py-4">
-              <h2 className="text-[16px] font-bold text-[#111827]">My Active Services</h2>
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+              <h2 className="text-[16px] font-bold text-slate-900">My Active Services</h2>
               <Link
-                className="text-sm font-semibold text-[#16a34a] transition hover:opacity-80"
+                className="text-sm font-semibold text-green-600 transition hover:opacity-80"
                 href="/freelancer/my-services"
               >
                 View All
@@ -248,9 +253,9 @@ export function FreelancerDashboardClient() {
             </div>
 
             {isLoading ? (
-              <div className="px-5 py-8 text-sm text-[#6b7280]">Loading dashboard...</div>
+              <div className="px-5 py-8 text-sm text-slate-500">Loading dashboard...</div>
             ) : serviceCards.length ? (
-              <div className="divide-y divide-[#eef2f7]">
+              <div className="divide-y divide-slate-100">
                 {serviceCards.map((service) => (
                   <div
                     key={service.id}
@@ -263,12 +268,12 @@ export function FreelancerDashboardClient() {
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img alt={service.title} className="h-12 w-12 rounded-xl object-cover" src={service.image} />
                       <div className="min-w-0">
-                        <h3 className="truncate text-sm font-semibold text-[#111827]">{service.title}</h3>
-                        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#6b7280]">
+                        <h3 className="truncate text-sm font-semibold text-slate-900">{service.title}</h3>
+                        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
                           <span>{service.views} views</span>
                           <span>{service.orders} orders</span>
                           <span>{service.rating.toFixed(1)} rating</span>
-                          <span className="font-semibold text-[#374151]">${service.price}</span>
+                          <span className="font-semibold text-slate-700">${service.price}</span>
                         </div>
                       </div>
                     </Link>
@@ -280,16 +285,16 @@ export function FreelancerDashboardClient() {
                 ))}
               </div>
             ) : (
-              <div className="px-5 py-8 text-sm text-[#6b7280]">No gigs available yet.</div>
+              <div className="px-5 py-8 text-sm text-slate-500">No gigs available yet.</div>
             )}
           </div>
       </section>
 
-      <section className="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-sm">
-        <div className="flex items-center justify-between border-b border-[#eef2f7] px-5 py-4">
-          <h2 className="text-[16px] font-bold text-[#111827]">Active Orders</h2>
+      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+          <h2 className="text-[16px] font-bold text-slate-900">Active Orders</h2>
           <Link
-            className="text-sm font-semibold text-[#16a34a] transition hover:opacity-80"
+            className="text-sm font-semibold text-green-600 transition hover:opacity-80"
             href="/freelancer/active-work"
           >
             View All
@@ -297,23 +302,23 @@ export function FreelancerDashboardClient() {
         </div>
 
         {isLoading ? (
-          <div className="px-5 py-8 text-sm text-[#6b7280]">Loading active orders...</div>
+          <div className="px-5 py-8 text-sm text-slate-500">Loading active orders...</div>
         ) : projectCards.length ? (
-          <div className="divide-y divide-[#eef2f7]">
+          <div className="divide-y divide-slate-100">
             {projectCards.map((project) => (
               <div
                 key={project.id}
                 className="flex flex-col gap-4 px-5 py-4 md:flex-row md:items-center md:justify-between"
               >
                 <div>
-                  <h3 className="text-sm font-semibold text-[#111827]">{project.title}</h3>
-                  <p className="mt-1 text-sm text-[#6b7280]">
-                    {project.client} <span className="mx-1">•</span> Due: {project.dueDate}
+                  <h3 className="text-sm font-semibold text-slate-900">{project.title}</h3>
+                  <p className="mt-1 text-sm text-slate-500">
+                    {project.client} <span className="mx-1">/</span> Due: {project.dueDate}
                   </p>
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <span className="text-[20px] font-bold text-[#111827]">
+                  <span className="text-[20px] font-bold text-slate-900">
                     {formatMoney(project.price)}
                   </span>
                   <span className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${projectStatusClass(project.status)}`}>
@@ -324,7 +329,7 @@ export function FreelancerDashboardClient() {
             ))}
           </div>
         ) : (
-          <div className="px-5 py-8 text-sm text-[#6b7280]">No in-progress projects yet.</div>
+          <div className="px-5 py-8 text-sm text-slate-500">No in-progress projects yet.</div>
         )}
       </section>
     </div>

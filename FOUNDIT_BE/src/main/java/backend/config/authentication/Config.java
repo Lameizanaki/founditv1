@@ -3,6 +3,7 @@ package backend.config.authentication;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -13,9 +14,12 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -54,6 +58,9 @@ public class Config {
 
 	@Value("${GOOGLE_CLIENT_ID:}")
 	private String googleClientId;
+
+	@Value("${GOOGLE_CLIENT_SECRET:}")
+	private String googleClientSecret;
 	
 	@Bean 
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{	
@@ -126,13 +133,30 @@ public class Config {
 				.addFilterAfter(suspendedAccountFilter, MaintenanceModeFilter.class)
 				.addFilterAt(jwtLoginFilter(), UsernamePasswordAuthenticationFilter.class);
 
-		if (googleClientId != null && !googleClientId.isBlank()) {
+		if (isGoogleOAuthConfigured()) {
 			security.oauth2Login(auth ->
 				auth.successHandler(
 						new OAuthGoogleHandler(authGoogleHandler, frontendUrl)));
 		}
 
 		return security.build();
+	}
+	
+	@Bean
+	@ConditionalOnProperty(name = { "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET" })
+	public ClientRegistrationRepository clientRegistrationRepository() {
+		return new InMemoryClientRegistrationRepository(
+				CommonOAuth2Provider.GOOGLE
+						.getBuilder("google")
+						.clientId(googleClientId)
+						.clientSecret(googleClientSecret)
+						.scope("openid", "email", "profile")
+						.build());
+	}
+	
+	private boolean isGoogleOAuthConfigured() {
+		return googleClientId != null && !googleClientId.isBlank()
+				&& googleClientSecret != null && !googleClientSecret.isBlank();
 	}
 	
 	@Bean

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/components/providers/auth-provider";
@@ -80,31 +80,31 @@ export function AdminSettingsClient() {
 
   return (
     <div className="mx-auto w-full max-w-[1600px] space-y-6 px-4 pb-8 md:px-6 lg:px-10">
-      <div className="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
-        <h1 className="text-[28px] font-semibold text-[#222]">Platform Settings</h1>
-        <p className="mt-2 text-[15px] text-[#6b7280]">
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h1 className="text-[28px] font-semibold text-slate-900">Platform Settings</h1>
+        <p className="mt-2 text-[15px] text-slate-500">
           Control maintenance mode, login protection, and identity verification requirements.
         </p>
       </div>
 
       {error ? (
-        <div className="rounded-lg border border-[#fed7aa] bg-[#fff7ed] p-4 text-sm text-[#9a3412]">
+        <div className="rounded-lg border border-orange-200 bg-orange-50 p-4 text-sm text-orange-800">
           {error}
         </div>
       ) : null}
       {message ? (
-        <div className="rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] p-4 text-sm text-[#166534]">
+        <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">
           {message}
         </div>
       ) : null}
 
       <div className="grid gap-6 xl:grid-cols-[1fr_0.8fr]">
-        <section className="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="space-y-6">
-            <label className="flex items-start justify-between gap-4 rounded-2xl border border-[#e5e7eb] bg-[#f9fafb] p-5">
+            <label className="flex items-start justify-between gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-5">
               <div>
-                <p className="text-base font-semibold text-[#111827]">Maintenance Mode</p>
-                <p className="mt-1 text-sm text-[#6b7280]">
+                <p className="text-base font-semibold text-slate-900">Maintenance Mode</p>
+                <p className="mt-1 text-sm text-slate-500">
                   Temporarily block the app and show a maintenance message.
                 </p>
               </div>
@@ -119,9 +119,9 @@ export function AdminSettingsClient() {
             </label>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-[#374151]">Maintenance Message</label>
+              <label className="mb-2 block text-sm font-medium text-slate-700">Maintenance Message</label>
               <textarea
-                className="w-full rounded-2xl border border-[#d1d5db] bg-white px-4 py-3 text-sm text-[#111827] outline-none focus:border-[#2563eb]"
+                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-600"
                 onChange={(event) =>
                   setSettings((current) => ({ ...current, maintenanceMessage: event.target.value }))
                 }
@@ -130,10 +130,10 @@ export function AdminSettingsClient() {
               />
             </div>
 
-            <label className="flex items-start justify-between gap-4 rounded-2xl border border-[#e5e7eb] bg-[#f9fafb] p-5">
+            <label className="flex items-start justify-between gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-5">
               <div>
-                <p className="text-base font-semibold text-[#111827]">Require Identity Verification</p>
-                <p className="mt-1 text-sm text-[#6b7280]">
+                <p className="text-base font-semibold text-slate-900">Require Identity Verification</p>
+                <p className="mt-1 text-sm text-slate-500">
                   Keep E-KYC mandatory before users can access restricted platform actions.
                 </p>
               </div>
@@ -151,9 +151,9 @@ export function AdminSettingsClient() {
             </label>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-[#374151]">Max Login Attempts</label>
+              <label className="mb-2 block text-sm font-medium text-slate-700">Max Login Attempts</label>
               <input
-                className="h-12 w-full rounded-2xl border border-[#d1d5db] bg-white px-4 text-sm text-[#111827] outline-none focus:border-[#2563eb]"
+                className="h-12 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-none focus:border-blue-600"
                 max={5}
                 min={1}
                 onChange={(event) =>
@@ -170,14 +170,14 @@ export function AdminSettingsClient() {
 
           <div className="mt-6 flex justify-end gap-3">
             <button
-              className="rounded-xl border border-[#d1d5db] bg-white px-4 py-2.5 text-sm font-semibold text-[#111827] transition hover:bg-[#f9fafb]"
+              className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
               onClick={() => void loadSettings()}
               type="button"
             >
               {isLoading ? "Loading..." : "Reset"}
             </button>
             <button
-              className="rounded-xl bg-[#111827] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0b1220] disabled:opacity-60"
+              className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-950 disabled:opacity-60"
               disabled={isSaving}
               onClick={() => void saveSettings()}
               type="button"
@@ -187,9 +187,9 @@ export function AdminSettingsClient() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-[#111827]">Deployment Notes</h2>
-          <div className="mt-5 space-y-4 text-sm leading-7 text-[#4b5563]">
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-slate-900">Deployment Notes</h2>
+          <div className="mt-5 space-y-4 text-sm leading-7 text-slate-600">
             <p>Maintenance mode affects live traffic, so keep the message clear before deploying.</p>
             <p>
               The backend now reads environment overrides, which keeps production settings out of source control.

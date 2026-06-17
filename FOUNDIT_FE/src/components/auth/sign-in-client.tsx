@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { GoogleIcon } from "@/components/auth/google-icon";
 import { useAuth } from "@/components/providers/auth-provider";
 import { getDefaultRouteForRole } from "@/lib/auth";
 import { toErrorMessage } from "@/lib/api";
@@ -50,7 +51,7 @@ export function SignInClient({
   };
 
   return (
-    <section className="min-h-screen bg-[#f8f8f8] px-6 py-8 md:px-10 lg:px-16">
+    <section className="min-h-screen bg-slate-50 px-6 py-8 md:px-10 lg:px-16">
       <div className="mx-auto w-full">
         <div className="mb-3 flex justify-center">
           <div className="flex h-16 w-32 items-center">
@@ -65,7 +66,7 @@ export function SignInClient({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 overflow-hidden rounded-2xl bg-[#f8f8f8] lg:grid-cols-2">
+        <div className="grid grid-cols-1 overflow-hidden rounded-2xl bg-slate-50 lg:grid-cols-2">
           <div className="flex items-center justify-center px-4 py-6 sm:px-8 md:px-12 lg:px-14">
             <div className="w-full max-w-2xl">
               <h2 className="mb-2 text-[42px] font-bold leading-tight text-gray-900">
@@ -74,7 +75,7 @@ export function SignInClient({
               <p className="mb-8 text-[18px] text-gray-500">Sign in to continue</p>
 
               {googleSetupComplete ? (
-                <div className="mb-6 rounded-2xl border border-[#bbf7d0] bg-[#f0fdf4] px-4 py-3 text-sm font-medium leading-6 text-[#166534]">
+                <div className="mb-6 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium leading-6 text-green-800">
                   Your Google account is ready. Continue with Google once more to enter your dashboard with the role you selected.
                 </div>
               ) : null}
@@ -87,14 +88,14 @@ export function SignInClient({
                     onClick={() => void handleGoogleContinue()}
                     type="button"
                   >
-                    <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-gray-300 text-[11px] font-bold text-[#4285F4]">
-                      G
+                    <span className="inline-flex h-5 w-5 items-center justify-center">
+                      <GoogleIcon />
                     </span>
                     <span>{isGoogleLoading ? "Redirecting..." : "Continue with Google"}</span>
                   </button>
                 </div>
               ) : (
-                <div className="rounded-xl border border-[#dbeafe] bg-[#eff6ff] px-4 py-3 text-sm text-[#1d4ed8]">
+                <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
                   Google sign-in is unavailable in this deployment. Use email and password instead.
                 </div>
               )}
@@ -115,7 +116,7 @@ export function SignInClient({
 
               <form className="space-y-5" onSubmit={onSubmit}>
                 {error ? (
-                  <div className="mb-5 rounded-xl border border-[#fecaca] bg-[#fef2f2] px-4 py-3 text-sm font-medium text-[#dc2626]">
+                  <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
                     {error}
                   </div>
                 ) : null}
@@ -125,7 +126,7 @@ export function SignInClient({
                     Email
                   </label>
                   <input
-                    className="h-12 w-full rounded-xl border border-transparent bg-[#f1f1f3] px-4 text-sm outline-none placeholder:text-gray-400 focus:border-[#16a34a] focus:bg-white"
+                    className="h-12 w-full rounded-xl border border-transparent bg-slate-100 px-4 text-sm outline-none placeholder:text-gray-400 focus:border-green-600 focus:bg-white"
                     id="email"
                     onChange={(event) => setEmail(event.target.value)}
                     placeholder="you@example.com"
@@ -141,7 +142,7 @@ export function SignInClient({
                     Password
                   </label>
                   <input
-                    className="h-12 w-full rounded-xl border border-transparent bg-[#f1f1f3] px-4 pr-12 text-sm outline-none placeholder:text-gray-400 focus:border-[#16a34a] focus:bg-white"
+                    className="h-12 w-full rounded-xl border border-transparent bg-slate-100 px-4 pr-12 text-sm outline-none placeholder:text-gray-400 focus:border-green-600 focus:bg-white"
                     id="password"
                     onChange={(event) => setPassword(event.target.value)}
                     placeholder="Enter your password"
@@ -167,7 +168,7 @@ export function SignInClient({
 
                 <div className="pt-2">
                   <button
-                    className="h-12 w-full rounded-xl bg-[#08b239] text-sm font-semibold text-white transition hover:bg-[#069d32] disabled:cursor-not-allowed disabled:opacity-70"
+                    className="h-12 w-full rounded-xl bg-green-600 text-sm font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-70"
                     disabled={isSubmitting || isGoogleLoading}
                     type="submit"
                   >
@@ -188,12 +189,12 @@ export function SignInClient({
           <div className="hidden lg:flex lg:border-l lg:border-gray-200">
             <div className="flex w-full items-center justify-center p-8">
               <div className="flex h-full w-full items-center justify-center bg-transparent">
-                <div className="text-center text-gray-400">
+                <div className="flex h-full w-full items-center justify-center">
                   <Image
-                    alt="auth"
-                    className="h-full w-full object-contain"
+                    alt="Mobile login illustration"
+                    className="h-[min(72vh,760px)] w-full max-w-[760px] object-contain"
                     height={900}
-                    src="/assets/images/auth.png"
+                    src="/assets/images/auth-mobile-login.svg"
                     width={900}
                   />
                 </div>

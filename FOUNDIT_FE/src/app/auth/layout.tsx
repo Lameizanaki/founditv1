@@ -9,7 +9,7 @@ export default function AuthLayout({
     <main className="min-h-screen pb-12">
       <PublicHeader />
       <div className="px-4 pt-6 sm:px-6">
-        <div className="mx-auto max-w-4xl">{children}</div>
+        <div className="mx-auto max-w-7xl">{children}</div>
       </div>
     </main>
   );
