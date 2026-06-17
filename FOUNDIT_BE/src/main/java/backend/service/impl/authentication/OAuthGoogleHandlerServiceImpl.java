@@ -2,8 +2,9 @@ package backend.service.impl.authentication;
 
 import org.springframework.stereotype.Service;
 
-import backend.enums.authentication.Role;
 import backend.model.authentication.Register;
+import backend.repository.authentication.ClientRepository;
+import backend.repository.authentication.FreelancerRepository;
 import backend.repository.authentication.RegisterRepository;
 import backend.service.authentication.OAuthGoogleHandlerService;
 import jakarta.transaction.Transactional;
@@ -14,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 public class OAuthGoogleHandlerServiceImpl implements OAuthGoogleHandlerService{
 
 	private final RegisterRepository registerRepository;
+	private final ClientRepository clientRepository;
+	private final FreelancerRepository freelancerRepository;
 	
 	@Override
 	@Transactional
@@ -25,10 +28,6 @@ public class OAuthGoogleHandlerServiceImpl implements OAuthGoogleHandlerService{
 						existing.setGoogleSubject(googleSubject);
 						changed = true;
 					}
-					if (existing.getRole() == null) {
-						existing.setRole(Role.CLIENT);
-						changed = true;
-					}
 					return changed ? registerRepository.save(existing) : existing;
 				})
 				.orElseGet(() -> {
@@ -37,7 +36,6 @@ public class OAuthGoogleHandlerServiceImpl implements OAuthGoogleHandlerService{
 					user.setEmail(email);
 					user.setUsername(email);
 					user.setGoogleSubject(googleSubject);
-					user.setRole(Role.CLIENT);
 					
 					user.setAccountNonExpired(true);
 					user.setAccountNonLocked(true);
@@ -46,6 +44,19 @@ public class OAuthGoogleHandlerServiceImpl implements OAuthGoogleHandlerService{
 					
 					return registerRepository.save(user);
 				});
+	}
+
+	@Override
+	public boolean requiresRoleSelection(Register user) {
+		if (user == null || user.getRole() == null) {
+			return true;
+		}
+
+		return switch (user.getRole()) {
+			case CLIENT -> clientRepository.findByRegister_Id(user.getId()).isEmpty();
+			case FREELANCER -> freelancerRepository.findByRegister_Id(user.getId()).isEmpty();
+			case ADMIN -> false;
+		};
 	}
 	
 

@@ -55,6 +55,7 @@ public class OAuthGoogleHandler implements AuthenticationSuccessHandler{
         }
 		
         Register registered = register.findOrCreateFromGoogle(email, googleSubject);
+        boolean requiresRoleSelection = register.requiresRoleSelection(registered);
         
         var role = registered.getRole();
         Collection<? extends GrantedAuthority> authorities = (role != null) ? role.getAuthorities() : java.util.List.of();
@@ -69,7 +70,8 @@ public class OAuthGoogleHandler implements AuthenticationSuccessHandler{
                 .compact(); 
 
         // Redirect to frontend with token
-		String redirectUrl = frontend + "/auth/google/callback?token=" + token;
+		String redirectUrl = frontend + "/auth/google/callback?token=" + token
+				+ (requiresRoleSelection ? "&setupRole=true" : "");
 		response.sendRedirect(redirectUrl);
 	}
 }

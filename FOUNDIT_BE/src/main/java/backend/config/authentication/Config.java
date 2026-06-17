@@ -85,7 +85,7 @@ public class Config {
 								"/client/*/avatar"
 							).permitAll()
 							.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-							.requestMatchers(HttpMethod.PUT, "/role/update-role").permitAll()
+							.requestMatchers(HttpMethod.PUT, "/role/update-role").authenticated()
 							// =========== CLIENT FREELANCER=======
 							.requestMatchers(HttpMethod.POST, "/ekyc/**").hasAnyRole(Role.CLIENT.name(), Role.FREELANCER.name())
 							.requestMatchers(HttpMethod.PUT,  "/ekyc/**", "/freelancer/client/*/freelancer/*/sidebar/*/view").hasAnyRole(Role.CLIENT.name(), Role.FREELANCER.name())

@@ -23,7 +23,7 @@ public class ChooseRoleServiceImpl implements ChooseRoleService{
 
 	@Override
 	@Transactional
-	public void chooseRole(String email, String role) {
+	public Register chooseRole(String email, String role) {
 		 Register user = registerRepository.findByEmail(email)
 				 						   .orElseThrow(() -> new RuntimeException("NOT FOUND" + role));
 		 
@@ -31,11 +31,14 @@ public class ChooseRoleServiceImpl implements ChooseRoleService{
 		 
 		 try {
 			 Role roles = Role.valueOf(role.toUpperCase());
+			 if (roles == Role.ADMIN) {
+				 throw new RuntimeException("Invalid role: ADMIN. Valid roles are: CLIENT, FREELANCER");
+			 }
 			 user.setRole(roles);
 			 registerRepository.save(user);
 			 
 			 createRoleEntity(user);
-			 
+			 return user;
 		 } catch(IllegalArgumentException e) {
 			 throw new RuntimeException("Invalid role: " + role + ". Valid roles are: CLIENT, FREELANCER, ADMIN");
 		 }
@@ -46,6 +49,9 @@ public class ChooseRoleServiceImpl implements ChooseRoleService{
 	public void createRoleEntity(Register registeredUser) {
 		 switch(registeredUser.getRole()) {
 			 case FREELANCER:
+				 if (freelancerRepository.findByRegister_Id(registeredUser.getId()).isPresent()) {
+					 break;
+				 }
 				 Freelancer freelancer = new Freelancer();
 				 freelancer.setRegister(registeredUser);
 				 freelancer.setEmail(registeredUser.getEmail());
@@ -54,6 +60,9 @@ public class ChooseRoleServiceImpl implements ChooseRoleService{
 				 freelancerRepository.save(freelancer);
 				 break;
 			 case CLIENT:
+				 if (clientRepository.findByRegister_Id(registeredUser.getId()).isPresent()) {
+					 break;
+				 }
 				 Client client = new Client();
 				 client.setRegister(registeredUser);
 				 client.setEmail(registeredUser.getEmail());
