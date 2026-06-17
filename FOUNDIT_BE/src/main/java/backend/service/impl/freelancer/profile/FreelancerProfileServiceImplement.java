@@ -19,6 +19,7 @@ import backend.model.authentication.Freelancer;
 import backend.model.freelancer.gig.Gig;
 import backend.model.freelancer.gig.GigStatus;
 import backend.model.freelancer.profile.FreelancerProfile;
+import backend.model.freelancer.setting.Setting;
 import backend.model.freelancer_client.Project;
 import backend.repository.authentication.FreelancerRepository;
 import backend.repository.freelancer.profile.FreelancerProfileRepository;
@@ -283,8 +284,11 @@ public class FreelancerProfileServiceImplement implements FreelancerProfileServi
 			            .toList()
 	    		);
 	    dto.setProfilePictureData(viewProfileByClient.getProfilePictureData());
-	    dto.setProfilePictureName(viewProfileByClient.getProfilePictureName());
-	    dto.setProfilePictureType(viewProfileByClient.getProfilePictureType());
+	    dto.setProfilePictureName(resolveFreelancerAvatarName(freelancer, viewProfileByClient));
+	    dto.setProfilePictureType(resolveFreelancerAvatarType(freelancer, viewProfileByClient));
+	    if (hasFreelancerAvatar(freelancer, viewProfileByClient)) {
+	    	dto.setProfilePictureUrl("/freelancer/" + freelancer.getId() + "/avatar");
+	    }
 		return dto;
 	}
 	
@@ -373,8 +377,11 @@ public class FreelancerProfileServiceImplement implements FreelancerProfileServi
 		            .toList()
 	    		);
 	    dto.setProfilePictureData(profile.getProfilePictureData());
-	    dto.setProfilePictureName(profile.getProfilePictureName());
-	    dto.setProfilePictureType(profile.getProfilePictureType());
+	    dto.setProfilePictureName(resolveFreelancerAvatarName(freelancer, profile));
+	    dto.setProfilePictureType(resolveFreelancerAvatarType(freelancer, profile));
+	    if (hasFreelancerAvatar(freelancer, profile)) {
+	    	dto.setProfilePictureUrl("/freelancer/" + freelancer.getId() + "/avatar");
+	    }
 		return dto;
 	}
 	
@@ -460,11 +467,11 @@ public class FreelancerProfileServiceImplement implements FreelancerProfileServi
 	                dto.setSkill(profile.getSkills());
 
 	            dto.setProfilePictureData(null);
-	            if (profile.getProfilePictureData() != null && profile.getProfilePictureData().length > 0) {
+	            if (hasFreelancerAvatar(freelancer, profile)) {
 	                dto.setProfilePictureUrl("/freelancer/" + freelancer.getId() + "/avatar");
 	            }
-	            dto.setProfilePictureName(profile.getProfilePictureName());
-	                dto.setProfilePictureType(profile.getProfilePictureType());
+	            dto.setProfilePictureName(resolveFreelancerAvatarName(freelancer, profile));
+	                dto.setProfilePictureType(resolveFreelancerAvatarType(freelancer, profile));
 	                
 	                // Active services
 	            dto.setActiveService(activeServices(profile).stream()
@@ -583,6 +590,33 @@ public class FreelancerProfileServiceImplement implements FreelancerProfileServi
 				.mapToDouble(Double::doubleValue)
 				.average()
 				.orElse(0.0);
+	}
+
+	private boolean hasFreelancerAvatar(Freelancer freelancer, FreelancerProfile profile) {
+		if (profile != null && profile.getProfilePictureData() != null && profile.getProfilePictureData().length > 0) {
+			return true;
+		}
+
+		Setting setting = freelancer != null ? freelancer.getSetting() : null;
+		return setting != null && setting.getAvatarProfileData() != null && setting.getAvatarProfileData().length > 0;
+	}
+
+	private String resolveFreelancerAvatarName(Freelancer freelancer, FreelancerProfile profile) {
+		if (profile != null && profile.getProfilePictureName() != null && !profile.getProfilePictureName().isBlank()) {
+			return profile.getProfilePictureName();
+		}
+
+		Setting setting = freelancer != null ? freelancer.getSetting() : null;
+		return setting != null ? setting.getAvatarProfileName() : null;
+	}
+
+	private String resolveFreelancerAvatarType(Freelancer freelancer, FreelancerProfile profile) {
+		if (profile != null && profile.getProfilePictureType() != null && !profile.getProfilePictureType().isBlank()) {
+			return profile.getProfilePictureType();
+		}
+
+		Setting setting = freelancer != null ? freelancer.getSetting() : null;
+		return setting != null ? setting.getAvatarProfileType() : null;
 	}
 
 }

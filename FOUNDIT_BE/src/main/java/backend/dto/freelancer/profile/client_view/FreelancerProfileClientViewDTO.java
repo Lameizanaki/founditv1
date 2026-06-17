@@ -21,6 +21,7 @@ public class FreelancerProfileClientViewDTO {
 	
 	@Lob
 	private byte[] profilePictureData;
+	private String profilePictureUrl;
 	private String profilePictureType;
 	private String profilePictureName;
 }

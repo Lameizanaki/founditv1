@@ -102,7 +102,7 @@ public class FreelancerRightSideBarController {
 	    Freelancer freelancer = freelancerRepository.findByEmail(email)
 	            .orElseThrow(() -> new RuntimeException("Freelancer not found"));
 		
-		FreelancerRightSideBar freelancerRightSideBar = freelancerRightSideBarService.getByFreelancerRightSideBar(freelancer.getId());
+		FreelancerRightSideBar freelancerRightSideBar = freelancerRightSideBarService.me(freelancer.getId());
 		
 		return ResponseEntity.ok(freelancerRightSideBar);
 	}

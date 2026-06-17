@@ -27,6 +27,7 @@ import backend.exception.ErrorResponseException;
 import backend.mapper.FreelancerProfileMapper;
 import backend.model.authentication.Freelancer;
 import backend.model.freelancer.profile.FreelancerProfile;
+import backend.model.freelancer.setting.Setting;
 import backend.repository.authentication.FreelancerRepository;
 import backend.service.freelancer.profile.FreelancerProfileService;
 import jakarta.transaction.Transactional;
@@ -190,18 +191,27 @@ public class FreelancerProfileController {
 	public ResponseEntity<byte[]> getFreelancerAvatar(@PathVariable Long id) {
 		Freelancer freelancer = freelancerProfileService.getByFreelancer(id);
 		FreelancerProfile profile = freelancer.getFreelancerProfiles();
-		if (profile == null || profile.getProfilePictureData() == null || profile.getProfilePictureData().length == 0) {
+		Setting setting = freelancer.getSetting();
+		byte[] avatarData = profile != null ? profile.getProfilePictureData() : null;
+		String contentType = profile != null ? profile.getProfilePictureType() : null;
+
+		if ((avatarData == null || avatarData.length == 0) && setting != null) {
+			avatarData = setting.getAvatarProfileData();
+			contentType = setting.getAvatarProfileType();
+		}
+
+		if (avatarData == null || avatarData.length == 0) {
 			return ResponseEntity.notFound().build();
 		}
 
-		String contentType = profile.getProfilePictureType() != null && !profile.getProfilePictureType().isBlank()
-				? profile.getProfilePictureType()
+		String resolvedContentType = contentType != null && !contentType.isBlank()
+				? contentType
 				: MediaType.IMAGE_JPEG_VALUE;
 
 		return ResponseEntity.ok()
-				.contentType(MediaType.parseMediaType(contentType))
+				.contentType(MediaType.parseMediaType(resolvedContentType))
 				.header(HttpHeaders.CACHE_CONTROL, "private, max-age=300")
-				.body(profile.getProfilePictureData());
+				.body(avatarData);
 	}
 	
 	// Freelancer View

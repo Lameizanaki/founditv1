@@ -25,6 +25,7 @@ import backend.model.chat.ChatMessage;
 import backend.model.chat.ChatRoom;
 import backend.model.client.profile.Profile;
 import backend.model.freelancer.profile.FreelancerProfile;
+import backend.model.freelancer.setting.Setting;
 import backend.repository.authentication.ClientRepository;
 import backend.repository.authentication.FreelancerRepository;
 import backend.repository.authentication.RegisterRepository;
@@ -220,18 +221,29 @@ public class ChatServiceImpl implements ChatService {
                 .orElseThrow(() -> new RuntimeException("Freelancer not found"));
 
         FreelancerProfile profile = freelancer.getFreelancerProfiles();
-        if (profile == null || profile.getProfilePictureData() == null || profile.getProfilePictureData().length == 0) {
+        Setting setting = freelancer.getSetting();
+        byte[] avatarData = profile != null ? profile.getProfilePictureData() : null;
+        String avatarName = profile != null ? profile.getProfilePictureName() : null;
+        String avatarType = profile != null ? profile.getProfilePictureType() : null;
+
+        if ((avatarData == null || avatarData.length == 0) && setting != null) {
+            avatarData = setting.getAvatarProfileData();
+            avatarName = setting.getAvatarProfileName();
+            avatarType = setting.getAvatarProfileType();
+        }
+
+        if (avatarData == null || avatarData.length == 0) {
             throw new RuntimeException("Freelancer avatar not found");
         }
 
-        String fileName = profile.getProfilePictureName() == null || profile.getProfilePictureName().isBlank()
+        String fileName = avatarName == null || avatarName.isBlank()
                 ? "freelancer-avatar"
-                : profile.getProfilePictureName();
-        String contentType = profile.getProfilePictureType() == null || profile.getProfilePictureType().isBlank()
+                : avatarName;
+        String contentType = avatarType == null || avatarType.isBlank()
                 ? "image/jpeg"
-                : profile.getProfilePictureType();
+                : avatarType;
 
-        return new ChatAttachmentResponse(fileName, contentType, profile.getProfilePictureData());
+        return new ChatAttachmentResponse(fileName, contentType, avatarData);
     }
 
     @Override
