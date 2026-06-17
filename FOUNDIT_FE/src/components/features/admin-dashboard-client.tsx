@@ -219,7 +219,7 @@ export function AdminDashboardClient() {
     },
     {
       title: "Total Earnings",
-      value: formatMoney(dashboard.totalRevenue),
+      value: formatMoney(0),
       badge: "Paid",
       tone: "bg-[#f0fdf4] text-[#16a34a]",
     },

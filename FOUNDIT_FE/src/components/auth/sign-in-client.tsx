@@ -10,7 +10,7 @@ import { toErrorMessage } from "@/lib/api";
 
 export function SignInClient({ nextPath }: { nextPath: string | null }) {
   const router = useRouter();
-  const { continueWithGoogle, signIn } = useAuth();
+  const { continueWithGoogle, isGoogleAuthEnabled, signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -67,25 +67,39 @@ export function SignInClient({ nextPath }: { nextPath: string | null }) {
               </h2>
               <p className="mb-8 text-[18px] text-gray-500">Sign in to continue</p>
 
-              <div className="space-y-3">
-                <button
-                  className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 transition hover:bg-gray-50"
-                  disabled={isSubmitting || isGoogleLoading}
-                  onClick={() => void handleGoogleContinue()}
-                  type="button"
-                >
-                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-gray-300 text-[11px] font-bold text-[#4285F4]">
-                    G
-                  </span>
-                  <span>{isGoogleLoading ? "Redirecting..." : "Continue with Google"}</span>
-                </button>
-              </div>
+              {isGoogleAuthEnabled ? (
+                <div className="space-y-3">
+                  <button
+                    className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                    disabled={isSubmitting || isGoogleLoading}
+                    onClick={() => void handleGoogleContinue()}
+                    type="button"
+                  >
+                    <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-gray-300 text-[11px] font-bold text-[#4285F4]">
+                      G
+                    </span>
+                    <span>{isGoogleLoading ? "Redirecting..." : "Continue with Google"}</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="rounded-xl border border-[#dbeafe] bg-[#eff6ff] px-4 py-3 text-sm text-[#1d4ed8]">
+                  Google sign-in is unavailable in this deployment. Use email and password instead.
+                </div>
+              )}
 
-              <div className="my-7 flex items-center gap-4">
-                <div className="h-px flex-1 bg-gray-200" />
-                <span className="text-sm text-gray-400">or use email</span>
-                <div className="h-px flex-1 bg-gray-200" />
-              </div>
+              {isGoogleAuthEnabled ? (
+                <div className="my-7 flex items-center gap-4">
+                  <div className="h-px flex-1 bg-gray-200" />
+                  <span className="text-sm text-gray-400">or use email</span>
+                  <div className="h-px flex-1 bg-gray-200" />
+                </div>
+              ) : (
+                <div className="my-7 flex items-center gap-4">
+                  <div className="h-px flex-1 bg-gray-200" />
+                  <span className="text-sm text-gray-400">email sign in</span>
+                  <div className="h-px flex-1 bg-gray-200" />
+                </div>
+              )}
 
               <form className="space-y-5" onSubmit={onSubmit}>
                 {error ? (

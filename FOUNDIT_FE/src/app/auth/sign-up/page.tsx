@@ -12,7 +12,7 @@ const roles: Array<Exclude<AppRole, "ADMIN">> = ["CLIENT", "FREELANCER"];
 
 export default function SignUpPage() {
   const router = useRouter();
-  const { continueWithGoogle, signUp } = useAuth();
+  const { continueWithGoogle, isGoogleAuthEnabled, signUp } = useAuth();
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -84,25 +84,40 @@ export default function SignUpPage() {
               </h1>
               <p className="mt-2 text-[18px] text-[#7b7b7b]">Sign Up With FoundIT</p>
 
-              <div className="mt-8 space-y-3">
-                <button
-                  className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-[#e3e3e3] bg-white text-[14px] font-medium text-[#222] transition hover:bg-gray-50"
-                  disabled={isSubmitting || isGoogleLoading}
-                  onClick={() => void handleGoogleContinue()}
-                  type="button"
-                >
-                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-gray-300 text-[11px] font-bold text-[#4285F4]">
-                    G
-                  </span>
-                  <span>{isGoogleLoading ? "Redirecting..." : "Continue with Google"}</span>
-                </button>
-              </div>
+              {isGoogleAuthEnabled ? (
+                <>
+                  <div className="mt-8 space-y-3">
+                    <button
+                      className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-[#e3e3e3] bg-white text-[14px] font-medium text-[#222] transition hover:bg-gray-50"
+                      disabled={isSubmitting || isGoogleLoading}
+                      onClick={() => void handleGoogleContinue()}
+                      type="button"
+                    >
+                      <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-gray-300 text-[11px] font-bold text-[#4285F4]">
+                        G
+                      </span>
+                      <span>{isGoogleLoading ? "Redirecting..." : "Continue with Google"}</span>
+                    </button>
+                  </div>
 
-              <div className="my-6 flex items-center gap-4">
-                <div className="h-px flex-1 bg-[#e5e5e5]" />
-                <span className="text-[13px] text-[#8a8a8a]">or use email</span>
-                <div className="h-px flex-1 bg-[#e5e5e5]" />
-              </div>
+                  <div className="my-6 flex items-center gap-4">
+                    <div className="h-px flex-1 bg-[#e5e5e5]" />
+                    <span className="text-[13px] text-[#8a8a8a]">or use email</span>
+                    <div className="h-px flex-1 bg-[#e5e5e5]" />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="mt-8 rounded-xl border border-[#dbeafe] bg-[#eff6ff] px-4 py-3 text-[14px] text-[#1d4ed8]">
+                    Google sign-up is unavailable in this deployment. Create your account with email instead.
+                  </div>
+                  <div className="my-6 flex items-center gap-4">
+                    <div className="h-px flex-1 bg-[#e5e5e5]" />
+                    <span className="text-[13px] text-[#8a8a8a]">email sign up</span>
+                    <div className="h-px flex-1 bg-[#e5e5e5]" />
+                  </div>
+                </>
+              )}
 
               <form className="space-y-4" onSubmit={onSubmit}>
                 {error ? (

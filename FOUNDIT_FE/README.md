@@ -33,6 +33,7 @@ Create `.env.local` in `FOUNDIT_FE`:
 ```bash
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8085
 NEXT_PUBLIC_WS_BASE_URL=http://localhost:8085/ws
+NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=false
 ```
 
 For production, point these to your deployed Spring Boot backend.
@@ -59,10 +60,11 @@ For production, point these to your deployed Spring Boot backend.
 ## Production checklist
 
 1. Set `NEXT_PUBLIC_API_BASE_URL` and `NEXT_PUBLIC_WS_BASE_URL` to the public backend URL.
-2. Set Spring `FRONTEND_URL` to the public frontend URL.
-3. Replace all default secret values with real environment variables.
-4. Ensure PostgreSQL, mail, Google OAuth, and eKYC service URLs are reachable from production.
-5. Build and start:
+2. Set `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=true` only when backend Google OAuth is fully configured.
+3. Set Spring `FRONTEND_URL` to the public frontend URL.
+4. Replace all default secret values with real environment variables.
+5. Ensure PostgreSQL, mail, Google OAuth, and eKYC service URLs are reachable from production.
+6. Build and start:
 
 ```bash
 cd FOUNDIT_FE

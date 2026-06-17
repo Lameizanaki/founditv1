@@ -25,6 +25,7 @@ import type {
 } from "@/types/auth";
 
 interface AuthContextValue {
+  isGoogleAuthEnabled: boolean;
   status: AuthStatus;
   session: AuthSession | null;
   signIn: (payload: SignInPayload) => Promise<AuthSession>;
@@ -137,10 +138,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const continueWithGoogle = () => {
+    if (!appConfig.isGoogleAuthEnabled) {
+      throw new Error("Google sign-in is not configured for this environment.");
+    }
     window.location.href = `${appConfig.apiBaseUrl}/oauth2/authorization/google`;
   };
 
   const value: AuthContextValue = {
+    isGoogleAuthEnabled: appConfig.isGoogleAuthEnabled,
     status,
     session,
     signIn,
