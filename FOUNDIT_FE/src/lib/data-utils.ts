@@ -1,5 +1,7 @@
 "use client";
 
+import { appConfig } from "@/lib/config";
+
 export const asArray = (value: unknown): unknown[] => (Array.isArray(value) ? value : []);
 
 export const asRecord = (value: unknown): Record<string, unknown> =>
@@ -77,6 +79,22 @@ export const arrayFromField = (value: unknown) =>
     .map((item) => toText(item))
     .filter(Boolean);
 
+const resolveImageUrl = (value: string) => {
+  if (!value) {
+    return value;
+  }
+
+  if (value.startsWith("http://") || value.startsWith("https://") || value.startsWith("data:")) {
+    return value;
+  }
+
+  if (value.startsWith("/")) {
+    return `${appConfig.apiBaseUrl}${value}`;
+  }
+
+  return value;
+};
+
 export const buildImageSource = ({
   data,
   contentType,
@@ -90,7 +108,7 @@ export const buildImageSource = ({
 }) => {
   const rawUrl = toText(url);
   if (rawUrl) {
-    return rawUrl;
+    return resolveImageUrl(rawUrl);
   }
 
   if (typeof data === "string" && data.trim()) {
@@ -101,7 +119,7 @@ export const buildImageSource = ({
       imageData.startsWith("https://") ||
       imageData.startsWith("/")
     ) {
-      return imageData;
+      return resolveImageUrl(imageData);
     }
 
     return `data:${toText(contentType, "image/jpeg")};base64,${imageData}`;
